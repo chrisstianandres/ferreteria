@@ -1,6 +1,7 @@
-from django import forms
 from datetime import *
-from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput
+
+from django import forms
+from django.forms import TextInput, EmailInput
 
 from .models import Cliente
 
@@ -17,17 +18,19 @@ class ClienteForm(forms.ModelForm):
             })
 
             self.fields['nombres'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese sus dos nombres', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese sus dos nombres'})
             self.fields['apellidos'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese sus dos Apellidos', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese sus dos Apellidos'})
             self.fields['cedula'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese un numero de cedula', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese un numero de cedula'})
             self.fields['correo'].widget = EmailInput(
-                attrs={'placeholder': 'abc@correo.com', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'abc@correo.com'})
             self.fields['direccion'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese una direccion (Maximo 50 caracteres)', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese una direccion (Maximo 50 caracteres)'})
             self.fields['telefono'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese numero de telefono', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese numero de telefono'})
+            self.fields['celular'].widget = TextInput(
+                attrs={'placeholder': 'Ingrese numero de telefono'})
         # habilitar, desabilitar, y mas
 
     class Meta:
@@ -38,6 +41,7 @@ class ClienteForm(forms.ModelForm):
                   'correo',
                   'sexo',
                   'telefono',
+                  'celular',
                   'direccion'
                   ]
         labels = {
@@ -46,7 +50,8 @@ class ClienteForm(forms.ModelForm):
             'cedula': 'N° de cedula',
             'correo': 'Correo',
             'sexo': 'Genero',
-            'Telefono': 'Celular',
+            'telefono': 'Telefono',
+            'celular': 'Celular',
             'Direccion': 'direccion'
 
         }
@@ -57,5 +62,6 @@ class ClienteForm(forms.ModelForm):
             'sexo': forms.Select(attrs={'class': 'selectpicker', 'data-width': 'fit'}),
             'correo': forms.EmailInput(),
             'telefono': forms.TextInput(),
+            'celular': forms.TextInput(),
             'direccion': forms.TextInput()
         }

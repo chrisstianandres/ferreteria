@@ -1,6 +1,5 @@
 from django import forms
-from datetime import *
-from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput, Textarea
+from django.forms import TextInput, Textarea
 
 from .models import SitioWeb
 
@@ -15,13 +14,13 @@ class SitiowebForm(forms.ModelForm):
             })
 
             self.fields['titulo'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el titulo del sitio', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese el titulo del sitio'})
             self.fields['mision'].widget = Textarea(
-                attrs={'placeholder': 'Ingrese la mision de la empresa', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese la mision de la empresa'})
             self.fields['vision'].widget = Textarea(
-                attrs={'placeholder': 'Ingrese la vision de la empresa', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese la vision de la empresa'})
             self.fields['mapa'].widget = Textarea(
-                attrs={'placeholder': 'Copia y Pega un mapa de google', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Copia y Pega un mapa de google'})
         # habilitar, desabilitar, y mas
 
     class Meta:

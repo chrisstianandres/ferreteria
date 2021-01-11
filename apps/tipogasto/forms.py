@@ -1,6 +1,5 @@
 from django import forms
-from datetime import *
-from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput
+from django.forms import TextInput
 
 from .models import Tipo_gasto
 
@@ -15,7 +14,7 @@ class TipogastoForm(forms.ModelForm):
             })
 
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el nombre del Tipo de Gasto', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese el nombre del Tipo de Gasto'})
         # habilitar, desabilitar, y mas
 
     class Meta:

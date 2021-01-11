@@ -15,8 +15,7 @@ from apps.backEnd import nombre_empresa
 from apps.compra.forms import CompraForm, Detalle_CompraForm
 from apps.compra.models import Compra, Detalle_compra
 from apps.empresa.models import Empresa
-from apps.inventario_material.models import Inventario_material
-from apps.material.models import Material
+from apps.inventario.models import Inventario
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.producto.models import Producto
 from datetime import date
@@ -37,7 +36,7 @@ empresa = nombre_empresa()
 
 class lista(ValidatePermissionRequiredMixin, ListView):
     model = Compra
-    template_name = 'front-end/compra/compra_list.html'
+    template_name = 'front-end/compra/list.html'
     permission_required = 'compra.view_compra'
 
     @csrf_exempt
@@ -91,7 +90,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Compra
-    template_name = 'front-end/compra/compra_form.html'
+    template_name = 'front-end/compra/form.html'
     permission_required = 'compra.add_compra'
 
     @method_decorator(csrf_exempt)
@@ -119,20 +118,20 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         for i in datos['productos']:
                             dv = Detalle_compra()
                             dv.compra_id = c.id
-                            dv.material_id = i['id']
+                            dv.producto_id = i['id']
                             dv.cantidad = int(i['cantidad'])
                             dv.subtotal = float(i['subtotal'])
-                            x = Material.objects.get(pk=i['id'])
+                            x = Producto.objects.get(pk=i['id'])
                             dv.p_compra_actual = float(x.p_compra)
-                            pb = Producto_base.objects.get(material=x.id)
+                            pb = Producto_base.objects.get(producto=x.id)
                             pb.stock = pb.stock + int(i['cantidad'])
                             pb.save()
                             x.save()
                             dv.save()
                             for p in range(0, i['cantidad']):
-                                inv = Inventario_material()
+                                inv = Inventario()
                                 inv.compra_id = c.id
-                                inv.material_id = x.id
+                                inv.producto_id = x.id
                                 inv.save()
                         data['id'] = c.id
                         data['resp'] = True
@@ -262,18 +261,18 @@ class report(ValidatePermissionRequiredMixin, ListView):
                 start_date = request.POST.get('start_date', '')
                 end_date = request.POST.get('end_date', '')
                 if start_date == '' and end_date == '':
-                    query = Detalle_compra.objects.values('compra__fecha_compra', 'material__producto_base__nombre',
+                    query = Detalle_compra.objects.values('compra__fecha_compra', 'producto__producto_base__nombre',
                                                           'p_compra_actual'). \
                         order_by().annotate(Sum('cantidad')).annotate(Sum('compra__total')).annotate(Sum('subtotal'))
                 else:
-                    query = (Detalle_compra.objects.values('compra__fecha_compra', 'material__producto_base__nombre',
+                    query = (Detalle_compra.objects.values('compra__fecha_compra', 'producto__producto_base__nombre',
                                                            'p_compra_actual').
                         filter(compra__fecha_compra__range=[start_date, end_date]).order_by().annotate(
                         Sum('cantidad'))).annotate(Sum('compra__total'))
                 for p in query:
                     data.append([
                         p['compra__fecha_compra'].strftime("%d/%m/%Y"),
-                        p['material__producto_base__nombre'],
+                        p['producto__producto_base__nombre'],
                         int(p['cantidad__sum']),
                         format(p['p_compra_actual'], '.2f'),
                         format(p['compra__total__sum'], '.2f')])

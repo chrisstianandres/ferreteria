@@ -1,8 +1,8 @@
-from django.conf.urls import url
-from django.urls import path
-from . import views
-from apps.venta.views import *
 from django.contrib.auth.decorators import login_required
+from django.urls import path
+
+from apps.venta.views import *
+from . import views
 
 app_name = 'Venta'
 
@@ -17,5 +17,4 @@ urlpatterns = [
     path('report_total', login_required(report_total.as_view()), name='report_total'),
     path('report_total_pedidos', login_required(report_total_reserva.as_view()), name='report_total_pedidos'),
     path('data_tarjets', login_required(views.data_tarjets), name='data_tarjets'),
-
 ]

@@ -1,8 +1,9 @@
-from django.conf.urls import url
-from django.urls import path
-from . import views
-from apps.producto.views import *
 from django.contrib.auth.decorators import login_required
+from django.urls import path
+
+from apps.producto.views import *
+from . import views
+
 app_name = 'Producto'
 
 urlpatterns = [

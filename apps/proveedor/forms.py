@@ -1,6 +1,7 @@
-from django import forms
 from datetime import *
-from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput
+
+from django import forms
+from django.forms import TextInput, EmailInput
 
 from .models import Proveedor
 
@@ -17,18 +18,15 @@ class ProveedorForm(forms.ModelForm):
             })
 
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese sus dos nombres', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese sus dos nombres'})
             self.fields['num_doc'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese numero de docuemnto', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese numero de docuemnto'})
             self.fields['correo'].widget = EmailInput(
-                attrs={'placeholder': 'abc@correo.com', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'abc@correo.com'})
             self.fields['telefono'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el numero de telefono', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese el numero de telefono'})
             self.fields['direccion'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese una direccion', 'class': 'form-control form-rounded'})
-            # self.fields['sexo'].widget.attrs['class'] = 'selectpicker'
-            # self.fields["fecha_nacimiento"].widget = SelectDateWidget(years=years,
-            #                                                         attrs={'class': 'selectpicker'})
+                attrs={'placeholder': 'Ingrese una direccion'})
         # habilitar, desabilitar, y mas
 
     class Meta:
@@ -47,7 +45,6 @@ class ProveedorForm(forms.ModelForm):
             'correo': 'Correo',
             'telefono': 'Telefono',
             'direccion': 'Direccion'
-
         }
         widgets = {
             'nombre': forms.TextInput(),

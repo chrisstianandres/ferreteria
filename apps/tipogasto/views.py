@@ -1,8 +1,7 @@
 import json
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
@@ -20,7 +19,7 @@ empresa = nombre_empresa()
 
 class lista(ValidatePermissionRequiredMixin, ListView):
     model = Tipo_gasto
-    template_name = 'front-end/tipo_gasto/tipo_gasto_list.html'
+    template_name = 'front-end/tipo_gasto/list.html'
     permission_required = 'tipo_gasto.view_tipo_gasto'
 
     @csrf_exempt
