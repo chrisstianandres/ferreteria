@@ -109,7 +109,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 
 
 def sitio(request):
-    data = {'empresa': empresa, 'sitio': SitioWeb.objects.first(), 'title': empresa.nombre}
+    data = {'empresa': empresa}
     if request.user.is_authenticated:
         data['group'] = request.user.get_tipo_display
     else:
