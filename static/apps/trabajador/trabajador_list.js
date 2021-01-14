@@ -1,5 +1,4 @@
 var logotipo;
-var datatable;
 const toDataURL = url => fetch(url).then(response => response.blob())
     .then(blob => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -8,31 +7,35 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.readAsDataURL(blob)
     }));
 
-toDataURL('/media/imagen.PNG').then(dataUrl => {
+toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
     logotipo = dataUrl;
 });
-
-function datatable_fun() {
-    datatable = $("#datatable").DataTable({
+$(function () {
+    var datatable = $("#datatable").DataTable({
         responsive: true,
         autoWidth: false,
         ajax: {
             url: window.location.pathname,
             type: 'POST',
-            data: {'action': 'list'},
-            dataSrc: ""
+            dataSrc: "",
+            data: {'action': 'list'}
         },
-        columns: [
-            {"data": "full_name_list"},
-            {"data": "cedula"},
-            {"data": "correo"},
-            {"data": "sexo"},
-            {"data": "direccion"},
-            {"data": "celular"},
-            {"data": "id"}
-        ],
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+            searchPanes: {
+                clearMessage: 'Limpiar Filtros',
+                collapse: {
+                    0: 'Filtros de Busqueda',
+                    _: 'Filtros seleccionados (%d)'
+                },
+                title: {
+                    _: 'Filtros seleccionados - %d',
+                    0: 'Ningun Filtro seleccionados',
+                },
+                activeMessage: 'Filtros activos (%d)',
+                emptyPanes: 'No existen suficientes datos para generar filtros :('
+
+            }
         },
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
@@ -42,39 +45,35 @@ function datatable_fun() {
         buttons: {
             dom: {
                 button: {
-                    className: 'btn',
+                    className: '',
 
                 },
                 container: {
-                    className: 'buttons-container'
+                    className: 'buttons-container float-md-right'
                 }
             },
             buttons: [
                 {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel',
-                    className: "btn btn-success btn-space float-right",
+                    text: '<i class="fa fa-file-excel"></i> Excel', className: "btn btn-success my_class",
                     extend: 'excel'
                 },
                 {
                     text: '<i class="fa fa-file-pdf"></i> PDF',
-                    className: 'btn btn-danger btn-space float-right',
+                    className: 'btn btn-danger my_class',
                     extend: 'pdfHtml5',
                     //filename: 'dt_custom_pdf',
                     orientation: 'landscape', //portrait
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     // download: 'open',
-                    exportOptions:
-                        {
-                            columns: [0, 1, 2, 3, 4, 5, 6],
-                            search: 'applied',
-                            order: 'applied'
-                        },
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                        search: 'applied',
+                        order: 'applied'
+                    },
                     customize: function (doc) {
-                        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto",
-                            "Septiembre", "Octubre",
+                        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
                             "Noviembre", "Diciembre"
                         ];
-
                         var date = new Date();
 
                         function formatDateToString(date) {
@@ -90,14 +89,14 @@ function datatable_fun() {
                         }
 
                         var jsDate = formatDateToString(date);
-                        var logo = logotipo;
+
                         //[izquierda, arriba, derecha, abajo]
                         doc.pageMargins = [25, 120, 25, 50];
                         doc.defaultStyle.fontSize = 12;
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logo, width: 300}],
+                                columns: [{alignment: 'center', image: logotipo, width: 300}],
                                 margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
                             }
                         });
@@ -136,103 +135,99 @@ function datatable_fun() {
                             return 4;
                         };
                         doc.content[0].layout = objLayout;
-                        doc.content[1].table.widths = [35, '*', 70, 180, 70, 150, 70];
+                        doc.content[1].table.widths = [35, '*', '*', '*', '*', '*', '*', '*', '*'];
                         doc.styles.tableBodyEven.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center';
                     }
                 },
-
-            ]
+            ],
         },
+        columns: [
+            {"data": "username"},
+            {"data": "full_name"},
+            {"data": "cedula"},
+            {"data": "celular"},
+            {"data": "telefono"},
+            {"data": "direccion"},
+            {"data": "sexo"},
+            {"data": "avatar"},
+            {"data": "estado"},
+            {"data": "id"},
+        ],
         columnDefs: [
             {
-                targets: '_all',
+                targets: [-2],
                 class: 'text-center',
+                orderable: false,
+                render: function (data, type, row) {
+                    return '<span>' + data + '</span>';
+                }
+            },
+            {
+                targets: [-3],
+                class: 'text-center',
+                orderable: false,
+                render: function (data, type, row) {
+                    return '<img src="' + data + '" width="50" height="50" class="img-circle elevation-2" alt="User Image">';
+                }
             },
             {
                 targets: [-1],
                 class: 'text-center',
-                orderable: false,
+                width: '10%',
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" type="button" class="btn btn-warning btn-sm" rel="edit" ' +
+                    var edit = '<a style="color: white" href="/user/editar/' + data + '" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
                         'data-toggle="tooltip" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
-                    var del = '<a type="button" class="btn btn-danger btn-sm"  style="color: white" rel="del" ' +
-                        'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
-                    return edit + del
-
+                    var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
+                        'data-toggle="tooltip" title="Eliminar"><i class="fa fa-user-times"></i></a>' + ' ';
+                    var estado = '<a type="button" class="btn btn-primary btn-xs" style="color: white" ' +
+                        'data-toggle="tooltip" title="Gestionar Estado" rel="estado"> <i class="fa fa-user-cog"></i></a>' + ' ';
+                    return edit + estado + del;
                 }
             },
         ],
+        createdRow: function (row, data, dataIndex) {
+            if (data.estado === 'ACTIVO') {
+                $('td', row).eq(8).find('span').addClass('badge badge-pill badge-success');
+            } else if (data.estado === 'INACTIVO') {
+                $('td', row).eq(8).find('span').addClass('badge badge-pill badge-danger');
+            }
 
+        }
     });
-}
 
-$(function () {
-    var action = '';
-    var pk = '';
-    datatable_fun();
     $('#datatable tbody')
+        .on('click', 'a[rel="estado"]', function () {
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'estado'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea cambiar el estado de este trabajador?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito en la actualizacion', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    })
+                });
+        })
         .on('click', 'a[rel="del"]', function () {
             action = 'delete';
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var parametros = {'id': data.id};
+            var parametros = {'id': data.id, 'action': 'delete'};
             parametros['action'] = action;
             save_estado('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea eliminar este cliente?', parametros,
+                window.location.pathname, 'Esta seguro que desea eliminar este usuario?', parametros,
                 function () {
-                    menssaje_ok('Exito!', 'Exito al eliminar este cliente!', 'far fa-smile-wink', function () {
+                    menssaje_ok('Exito!', 'Exito al eliminar este usuario!', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false)
                     })
                 })
-        })
-        .on('click', 'a[rel="edit"]', function () {
-            $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
-            var tr = datatable.cell($(this).closest('td, li')).index();
-            var data = datatable.row(tr.row).data();
-            var sexo = '1';
-            if (data.sexo==='Femenino'){
-                sexo = '0';
-            }
-            $('input[name="nombres"]').val(data.nombres);
-            $('input[name="apellidos"]').val(data.apellidos);
-            $('input[name="cedula"]').val(data.cedula).attr('readonly', true);
-            $('input[name="correo"]').val(data.correo);
-            $('select[name="sexo"]').val(sexo);
-            $('input[name="telefono"]').val(data.telefono);
-            $('input[name="celular"]').val(data.celular);
-            $('input[name="direccion"]').val(data.direccion);
-            mostrar();
-            action = 'edit';
-            pk = data.id;
         });
-    //boton agregar cliente
+
     $('#nuevo').on('click', function () {
-        action = 'add';
-        pk = '';
-        reset();
-        $('input[name="cedula"]').attr('readonly', false);
-        mostrar();
-    });
+            window.location.href = '/user/nuevo'
 
 
-    //col-xl-4 col-lg-5
-
-    //enviar formulario de nuevo cliente
-    $('#form').on('submit', function (e) {
-        e.preventDefault();
-        var parametros = new FormData(this);
-        parametros.append('action', action);
-        parametros.append('id', pk);
-        var isvalid = $(this).valid();
-        if (isvalid) {
-            save_with_ajax2('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
-                function (response) {
-                    menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
-                    ocultar();
-                    });
-                });
-        }
-    });
+    })
 });
+

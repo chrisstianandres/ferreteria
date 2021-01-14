@@ -1,5 +1,4 @@
 var logotipo;
-var datatable;
 const toDataURL = url => fetch(url).then(response => response.blob())
     .then(blob => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -8,12 +7,13 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.readAsDataURL(blob)
     }));
 
-toDataURL('/media/imagen.PNG').then(dataUrl => {
+toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
     logotipo = dataUrl;
 });
-
-function datatable_fun() {
-    datatable = $("#datatable").DataTable({
+$(function () {
+    var action = '';
+    var pk = '';
+    var datatable = $("#datatable").DataTable({
         responsive: true,
         autoWidth: false,
         ajax: {
@@ -23,58 +23,65 @@ function datatable_fun() {
             dataSrc: ""
         },
         columns: [
-            {"data": "full_name_list"},
-            {"data": "cedula"},
+            {"data": "id"},
+            {"data": "nombre"},
+            {"data": "tipo"},
+            {"data": "num_doc"},
             {"data": "correo"},
-            {"data": "sexo"},
+            {"data": "telefono"},
             {"data": "direccion"},
-            {"data": "celular"},
             {"data": "id"}
         ],
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+            searchPanes: {
+                clearMessage: 'Limpiar Filtros',
+                collapse: {
+                    0: 'Filtros de Busqueda',
+                    _: 'Filtros seleccionados (%d)'
+                },
+                title: {
+                    _: 'Filtros seleccionados - %d',
+                    0: 'Ningun Filtro seleccionados',
+                },
+                activeMessage: 'Filtros activos (%d)',
+                emptyPanes: 'No existen suficientes datos para generar filtros :('
+
+            }
         },
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
-            "<'row'<'col-sm-12 col-md-12'f>>" +
+            "<'row'<'col-sm-12 col-md-12'f>>"+
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-        buttons: {
+         buttons: {
             dom: {
                 button: {
-                    className: 'btn',
+                    className: '',
 
                 },
                 container: {
-                    className: 'buttons-container'
+                    className: 'float-md-right'
                 }
             },
             buttons: [
                 {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel',
-                    className: "btn btn-success btn-space float-right",
-                    extend: 'excel'
-                },
-                {
-                    text: '<i class="fa fa-file-pdf"></i> PDF',
-                    className: 'btn btn-danger btn-space float-right',
+                    text: '<i class="fa fa-file-pdf"></i> Reporte PDF',
+                    className: 'btn btn-danger btn-space',
                     extend: 'pdfHtml5',
                     //filename: 'dt_custom_pdf',
                     orientation: 'landscape', //portrait
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
-                    // download: 'open',
-                    exportOptions:
-                        {
-                            columns: [0, 1, 2, 3, 4, 5, 6],
-                            search: 'applied',
-                            order: 'applied'
-                        },
+                    download: 'open',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6],
+                        search: 'applied',
+                        order: 'applied'
+                    },
                     customize: function (doc) {
-                        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto",
-                            "Septiembre", "Octubre",
+                        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
                             "Noviembre", "Diciembre"
                         ];
-
                         var date = new Date();
 
                         function formatDateToString(date) {
@@ -90,14 +97,13 @@ function datatable_fun() {
                         }
 
                         var jsDate = formatDateToString(date);
-                        var logo = logotipo;
                         //[izquierda, arriba, derecha, abajo]
                         doc.pageMargins = [25, 120, 25, 50];
                         doc.defaultStyle.fontSize = 12;
                         doc.styles.tableHeader.fontSize = 14;
                         doc['header'] = (function () {
                             return {
-                                columns: [{alignment: 'center', image: logo, width: 300}],
+                                columns: [{alignment: 'center', image: logotipo, width: 300}],
                                 margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
                             }
                         });
@@ -136,27 +142,27 @@ function datatable_fun() {
                             return 4;
                         };
                         doc.content[0].layout = objLayout;
-                        doc.content[1].table.widths = [35, '*', 70, 180, 70, 150, 70];
+                        doc.content[1].table.widths = [35, '*', 55, 90, 180, 70, 150];
                         doc.styles.tableBodyEven.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center';
                     }
                 },
-
+                {
+                    text: '<i class="fa fa-file-excel"></i> Reporte Excel',
+                    className: "btn btn-success btn-space float-right",
+                    extend: 'excel'
+                }
             ]
         },
         columnDefs: [
-            {
-                targets: '_all',
-                class: 'text-center',
-            },
             {
                 targets: [-1],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" type="button" class="btn btn-warning btn-sm" rel="edit" ' +
+                    var edit = '<a style="color: white" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
                         'data-toggle="tooltip" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
-                    var del = '<a type="button" class="btn btn-danger btn-sm"  style="color: white" rel="del" ' +
+                    var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
                         'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
                     return edit + del
 
@@ -165,12 +171,6 @@ function datatable_fun() {
         ],
 
     });
-}
-
-$(function () {
-    var action = '';
-    var pk = '';
-    datatable_fun();
     $('#datatable tbody')
         .on('click', 'a[rel="del"]', function () {
             action = 'delete';
@@ -179,9 +179,9 @@ $(function () {
             var parametros = {'id': data.id};
             parametros['action'] = action;
             save_estado('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea eliminar este cliente?', parametros,
+                '/proveedor/nuevo', 'Esta seguro que desea eliminar este proveedor?', parametros,
                 function () {
-                    menssaje_ok('Exito!', 'Exito al eliminar este cliente!', 'far fa-smile-wink', function () {
+                    menssaje_ok('Exito!', 'Exito al eliminar este proveedor!', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false)
                     })
                 })
@@ -190,47 +190,44 @@ $(function () {
             $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var sexo = '1';
-            if (data.sexo==='Femenino'){
-                sexo = '0';
-            }
-            $('input[name="nombres"]').val(data.nombres);
-            $('input[name="apellidos"]').val(data.apellidos);
-            $('input[name="cedula"]').val(data.cedula).attr('readonly', true);
+            $('input[name="nombre"]').val(data.nombre);
+            $('select[name="tipo"]').val(data.tipo_val).prop('disabled', true);
+            $('input[name="num_doc"]').val(data.num_doc).attr('readonly', true);
             $('input[name="correo"]').val(data.correo);
-            $('select[name="sexo"]').val(sexo);
             $('input[name="telefono"]').val(data.telefono);
-            $('input[name="celular"]').val(data.celular);
             $('input[name="direccion"]').val(data.direccion);
-            mostrar();
+            $('#Modal').modal('show');
             action = 'edit';
             pk = data.id;
         });
-    //boton agregar cliente
+
+
+    //boton agregar proveedor
     $('#nuevo').on('click', function () {
+        $('#exampleModalLabel').html('<i class="fas fa-plus"></i>&nbsp;Nuevo registro de un Proveedor ');
+        $('input[name="num_doc"]').attr('readonly', false);
+        $('select[name="tipo"]').attr('disabled', false);
+        $('#Modal').modal('show');
         action = 'add';
         pk = '';
-        reset();
-        $('input[name="cedula"]').attr('readonly', false);
-        mostrar();
     });
-
-
-    //col-xl-4 col-lg-5
 
     //enviar formulario de nuevo cliente
     $('#form').on('submit', function (e) {
         e.preventDefault();
+        $('select[name="tipo"]').attr('disabled', false);
         var parametros = new FormData(this);
         parametros.append('action', action);
         parametros.append('id', pk);
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
+                '/proveedor/nuevo', 'Esta seguro que desea guardar este proveedor?', parametros,
                 function (response) {
-                    menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
-                    ocultar();
+                    menssaje_ok('Exito!', 'Exito al guardar este proveedor!', 'far fa-smile-wink', function () {
+                        $('#Modal').modal('hide');
+                        reset();
+                        datatable.ajax.reload(null, false);
                     });
                 });
         }

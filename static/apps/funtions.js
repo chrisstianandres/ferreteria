@@ -1,3 +1,23 @@
+function mostrar() {
+    $('#div_table').removeClass('col-xl-12').addClass('col-xl-8 col-lg-12');
+    $('#div_form').show();
+    datatable.destroy();
+    datatable_fun();
+}
+
+function ocultar() {
+    reset();
+    $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
+    $('#div_form').hide();
+    datatable.destroy();
+    datatable_fun();
+}
+
+$('#cancel').on('click', function () {
+        $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
+        ocultar();
+    });
+
 function borrar_todo_alert(title, content, callback, callback2) {
     $.confirm({
         title: title,
@@ -91,7 +111,7 @@ function callback_2(response, entidad) {
 
 function save_estado(title, url, content, parametros, callback) {
     $.confirm({
-        theme: 'modern',
+        theme: 'supervan',
         type: 'red',
         icon: 'fas fa-exclamation-circle',
         title: title,
@@ -204,7 +224,7 @@ function error_login(title, content, icon, callback) {
 
 function menssaje_ok(title, content, icon, callback) {
     $.confirm({
-        theme: 'modern',
+        theme: 'supervan',
         icon: icon,
         type: 'green',
         title: title,

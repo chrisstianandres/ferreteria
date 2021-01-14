@@ -19,7 +19,7 @@ empresa = nombre_empresa()
 
 class lista(ListView):
     model = Presentacion
-    template_name = 'front-end/presentacion/presentacion_list.html'
+    template_name = 'front-end/presentacion/list.html'
     permission_required = 'presentacion.view_presentacion'
 
     @csrf_exempt
@@ -44,9 +44,11 @@ class lista(ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nueva Presentacion'
+        data['boton'] = 'Guardar'
         data['titulo'] = 'Listado de Presentaciones'
         data['nuevo'] = '/presentacion/nuevo'
+        data['titulo_lista'] = 'Listado de Presentaciones'
+        data['titulo_formulario'] = 'Formulario de Registro'
         data['empresa'] = empresa
         data['form'] = PresentacionForm
         return data

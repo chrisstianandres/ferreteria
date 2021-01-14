@@ -1,7 +1,6 @@
 import json
 
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from django.shortcuts import render, redirect
+from django.http import JsonResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
@@ -19,7 +18,7 @@ empresa = nombre_empresa()
 
 class lista(ValidatePermissionRequiredMixin, ListView):
     model = Categoria
-    template_name = 'front-end/categoria/categoria_list.html'
+    template_name = 'front-end/categoria/list.html'
     permission_required = 'categoria.view_categoria'
 
     @csrf_exempt
@@ -44,9 +43,11 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nueva Categoria'
+        data['boton'] = 'Guardar'
         data['titulo'] = 'Listado de Categorias'
         data['nuevo'] = '/categoria/nuevo'
+        data['titulo_lista'] = 'Listado de Categorias'
+        data['titulo_formulario'] = 'Formulario de Registro'
         data['empresa'] = empresa
         data['form'] = CategoriaForm
         return data

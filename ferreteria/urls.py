@@ -24,4 +24,6 @@ urlpatterns = [
     path('', include('apps.sitioweb.urls', namespace='sitio')),
     path('menu', login_required(backEnd.menu), name='menu'),
     path('cliente/', include('apps.cliente.urls', namespace='cliente')),
+    path('categoria/', include('apps.categoria.urls', namespace='categoria')),
+    path('presentacion/', include('apps.presentacion.urls', namespace='presentacion')),
 ]
