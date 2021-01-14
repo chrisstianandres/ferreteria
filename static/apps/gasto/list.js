@@ -37,8 +37,8 @@ var datos = {
 
     },
 };
-$(function () {
-    daterange();
+
+function datatable_fun() {
     datatable = $("#datatable").DataTable({
         responsive: true,
         language: {
@@ -66,15 +66,15 @@ $(function () {
             },
             buttons: [
                 {
-                    text: '<i class="fa fa-file-pdf"></i> Reporte PDF',
-                    className: 'btn btn-danger my_class',
+                    text: '<i class="fa fa-file-pdf"></i> PDF',
+                    className: 'btn btn-danger btn-space',
                     extend: 'pdfHtml5',
                     //filename: 'dt_custom_pdf',
                     orientation: 'landscape', //portrait
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4],
+                        columns: [0, 1, 2, 3],
                         search: 'applied',
                         order: 'applied'
                     },
@@ -149,11 +149,11 @@ $(function () {
                     }
                 },
                 {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel', className: "btn btn-success my_class",
+                    text: '<i class="fa fa-file-excel"></i> Excel', className: "btn btn-success btn-space",
                     extend: 'excel'
                 },
                 {
-                    className: 'btn btn-info',
+                    className: 'btn btn-info btn-space',
                     text: '<i class="far fa-keyboard"></i> &nbsp;Tipo de Gasto</a>',
                     action: function (e, dt, node, config) {
                         window.location.href = '/tipo_gasto/lista'
@@ -162,7 +162,6 @@ $(function () {
             ],
         },
         columns: [
-            {"data": "id"},
             {"data": "fecha_pago"},
             {"data": "tipo_gasto.nombre"},
             {"data": "valor"},
@@ -175,13 +174,13 @@ $(function () {
                 class: 'text-center',
                 render: function (data, type, row) {
 
-                    var devolver = '<a type="button" rel="del" class="btn btn-danger btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>';
-                    var editar = '<a type="button" rel="edit" class="btn btn-success btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Editar"><i class="fa fa-edit"></i></a>' + ' ';
+                    var devolver = '<a type="button" rel="del" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>';
+                    var editar = '<a type="button" rel="edit" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Editar"><i class="fa fa-edit"></i></a>' + ' ';
                     return editar + devolver;
                 }
             },
             {
-                targets: [3],
+                targets: [2],
                 class: 'text-center',
                 render: function (data, type, row) {
                     return '$ ' + parseFloat(data).toFixed(2);
@@ -189,6 +188,11 @@ $(function () {
             },
         ],
     });
+}
+
+$(function () {
+    daterange();
+    datatable_fun();
     $('#datatable tbody')
         .on('click', 'a[rel="del"]', function () {
             action = 'delete';
@@ -205,32 +209,30 @@ $(function () {
                 })
         })
         .on('click', 'a[rel="edit"]', function () {
-            $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            console.log(data);
             $('input[name="fecha_pago"]').val(data.fecha_pago).attr('readonly', false).daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
                 minYear: 1901,
                 maxDate: new Date(),
                 locale: {
-                    format: 'DD-MM-YYYY',
+                    format: 'YYYY-MM-DD',
                     applyLabel: '<i class="fas fa-search"></i> Aplicar',
                     cancelLabel: '<i class="fas fa-times"></i> Cancelar',
                 },
             });
             $('input[name="valor"]').val(data.valor);
-            $('input[name="detalle"]').val(data.detalle);
+            $('textarea[name="detalle"]').val(data.detalle);
             $('select[name="tipo_gasto"]').val(data.tipo_gasto.id).trigger('change');
-            $('#Modal').modal('show');
+            mostrar();
             action = 'edit';
             pk = data.id;
         });
     //boton agregar cliente
     $('#nuevo').on('click', function () {
-        $('#exampleModalLabel').html('<i class="fas fa-plus"></i>&nbsp;Nuevo registro de un gasto ');
-        $('#Modal').modal('show');
+        reset();
+        mostrar();
         action = 'add';
         pk = '';
     });
@@ -247,14 +249,41 @@ $(function () {
                 '/gasto/nuevo', 'Esta seguro que desea guardar este gasto?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este gasto!', 'far fa-smile-wink', function () {
-                        $('#Modal').modal('hide');
                         reset();
-                        datatable.ajax.reload(null, false);
+                        ocultar();
+                    });
+                });
+        }
+    });
+
+
+    //nuevo tipo
+    $('#id_new_tipo_gasto').on('click', function () {
+        $('#Modal').modal('show');
+        action = 'add';
+    });
+
+    //enviar formulario de nuevo tipo de gasto
+    $('#form_tipo_gasto').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', action);
+        parametros.append('id', pk);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/tipo_gasto/nuevo', 'Esta seguro que desea guardar este tipo de gasto?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar este tipo de gasto!', 'far fa-smile-wink', function () {
+                         $('#Modal').modal('hide');
+                        var newOption = new Option(response.tipo_gasto['nombre'], response.tipo_gasto['id'], false, true);
+                        $('#id_tipo_gasto').append(newOption).trigger('change');
                     });
                 });
         }
     });
 });
+
 
 function daterange() {
     $('input[name="fecha"]').daterangepicker({

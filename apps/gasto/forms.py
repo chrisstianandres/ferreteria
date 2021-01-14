@@ -58,5 +58,5 @@ class GastoForm(forms.ModelForm):
                 attrs={'value': datetime.now().strftime('%Y-%m-%d')},
             ),
             'valor': forms.TextInput(),
-            'detalle': forms.TextInput()
+            'detalle': forms.Textarea()
         }

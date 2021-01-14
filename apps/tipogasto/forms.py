@@ -14,7 +14,7 @@ class TipogastoForm(forms.ModelForm):
             })
 
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el nombre del Tipo de Gasto'})
+                attrs={'placeholder': 'Ingrese el nombre del Tipo de Gasto', 'class': 'form-control'})
         # habilitar, desabilitar, y mas
 
     class Meta:

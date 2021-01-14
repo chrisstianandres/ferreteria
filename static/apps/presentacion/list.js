@@ -51,7 +51,7 @@ $(function () {
             var parametros = {'id': data.id};
             parametros['action'] = action;
             save_estado('Alerta',
-                window.location.pathname, 'Esta seguro que desea eliminar esta presentacion?', parametros,
+               '/presentacion/nuevo', 'Esta seguro que desea eliminar esta presentacion?', parametros,
                 function () {
                     menssaje_ok('Exito!', 'Exito al eliminar esta presentacion!', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false)

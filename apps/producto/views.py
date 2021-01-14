@@ -12,7 +12,7 @@ from django.views.generic import *
 from apps.backEnd import nombre_empresa
 from apps.categoria.forms import CategoriaForm
 from apps.empresa.models import Empresa
-from apps.inventario_productos.models import Inventario_producto
+from apps.inventario.models import Inventario
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.presentacion.forms import PresentacionForm
 from apps.producto.forms import ProductoForm, Producto_baseForm

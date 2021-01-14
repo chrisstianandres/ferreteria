@@ -44,9 +44,11 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nuevo Tipo de gasto'
+        data['boton'] = 'Guardar'
         data['titulo'] = 'Listado de Tipos de Gastos'
         data['nuevo'] = '/tipo_gasto/nuevo'
+        data['titulo_lista'] = 'LListado de Tipos de Gastos'
+        data['titulo_formulario'] = 'Formulario de Registro'
         data['empresa'] = empresa
         data['form'] = TipogastoForm
         return data
@@ -84,7 +86,8 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def save_data(self, f):
         data = {}
         if f.is_valid():
-            f.save()
+            tipo = f.save()
+            data['tipo_gasto'] = tipo.toJSON()
             data['resp'] = True
         else:
             data['error'] = f.errors
