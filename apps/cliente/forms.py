@@ -18,19 +18,19 @@ class ClienteForm(forms.ModelForm):
             })
 
             self.fields['nombres'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese sus dos nombres'})
+                attrs={'placeholder': 'Ingrese sus dos nombres', 'class': 'form-control'})
             self.fields['apellidos'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese sus dos Apellidos'})
+                attrs={'placeholder': 'Ingrese sus dos Apellidos', 'class': 'form-control'})
             self.fields['cedula'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese un numero de cedula'})
+                attrs={'placeholder': 'Ingrese un numero de cedula', 'class': 'form-control'})
             self.fields['correo'].widget = EmailInput(
-                attrs={'placeholder': 'abc@correo.com'})
+                attrs={'placeholder': 'abc@correo.com', 'class': 'form-control'})
             self.fields['direccion'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese una direccion (Maximo 50 caracteres)'})
+                attrs={'placeholder': '(Maximo 50 caracteres)', 'class': 'form-control'})
             self.fields['telefono'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese numero de telefono'})
+                attrs={'placeholder': 'Ingrese numero de telefono', 'class': 'form-control'})
             self.fields['celular'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese numero de telefono'})
+                attrs={'placeholder': 'Ingrese numero de celular', 'class': 'form-control'})
         # habilitar, desabilitar, y mas
 
     class Meta:
