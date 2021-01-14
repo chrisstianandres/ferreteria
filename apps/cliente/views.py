@@ -74,19 +74,20 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 f = ClienteForm(request.POST)
                 data = self.save_data(f)
             elif action == 'edit':
+                pk = request.POST['id']
                 cliente = Cliente.objects.get(pk=int(pk))
                 f = ClienteForm(request.POST, instance=cliente)
                 data = self.save_data(f)
             elif action == 'delete':
-               cli = Cliente.objects.get(pk=pk)
-               cli.delete()
-               data['resp'] = True
+                pk = request.POST['id']
+                cli = Cliente.objects.get(pk=pk)
+                cli.delete()
+                data['resp'] = True
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:

@@ -23,7 +23,6 @@ $(function () {
             dataSrc: ""
         },
         columns: [
-            {"data": "id"},
             {"data": "full_name_list"},
             {"data": "cedula"},
             {"data": "correo"},
@@ -197,12 +196,12 @@ $(function () {
         });
     //boton agregar cliente
     $('#nuevo').on('click', function () {
-        $('#exampleModalLabel').html('<i class="fas fa-plus"></i>&nbsp;Nuevo registro de un Cliente ');
-        $('input[name="cedula"]').attr('readonly', false);
-        $('#Modal').modal('show');
+        $('#div_table').removeClass('col-xl-12').addClass('col-xl-7 col-lg-12');
+        $('#div_form').show();
         action = 'add';
         pk= '';
     });
+    //col-xl-4 col-lg-5
 
     //enviar formulario de nuevo cliente
     $('#form').on('submit', function (e) {
