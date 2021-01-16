@@ -1,24 +1,5 @@
 $(document).ready(function () {
-
-    jQuery.validator.addMethod("lettersonly", function (value, element) {
-        return this.optional(element) || /^[a-zA-z\s\ñ\Ñ," "]+$/i.test(value);
-    }, "Letters and spaces only please");
-
-
-    $.validator.setDefaults({
-        errorClass: 'invalid-feedback',
-
-        highlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-invalid")
-                .removeClass("is-valid");
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-valid")
-                .removeClass("is-invalid");
-        }
-    });
+    validador();
     $("#form").validate({
         rules: {
             nombre: {

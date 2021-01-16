@@ -18,6 +18,9 @@ from django.contrib.auth.decorators import login_required
 from django.urls import path, include
 
 from apps import backEnd
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,4 +45,5 @@ urlpatterns = [
     path('tipo_gasto/', include('apps.tipogasto.urls', namespace='tipo_gasto')),
     path('gasto/', include('apps.gasto.urls', namespace='gasto')),
     # # path('devolucion/', include('apps.delvoluciones_venta.urls', namespace='devolucion')),
-]
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\
+                  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

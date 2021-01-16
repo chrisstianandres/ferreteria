@@ -64,19 +64,34 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 f = PresentacionForm(request.POST)
                 data = self.save_data(f)
             elif action == 'edit':
+                pk = request.POST['id']
                 cat = Presentacion.objects.get(pk=int(pk))
                 f = PresentacionForm(request.POST, instance=cat)
                 data = self.save_data(f)
             elif action == 'delete':
+                pk = request.POST['id']
                 cat = Presentacion.objects.get(pk=pk)
                 cat.delete()
                 data['resp'] = True
+            elif action == 'search':
+                data = []
+                term = request.POST['term']
+                query = Presentacion.objects.filter(nombre__icontains=term)[0:10]
+                for a in query:
+                    result = {'id': int(a.id), 'text': str(a.nombre)}
+                    data.append(result)
+            elif action == 'get':
+                data = []
+                id = request.POST['id']
+                producto = Presentacion.objects.filter(pk=id)
+                for i in producto:
+                    item = i.toJSON()
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:

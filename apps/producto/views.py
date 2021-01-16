@@ -84,7 +84,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -272,13 +272,17 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
             if action == 'add':
                 f = self.form_class(request.POST or None, request.FILES or None)
                 if f.is_valid():
-                    var = f.save()
-                    data['producto_base'] = var.toJSON()
-                    data['resp'] = True
-                    return HttpResponseRedirect('/producto/lista')
+                    f.save(commit=False)
+                    if (Producto.objects.filter(producto_base_id=int(f.data['producto_base']),
+                                                presentacion_id=int(f.data['presentacion']))):
+                        f.add_error("presentacion", "Ya existe este producto con esta presentacion")
+                        data['error'] = f.errors
+                    else:
+                        var = f.save()
+                        data['producto_base'] = var.toJSON()
+                        data['resp'] = True
                 else:
                     data['error'] = f.errors
-                    data['form'] = f
             elif action == 'delete':
                 pk = request.POST['id']
                 f = Producto.objects.get(pk=pk)
@@ -299,10 +303,27 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                 query = Producto_base.objects.get(id=pk)
                 item = query.toJSON()
                 data.append(item)
+            elif action == 'edit':
+                pk = request.POST['id']
+                producto = Producto.objects.get(pk=pk)
+                f = self.form_class(request.POST or None, request.FILES or None, instance=producto)
+                if f.is_valid():
+                    f.save(commit=False)
+                    if (Producto.objects.filter(producto_base_id=int(f.data['producto_base']),
+                                                presentacion_id=int(f.data['presentacion']))):
+                        f.add_error("presentacion", "Ya existe este producto con esta presentacion")
+                        data['error'] = f.errors
+                    else:
+                        var = f.save()
+                        data['producto_base'] = var.toJSON()
+                        data['resp'] = True
+                else:
+                    data['error'] = f.errors
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
+            print(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
     def save_data(self, f):
@@ -314,6 +335,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         else:
             data['error'] = f.errors
         return data
+
 
 
     def get_context_data(self, **kwargs):
@@ -350,11 +372,9 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
             if action == 'edit':
                 f = self.form_class(request.POST or None, request.FILES or None, instance=producto)
                 if f.is_valid():
-                    print(2)
                     var = f.save()
                     data['producto_base'] = var.toJSON()
                     data['resp'] = True
-                    return HttpResponseRedirect('/producto/lista')
                 else:
                     print(25)
                     data['error'] = f.errors

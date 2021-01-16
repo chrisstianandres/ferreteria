@@ -180,7 +180,6 @@ $(function () {
                 })
         })
         .on('click', 'a[rel="edit"]', function () {
-            $('#exampleModalLabel').html('<i class="fas fa-edit"></i>&nbsp;Edicion de un registro');
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
             var sexo = '1';

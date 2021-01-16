@@ -21,13 +21,26 @@ class Producto(models.Model):
         item['producto_base'] = self.producto_base.toJSON()
         item['presentacion'] = self.presentacion.toJSON()
         item['pvp'] = format(self.pvp, '.2f')
+        item['pcp'] = format(self.pcp, '.2f')
         item['imagen'] = self.get_image()
+        item['name_imagen'] = self.name_image()
+        item['check'] = self.check_image()
         return item
 
     def get_image(self):
         if self.imagen:
             return '{}{}'.format(MEDIA_URL, self.imagen)
         return '{}{}'.format(MEDIA_URL, 'producto/no_imagen.jpg')
+
+    def name_image(self):
+        if self.imagen:
+            return '{}'.format(self.imagen)
+        return '{}{}'.format(MEDIA_URL, 'producto/no_imagen.jpg')
+
+    def check_image(self):
+        if self.imagen:
+            return 1
+        return 0
 
 
     class Meta:

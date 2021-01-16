@@ -1,5 +1,7 @@
 var logotipo;
 var datatable;
+var action;
+var pk;
 
 function datatable_fun() {
     datatable = $("#datatable").DataTable({
@@ -17,10 +19,11 @@ function datatable_fun() {
         columns: [
             {"data": "producto_base.nombre"},
             {"data": "producto_base.categoria.nombre"},
-            {"data": "producto_base.presentacion.nombre"},
+            {"data": "presentacion.nombre"},
             {"data": "producto_base.stock"},
             {"data": "producto_base.descripcion"},
             {"data": "pvp"},
+            {"data": "pcp"},
             {"data": "imagen"},
             {"data": "id"}
         ],
@@ -64,7 +67,7 @@ function datatable_fun() {
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         columnDefs: [
             {
-                targets: [-7],
+                targets: [3],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -72,7 +75,7 @@ function datatable_fun() {
                 }
             },
             {
-                targets: [-3, -4, -5],
+                targets: [-3, -4],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
@@ -88,7 +91,7 @@ function datatable_fun() {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="User Image">';
+                    return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2">';
                 }
             },
             {
@@ -98,7 +101,7 @@ function datatable_fun() {
                 orderable: false,
                 render: function (data, type, row) {
                     var edit = '<a style="color: white" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
-                        'data-toggle="tooltip" href="/producto/editar/' + data + '" title="Editar Datos"><i class="fa fa-edit"></i></a>' + ' ';
+                        'data-toggle="tooltip" title="Editar Datos"><i class="fa fa-edit"></i></a>' + ' ';
                     var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
                         'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
                     return edit + del
@@ -122,25 +125,270 @@ function datatable_fun() {
 
 $(function () {
     datatable_fun();
+    //Botones dentro de datatable
+    $('#datatable tbody')
+        .on('click', 'a[rel="del"]', function () {
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'delete'};
+            save_estado('Alerta',
+                '/producto/nuevo', 'Esta seguro que desea eliminar este producto?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al eliminar el producto!', 'far fa-smile-wink', function () {
+                        datatable.ajax.reload(null, false);
+                    })
+                });
+        })
+        .on('click', 'a[rel="edit"]', function () {
+            var tr = datatable.cell($(this).closest('td, li')).index();
+            var data = datatable.row(tr.row).data();
+            check_image(data);
+            cal_pvp();
+            mostrar();
+            action = 'edit';
+            pk = data.id;
+        });
 
-    $('#datatable tbody').on('click', 'a[rel="del"]', function () {
-        var tr = datatable.cell($(this).closest('td, li')).index();
-        var data = datatable.row(tr.row).data();
-        var parametros = {'id': data.id, 'action': 'delete'};
-        save_estado('Alerta',
-            '/producto/nuevo', 'Esta seguro que desea eliminar este producto?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al eliminar el producto!', 'far fa-smile-wink', function () {
-                    datatable.ajax.reload(null, false);
-                })
-            });
-    });
-
+    //botones de formulario
     $('#nuevo').on('click', function () {
         reset();
         mostrar();
+        cal_pvp();
         action = 'add';
         pk = '';
+    });
+    $('#cancel_2').on('click', function () {
+        $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
+        ocultar();
+        $('select[name="producto_base"]').val('').trigger('change');
+        $('select[name="presentacion"]').val('').trigger('change');
+        $('#check_image').html(
+            '<input type="file" name="imagen" accept="image/*" id="id_imagen">');
+    });
 
-    })
+    $('#id_producto_base')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/producto/nuevo',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data,
+                    };
+                },
+            },
+            placeholder: 'Busca un Producto',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/producto/nuevo',
+                data: {
+                    "id": $('#id_producto_base option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    $('#id_des').val(data[0].descripcion);
+                    $('#id_cat').val(data[0]['categoria'].nombre);
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        });
+
+    $('#id_presentacion_producto')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/presentacion/nuevo',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data,
+                    };
+                },
+            },
+            placeholder: 'Busca una Presentacion',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/presentacion/nuevo',
+                data: {
+                    "id": $('#id_presentacion_producto option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    $('#id_pres').val(data[0].nombre);
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        });
+
+    $('#id_new_producto').on('click', function () {
+        $('#Modal_prod').modal('show');
+        action = 'add';
+        pk = '';
+    });
+    $('#id_new_categoria').on('click', function () {
+        $('#Modal').modal('show');
+        action = 'add';
+        pk = '';
+    });
+    $('#id_new_presentacion').on('click', function () {
+        $('#Modal2').modal('show');
+        action = 'add';
+        pk = '';
+    });
+
+
+    $('#form_prod').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', 'add_base');
+        parametros.append('id', '');
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/producto/nuevo', 'Esta seguro que desea guardar este producto?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar este producto!', 'far fa-smile-wink', function () {
+                        $('#Modal_prod').modal('hide');
+                        var newOption = new Option(response.producto_base['nombre'], response.producto_base['id'], false, true);
+                        $('#id_producto_base').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
+    $('#form_cat').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', action);
+        parametros.append('id', pk);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/categoria/nuevo', 'Esta seguro que desea guardar esta categoria?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar esta categoria!', 'far fa-smile-wink', function () {
+                        $('#Modal').modal('hide');
+                        var newOption = new Option(response.categoria['nombre'], response.categoria['id'], false, true);
+                        $('#id_categoria').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
+    $('#form_pre').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', action);
+        parametros.append('id', pk);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/presentacion/nuevo', 'Esta seguro que desea guardar esta presentacion?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar esta presentacion!', 'far fa-smile-wink', function () {
+                        $('#Modal2').modal('hide');
+                        var newOption = new Option(response.presentacion['full'], response.presentacion['id'], false, true);
+                        $('#id_presentacion').append(newOption).trigger('change');
+                    });
+                });
+        }
+    });
+
+    //enviar formulario de nuevo producto
+    $('#form').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', action);
+        parametros.append('id', pk);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                '/producto/nuevo', 'Esta seguro que desea guardar este producto?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar este producto!', 'far fa-smile-wink', function () {
+                        $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
+                        ocultar();
+                        $('select[name="producto_base"]').val('').trigger('change');
+                        $('select[name="presentacion"]').val('').trigger('change');
+                        $('#check_image').html(
+                            '<input type="file" name="imagen" accept="image/*" id="id_imagen">');
+                    });
+                });
+        }
+    });
+
+    function check_image(data) {
+        if (data.check === 1) {
+            $('#check_image').html(
+                '<p class="file-upload"><strong>Actualmente:</strong> <a href="' + data.imagen + '"></a><br>'
+                + data.name_imagen + '<br><span class="clearable-file-input"> <input type="checkbox" ' +
+                'name="imagen-clear" id="imagen-clear_id"> <label for="imagen-clear_id">Limpiar</label></span><br>' +
+                'Modificar: <input type="file" name="imagen" accept="image/*" id="id_imagen"></p>');
+        } else {
+            $('#check_image').html(
+                '<input type="file" name="imagen" accept="image/*" id="id_imagen">');
+
+        }
+        $('#id_des').val(data.producto_base.descripcion);
+        $('#id_cat').val(data.producto_base.categoria.nombre);
+        $('#id_pcp').val(data.pcp);
+        $('select[name="producto_base"]').val(data.producto_base.id).trigger('change');
+        $('select[name="presentacion"]').val(data.presentacion.id).trigger('change');
+
+    }
 });
