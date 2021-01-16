@@ -18,15 +18,15 @@ class ProveedorForm(forms.ModelForm):
             })
 
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese sus dos nombres'})
+                attrs={'placeholder': 'Ingrese sus dos nombres',  'class': 'form-control'})
             self.fields['num_doc'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese numero de docuemnto'})
+                attrs={'placeholder': 'Ingrese numero de docuemnto',  'class': 'form-control'})
             self.fields['correo'].widget = EmailInput(
-                attrs={'placeholder': 'abc@correo.com'})
+                attrs={'placeholder': 'abc@correo.com',  'class': 'form-control'})
             self.fields['telefono'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el numero de telefono'})
+                attrs={'placeholder': 'Ingrese el numero de telefono',  'class': 'form-control'})
             self.fields['direccion'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese una direccion'})
+                attrs={'placeholder': 'Maximo 50 Caracteres',  'class': 'form-control'})
         # habilitar, desabilitar, y mas
 
     class Meta:

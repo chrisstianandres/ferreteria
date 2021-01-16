@@ -766,6 +766,7 @@
             ((value.length >= validator.minlength) && validator.negative);
         }
       },
+
       maxchecked: {
         name: "maxchecked",
         init: function($this, name) {

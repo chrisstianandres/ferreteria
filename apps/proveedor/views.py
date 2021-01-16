@@ -13,7 +13,7 @@ from apps.proveedor.forms import ProveedorForm
 from apps.proveedor.models import Proveedor
 
 opc_icono = 'fas fa-user-tag'
-opc_entidad = 'Proveedor'
+opc_entidad = 'Proveedores'
 crud = '/proveedor/crear'
 empresa = nombre_empresa()
 
@@ -56,6 +56,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Nuevo Porveedor'
         data['titulo'] = 'Listado de Porveedores'
+        data['titulo_lista'] = 'Listado de Porveedores'
         data['form'] = ProveedorForm
         data['nuevo'] = '/proveedor/nuevo'
         data['empresa'] = empresa
@@ -94,10 +95,8 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 
     def save_data(self, f):
         data = {}
-        print(f.data)
         if f.is_valid():
             f.save(commit=False)
-            print(f.data['tipo'])
             if int(f.data['tipo']) == 0:
                 if verificar(f.data['num_doc']):
                     prod = f.save()
@@ -112,7 +111,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                     data['resp'] = True
                     data['proveedor'] = prod.toJSON()
                 else:
-                    f.add_error("num_doc", "Numero de Cedula no valido para Ecuador")
+                    f.add_error("num_doc", "Numero de Ruc no valido para Ecuador")
                     data['error'] = f.errors
         else:
             data['error'] = f.errors

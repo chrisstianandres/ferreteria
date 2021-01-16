@@ -1,23 +1,19 @@
 $(document).ready(function () {
-    jQuery.validator.addMethod("lettersonly", function (value, element) {
-        return this.optional(element) || /^[a-z," "]+$/i.test(value);
-    }, "Letters and spaces only please");
+    $.validator.addMethod("tipo", function (value, element) {
 
+        var tipo = $("#id_tipo").val();
+        console.log(tipo);
 
-     $.validator.setDefaults({
-        errorClass: 'invalid-feedback',
-
-        highlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-invalid")
-                .removeClass("is-valid");
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-valid")
-                .removeClass("is-invalid");
+        if (tipo === '0') {
+            console.log(12);
+            return ((value.length === 10));
+        } else if (tipo === '1'){
+            console.log(13);
+           return ((value.length === 13));
         }
-    });
+    }, "");
+    validador();
+
     $("#form").validate({
         rules: {
             nombre: {
@@ -31,8 +27,7 @@ $(document).ready(function () {
             },
             num_doc: {
                 required: true,
-                minlength: 10,
-                maxlength: 13,
+                tipo: true,
                 digits: true
             },
             correo: {
@@ -54,19 +49,19 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Porfavor ingresa tus nombres y apellidos",
+                required: "Por favor ingresa tus nombres y apellidos",
                 minlength: "Debe ingresar al menos un nombre y un apellido",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             num_doc: {
-                required: "Porfavor ingresa tu numero de documento",
-                minlength: "Tu numero de documento debe tener al menos 10 digitos",
+                required: "Por favor ingresa tu numero de documento",
+                tipo: "Error en el numero de digitos (10 para cedula o 13 para ruc)",
+                // minlength: "Numero de digitos deficiente (10 para cedula)",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 13 digitos",
             },
             correo: "Debe ingresar un correo valido",
             telefono: {
-                required: "Porfavor ingresa tu numero celular",
+                required: "Por favor ingresa tu numero celular",
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
                 maxlength: "Tu numero de documento debe tener maximo 10 digitos",

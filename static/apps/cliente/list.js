@@ -1,12 +1,5 @@
 var logotipo;
 var datatable;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
 
 toDataURL('/media/imagen.PNG').then(dataUrl => {
     logotipo = dataUrl;

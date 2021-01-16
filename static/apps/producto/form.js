@@ -2,7 +2,7 @@ $(document).ready(function () {
     edit_cat();
     var action = '';
     var pk = '';
-    $('input[name="pvp"], input[name="pvp_alq"], input[name="pvp_confec"]').TouchSpin({
+    $('input[name="pvp"]').TouchSpin({
         min: 0.05,
         max: 1000000,
         step: 0.01,
@@ -12,20 +12,7 @@ $(document).ready(function () {
         maxboostedstep: 10,
         prefix: '$'
     });
-    $.validator.setDefaults({
-        errorClass: 'invalid-feedback',
-
-        highlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-invalid")
-                .removeClass("is-valid");
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-valid")
-                .removeClass("is-invalid");
-        }
-    });
+   validador();
     $("#form").validate({
         rules: {
             nombre: {

@@ -28,7 +28,7 @@ empresa = nombre_empresa()
 
 class lista(ValidatePermissionRequiredMixin, ListView):
     model = Producto
-    template_name = 'front-end/producto/producto_list.html'
+    template_name = 'front-end/producto/list.html'
     permission_required = 'producto.view_producto'
 
     @csrf_exempt
@@ -50,13 +50,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 for a in query:
                     result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
                     data.append(result)
-            elif action == 'search_rep':
-                data = []
-                term = request.POST['term']
-                query = Producto.objects.filter(producto_base__nombre__icontains=term)[0:10]
-                for a in query:
-                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
-                    data.append(result)
             elif action == 'get':
                 data = []
                 id = request.POST['id']
@@ -68,30 +61,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     item['subtotal'] = 0.00
                     item['iva_emp'] = empresa.iva
                     data.append(item)
-            elif action == 'get_rep':
-                data = []
-                id = request.POST['id']
-                producto = Producto.objects.filter(pk=id)
-                empresa = Empresa.objects.first()
-                for i in producto:
-                    item = i.toJSON()
-                    item['cantidad'] = 1
-                    item['pvp'] = 1.00
-                    item['subtotal'] = 0.00
-                    item['iva_emp'] = empresa.iva
-                    data.append(item)
-            elif action == 'get_confec':
-                data = []
-                id = request.POST['id']
-                producto = Producto.objects.filter(pk=id)
-                empresa = Empresa.objects.first()
-                for i in producto:
-                    item = i.toJSON()
-                    item['cantidad'] = 1
-                    item['pvp'] = format(i.pvp_confec, '.2f')
-                    item['subtotal'] = 0.00
-                    item['iva_emp'] = empresa.iva
-                    data.append(item)
             elif action == 'sitio':
                 data = []
                 h = datetime.today()
@@ -99,8 +68,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                                                            venta__estado=1).values('inventario__producto__producto_base_id',
                                                                                    'inventario__producto_id',
                                                                                    'inventario__producto__pvp',
-                                                                                   'inventario__producto__pvp_alq',
-                                                                                   'inventario__producto__pvp_confec',
                                                                                    'inventario__producto__imagen').annotate(total=Sum('cantidad')).order_by('-total')[0:3]
                 for i in query:
                     px = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
@@ -124,16 +91,22 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nuevo Producto'
+        data['boton'] = 'Guardar'
         data['titulo'] = 'Listado de Productos'
+        data['titulo_lista'] = 'Listado de Productos'
         data['nuevo'] = '/producto/nuevo'
+        data['form_cat'] = CategoriaForm
+        data['form_pres'] = PresentacionForm
+        data['form_prod'] = Producto_baseForm
+        if 'form' not in data:
+            data['form'] = ProductoForm
         data['empresa'] = empresa
         return data
 
 
 class report(ValidatePermissionRequiredMixin, ListView):
         model = Producto
-        template_name = 'front-end/producto/producto_report.html'
+        template_name = 'front-end/producto/report.html'
         permission_required = 'producto.view_producto'
 
         @csrf_exempt
@@ -285,7 +258,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
     model = Producto
     form_class = ProductoForm
     success_url = 'producto:lista'
-    template_name = 'front-end/producto/producto_form.html'
+    template_name = 'front-end/producto/form.html'
     permission_required = 'producto.add_producto'
 
     @method_decorator(csrf_exempt)
@@ -295,7 +268,6 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        print(action)
         try:
             if action == 'add':
                 f = self.form_class(request.POST or None, request.FILES or None)
@@ -305,7 +277,6 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                     data['resp'] = True
                     return HttpResponseRedirect('/producto/lista')
                 else:
-                    print(5)
                     data['error'] = f.errors
                     data['form'] = f
             elif action == 'delete':
@@ -347,8 +318,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        if 'form' not in data:
-            data['form'] = self.form_class(self.request.GET)
+
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Producto'
@@ -356,10 +326,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         data['nuevo'] = '/producto/nuevo'
         data['action'] = 'add'
         data['crud'] = crud
-        data['form_cat'] = CategoriaForm
-        data['form_pres'] = PresentacionForm
-        data['form_prod'] = Producto_baseForm
-        data['empresa'] = empresa
+
         return data
 
 

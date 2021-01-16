@@ -17,10 +17,10 @@ class Producto_baseForm(forms.ModelForm):
                 'class': 'form-control'
             })
             self.fields['nombre'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese el nombre del producto', 'class': 'form-control form-rounded',
+                attrs={'placeholder': 'Ingrese el nombre del producto', 'class': 'form-control',
                        'id': 'id_nombre_producto'})
             self.fields['descripcion'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control'})
             self.fields['categoria'].widget.attrs = {
                 'class': 'form-control select2',
                 'id': 'id_despcripcion_producto'}
@@ -47,23 +47,25 @@ class ProductoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.Meta.fields:
-            # self.fields[field].widget.attrs.update({
-            #     'class': 'form-control'
-            # })
             self.fields['pvp'].widget.attrs = {
                 'class': 'form-control form-control-sm input-sm',
                 'value': 1}
+            self.fields['pcp'].widget.attrs = {
+                'class': 'form-control form-control-sm input-sm',
+                'value': 1}
             self.fields['producto_base'].widget.attrs = {
-                'class': 'form-control select2'}
+                'class': 'form-control select2',
+                'style': "width: 89.5%"}
             self.fields['presentacion'].widget.attrs = {
                 'class': 'form-control select2',
                 'id': 'id_presentacion_producto'}
 
     class Meta:
         model = Producto
-        fields = ['producto_base', 'pvp', 'presentacion']
-        labels = {'producto_base': 'Producto', 'pvp': 'P.V.P.', 'presentacion': 'Presentacion','imagen': 'Imagen'}
-        widgets = {'pvp': forms.TextInput(), 'presentacion': forms.TextInput()}
+        fields = ['producto_base', 'pvp', 'pcp', 'presentacion']
+        labels = {'producto_base': 'Producto', 'pvp': 'P.V.P.', 'pcp': 'P. Compra', 'presentacion': 'Presentacion',
+                  'imagen': 'Imagen'}
+        widgets = {'pvp': forms.TextInput(), 'pcp': forms.TextInput(), 'presentacion': forms.TextInput()}
 
 
 class GroupForm(forms.ModelForm):
