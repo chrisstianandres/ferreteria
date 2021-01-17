@@ -1,7 +1,7 @@
 import json
 
 from datetime import datetime, timedelta
-from django.db.models import Q, Sum, Max
+from django.db.models import Q, Sum, Max, Count
 from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import JsonResponse
@@ -43,6 +43,16 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for c in Producto.objects.all():
                     data.append(c.toJSON())
+            elif action == 'search_no_stock':
+                data = []
+                term = request.POST['term']
+                query = Producto.objects.values('producto_base__id', 'producto_base__nombre').filter(
+                    producto_base__nombre__icontains=term)[0:10].annotate(Count('producto_base__id'))
+                print(query.query)
+                for a in query:
+                    result = {'id': int(a['producto_base__id']), 'text': str(a['producto_base__nombre'])}
+                    data.append(result)
+                print(data)
             elif action == 'search':
                 data = []
                 term = request.POST['term']
@@ -310,7 +320,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                 if f.is_valid():
                     f.save(commit=False)
                     if (Producto.objects.filter(producto_base_id=int(f.data['producto_base']),
-                                                presentacion_id=int(f.data['presentacion']))):
+                                                presentacion_id=int(f.data['presentacion'])).exclude(pk=pk)):
                         f.add_error("presentacion", "Ya existe este producto con esta presentacion")
                         data['error'] = f.errors
                     else:

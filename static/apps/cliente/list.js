@@ -1,9 +1,6 @@
 var logotipo;
 var datatable;
 
-toDataURL('/media/imagen.PNG').then(dataUrl => {
-    logotipo = dataUrl;
-});
 
 function datatable_fun() {
     datatable = $("#datatable").DataTable({

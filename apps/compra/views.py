@@ -82,8 +82,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['boton'] = 'Nueva Compra'
+        data['boton'] = 'Guardar'
         data['titulo'] = 'Listado de Compras'
+        data['titulo_lista'] = 'Listado de Compras'
         data['empresa'] = empresa
         return data
 
@@ -151,6 +152,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Compra'
         data['titulo'] = 'Nueva Compra'
+        data['titulo_lista'] = 'Detalle de productos'
         data['nuevo'] = '/compra/nuevo'
         data['empresa'] = empresa
         data['form'] = CompraForm()

@@ -1,16 +1,7 @@
 var datatable;
 var logotipo;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
 
-toDataURL('/media/logo_don_chuta.png').then(dataUrl => {
-    logotipo = dataUrl;
-});
+
 var datos = {
     fechas: {
         'start_date': '',
@@ -26,7 +17,7 @@ var datos = {
             this.fechas['end_date'] = '';
         }
         $.ajax({
-            url: '/compra/lista',
+            url: window.location.pathname,
             type: 'POST',
             data: this.fechas,
             success: function (data) {
@@ -39,9 +30,8 @@ var datos = {
 };
 
 
-$(function () {
-    daterange();
-    datatable = $("#datatable").DataTable({
+function datatable_fun(){
+     datatable = $("#datatable").DataTable({
         destroy: true,
         scrollX: true,
         autoWidth: false,
@@ -208,7 +198,38 @@ $(function () {
 
         }
     });
-    $('#datatable tbody').on('click', 'a[rel="devolver"]', function () {
+}
+
+function daterange() {
+    $('input[name="fecha"]').daterangepicker({
+        locale: {
+            format: 'YYYY-MM-DD',
+            applyLabel: '<i class="fas fa-search"></i> Buscar',
+            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
+        }
+    }).on('apply.daterangepicker', function (ev, picker) {
+        picker['key'] = 1;
+        datos.add(picker);
+        // filter_by_date();
+
+    }).on('cancel.daterangepicker', function (ev, picker) {
+        picker['key'] = 0;
+        datos.add(picker);
+
+    });
+
+}
+
+function pad(str, max) {
+    str = str.toString();
+    return str.length < max ? pad("0" + str, max) : str;
+}
+
+$(function () {
+    daterange();
+    datatable_fun();
+    $('#datatable tbody')
+        .on('click', 'a[rel="devolver"]', function () {
         $('.tooltip').remove();
         var tr = datatable.cell($(this).closest('td, li')).index();
         var data = datatable.row(tr.row).data();
@@ -271,31 +292,6 @@ $(function () {
 
 $('#nuevo').on('click', function () {
         window.location.replace('/compra/nuevo')
-
     })
 });
 
-function daterange() {
-    $('input[name="fecha"]').daterangepicker({
-        locale: {
-            format: 'YYYY-MM-DD',
-            applyLabel: '<i class="fas fa-search"></i> Buscar',
-            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
-        }
-    }).on('apply.daterangepicker', function (ev, picker) {
-        picker['key'] = 1;
-        datos.add(picker);
-        // filter_by_date();
-
-    }).on('cancel.daterangepicker', function (ev, picker) {
-        picker['key'] = 0;
-        datos.add(picker);
-
-    });
-
-}
-
-function pad(str, max) {
-    str = str.toString();
-    return str.length < max ? pad("0" + str, max) : str;
-}

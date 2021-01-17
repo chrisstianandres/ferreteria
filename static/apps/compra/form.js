@@ -33,7 +33,7 @@ var compras = {
     },
     list: function () {
         this.calculate();
-        tblcompra = $("#tblinsumos").DataTable({
+        tblcompra = $("#datatable").DataTable({
             destroy: true,
             autoWidth: false,
             dataSrc: "",
@@ -46,7 +46,7 @@ var compras = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
+                {data: "presentacion.nombre"},
                 {data: "cantidad"},
                 {data: "p_compra"},
                 {data: "subtotal"}
@@ -128,7 +128,7 @@ $(function () {
         })
     });
     //cantidad de productos
-    $('#tblinsumos tbody').on('click', 'a[rel="remove"]', function () {
+    $('#datatable tbody').on('click', 'a[rel="remove"]', function () {
         var tr = tblcompra.cell($(this).closest('td, li')).index();
         borrar_todo_alert('Alerta de Eliminación',
             'Esta seguro que desea eliminar este producto de tu detalle?', function () {
@@ -249,7 +249,7 @@ $(function () {
         minimumInputLength: 1,
     });
 
-    $('#id_material').select2({
+    $('#id_producto').select2({
         theme: "classic",
         language: {
             inputTooShort: function () {
@@ -266,11 +266,11 @@ $(function () {
         ajax: {
             delay: 250,
             type: 'POST',
-            url: '/material/lista',
+            url: '/producto/lista',
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
-                    'action': 'search'
+                    'action': 'search_no_stock'
                 };
                 return queryParameters;
             },

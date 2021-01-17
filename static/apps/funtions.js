@@ -450,24 +450,31 @@ function customize(doc) {
 }
 
 
-function validador(){
+function validador() {
     jQuery.validator.addMethod("lettersonly", function (value, element) {
-    return this.optional(element) || /^[a-z," "]+$/i.test(value);
-}, "Solo puede ingresar letras y espacios");
+        return this.optional(element) || /^[a-z," "]+$/i.test(value);
+    }, "Solo puede ingresar letras y espacios");
 
 
-$.validator.setDefaults({
-    errorClass: 'invalid-feedback',
+    $.validator.setDefaults({
+        errorClass: 'invalid-feedback',
 
-    highlight: function (element, errorClass, validClass) {
-        $(element)
-            .addClass("is-invalid")
-            .removeClass("is-valid");
-    },
-    unhighlight: function (element, errorClass, validClass) {
-        $(element)
-            .addClass("is-valid")
-            .removeClass("is-invalid");
-    }
-});
+        highlight: function (element, errorClass, validClass) {
+            $(element)
+                .addClass("is-invalid")
+                .removeClass("is-valid");
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element)
+                .addClass("is-valid")
+                .removeClass("is-invalid");
+        }
+    });
+}
+
+
+function year_footer() {
+    var ano = (new Date).getFullYear();
+    $('#year').text(ano);
+
 }
