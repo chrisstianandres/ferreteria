@@ -267,8 +267,7 @@ $(function () {
                 },
                 dataType: 'json',
                 success: function (data) {
-                    console.log(data);
-                    $('#id_pres').val(data[0].nombre);
+                    $(this).val(data[0].nombre);
                 },
                 error: function (xhr, status, data) {
                     alert(data);

@@ -26,23 +26,27 @@
                         <br><br>
                         <table id="datatable" class="table table-bordered table-hover" style="width: 100%">
                             {% block table %}
-                                <thead>
-                                <tr>
-                                    <th><em class="fas fa-trash-alt"></em></th>
-                                    <th>Material</th>
-                                    <th>Catg</th>
-                                    <th>Prst</th>
-                                    <th>Cant</th>
-                                    <th>P. Compra</th>
-                                    <th>Subtotal</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
 
                             {% endblock %}
                         </table>
+                        <br>
+                        <div class="row">
+                            <div class="col-lg-7">
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <br>
+                                        {% block totales %}
+
+                                        {% endblock %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary btn-sm btn-flat" id="save">
                             <i class="far fa-save"></i> {{ boton }}
@@ -56,12 +60,43 @@
                     </div>
                 </div>
             </div>
-
-
-            {% block modals %}
-                <div class="modal fade" id="Modal_proveedor" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="Modal_detalle" tabindex="-1" aria-labelledby="exampleModalLabel"
                      aria-hidden="true">
-                    <form method="post" id="form" enctype="multipart/form-data" action=".">
+                    <form method="post" id="form_detalle" enctype="multipart/form-data" action=".">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-plus"></i>&nbsp;{{ titulo_detalle }}
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        {% block datos_trans %}
+
+                                        {% endblock %}
+                                        <div class="form-group">
+                                            <input type="hidden" value="{{ action }}">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i
+                                            class="fas fa-times"></i> Cancelar
+                                    </button>
+                                    <button id="facturar" type="button" class="btn btn-success"><i class="fas fa-hand-holding-usd"></i>&nbsp;Facturar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+         <div class="modal fade" id="Modal_person" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <form method="post" id="form_person" enctype="multipart/form-data" action=".">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -94,44 +129,7 @@
                         </div>
                     </form>
                 </div>
-
-                 <div class="modal fade" id="Modal_detalle" tabindex="-1" aria-labelledby="exampleModalLabel"
-                     aria-hidden="true">
-                    <form method="post" id="form" enctype="multipart/form-data" action=".">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-plus"></i>&nbsp;Registro
-                                        de un Proveedor</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="container-fluid">
-                                        <div class="form-group">
-                                            {{ formp.as_p }}
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="hidden" value="{{ action }}">
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i
-                                            class="fas fa-user-times"></i> Cancelar
-                                    </button>
-                                    <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
-                                        Proveedor
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            {% endblock %}
-    </div>
+        </div>
     </div>
 {% endblock %}
 {% block script %}

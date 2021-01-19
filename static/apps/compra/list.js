@@ -87,7 +87,8 @@ function datatable_fun(){
                          search: 'applied',
                          order: 'applied'
                      },
-                     customize: function (doc) {
+                     customize:
+                         function (doc) {
                          const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
                              "Noviembre", "Diciembre"
                          ];
@@ -170,8 +171,8 @@ function datatable_fun(){
                 class: 'text-center',
                 width: "15%",
                 render: function (data, type, row) {
-                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
-                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-sm btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ';
+                    var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
+                    var devolver = '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ';
                     return detalle + devolver ;
                 }
             },
@@ -265,11 +266,11 @@ $(function () {
                     dataSrc: ""
                 },
                 columns: [
-                    {data: 'material.producto_base.nombre'},
-                    {data: 'material.producto_base.categoria.nombre'},
-                    {data: 'material.producto_base.presentacion.nombre'},
+                    {data: 'producto.producto_base.nombre'},
+                    {data: 'producto.producto_base.categoria.nombre'},
+                    {data: 'producto.presentacion.nombre'},
                     {data: 'cantidad'},
-                    {data: 'p_compra'},
+                    {data: 'p_compra_actual'},
                     {data: 'subtotal'}
                 ],
                 columnDefs: [
@@ -287,11 +288,10 @@ $(function () {
                     },
                 ],
             });
-
         });
 
 $('#nuevo').on('click', function () {
-        window.location.replace('/compra/nuevo')
+        window.location.href='/compra/nuevo'
     })
 });
 

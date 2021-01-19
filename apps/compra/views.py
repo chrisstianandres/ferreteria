@@ -123,7 +123,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dv.cantidad = int(i['cantidad'])
                             dv.subtotal = float(i['subtotal'])
                             x = Producto.objects.get(pk=i['id'])
-                            dv.p_compra_actual = float(x.p_compra)
+                            dv.p_compra_actual = float(x.pcp)
                             pb = Producto_base.objects.get(producto=x.id)
                             pb.stock = pb.stock + int(i['cantidad'])
                             pb.save()
@@ -139,7 +139,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
-
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
@@ -153,6 +152,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['boton'] = 'Guardar Compra'
         data['titulo'] = 'Nueva Compra'
         data['titulo_lista'] = 'Detalle de productos'
+        data['titulo_detalle'] = 'Datos de la factura'
         data['nuevo'] = '/compra/nuevo'
         data['empresa'] = empresa
         data['form'] = CompraForm()

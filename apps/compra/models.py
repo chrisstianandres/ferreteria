@@ -54,7 +54,7 @@ class Detalle_compra(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['compra'] = self.compra.toJSON()
-        item['material'] = self.producto.toJSON()
+        item['producto'] = self.producto.toJSON()
         return item
 
     class Meta:

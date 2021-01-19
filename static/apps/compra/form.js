@@ -13,7 +13,7 @@ var compras = {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
-            dict.subtotal = dict.cantidad * parseFloat(dict.p_compra);
+            dict.subtotal = dict.cantidad * parseFloat(dict.pcp);
             subtotal += dict.subtotal;
             iva_emp = dict.iva_emp;
             console.log(dict);
@@ -48,7 +48,7 @@ var compras = {
                 {data: "producto_base.categoria.nombre"},
                 {data: "presentacion.nombre"},
                 {data: "cantidad"},
-                {data: "p_compra"},
+                {data: "pcp"},
                 {data: "subtotal"}
             ],
             columnDefs: [
@@ -98,35 +98,6 @@ var compras = {
 
 };
 $(function () {
-    //texto de los selects
-    $('.select2').select2({
-        "language": {
-            "noResults": function () {
-                return "Sin resultados";
-            }
-        },
-        allowClear: true
-    });
-    //seleccionar producto del select producto
-    $('#id_material').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/material/lista',
-            data: {
-                "id": $('#id_material option:selected').val(),
-                "action": 'get_asig'
-            },
-            dataType: 'json',
-            success: function (data) {
-                compras.add(data[0]);
-                $('#id_material option:selected').remove();
-            },
-            error: function (xhr, status, data) {
-                alert(data['0']);
-            },
-
-        })
-    });
     //cantidad de productos
     $('#datatable tbody').on('click', 'a[rel="remove"]', function () {
         var tr = tblcompra.cell($(this).closest('td, li')).index();
@@ -159,11 +130,16 @@ $(function () {
     });
 
     $('#save').on('click', function () {
+        if (compras.items.productos.length === 0) {
+            menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
+            return false
+        } else {
+            $('#Modal_detalle').modal('show');
+        }
+    });
+    $('#facturar').on('click', function () {
         if ($('select[name="proveedor"]').val() === "") {
             menssaje_error('Error!', "Debe seleccionar un proveedor", 'far fa-times-circle');
-            return false
-        } else if (compras.items.productos.length === 0) {
-            menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
             return false
         }
         var action = $('input[name="action"]').val();
@@ -172,8 +148,8 @@ $(function () {
         compras.items.fecha_compra = $('input[name="fecha_compra"]').val();
         compras.items.proveedor = $('#id_proveedor option:selected').val();
         parametros = {'compras': JSON.stringify(compras.items)};
-        parametros['action']='add';
-        parametros['id']='';
+        parametros['action'] = 'add';
+        parametros['id'] = '';
         save_with_ajax('Alerta',
             window.location.pathname, 'Esta seguro que desea guardar esta compra?', parametros, function (response) {
                 var ok = {'productos': response['productos']};
@@ -190,9 +166,9 @@ $(function () {
     });
 
     $('#id_new_proveedor').on('click', function () {
-        $('#Modal').modal('show');
+        $('#Modal_person').modal('show');
     });
-    $('#form').on('submit', function (e) {
+    $('#form_person').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
         parametros.append('action', 'add');
@@ -203,7 +179,7 @@ $(function () {
                 '/proveedor/nuevo', 'Esta seguro que desea guardar este proveedor?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este proveedor!', 'far fa-smile-wink', function () {
-                        $('#Modal').modal('hide');
+                        $('#Modal_person').modal('hide');
                         var newOption = new Option(response.proveedor['full_name'], response.proveedor['id'], false, true);
                         $('#id_proveedor').append(newOption).trigger('change');
                     });
@@ -282,9 +258,29 @@ $(function () {
             },
 
         },
-        placeholder: 'Busca un material',
+        placeholder: 'Busca un producto',
         minimumInputLength: 1,
-    });
+    })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/producto/lista',
+                data: {
+                    "id": $('#id_producto option:selected').val(),
+                    "action": 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    compras.add(data[0]);
+                    $('#id_producto').val(null).trigger('change');
+
+                },
+                error: function (xhr, status, data) {
+                    alert(data['0']);
+                },
+
+            })
+        });
 
 
     $('#Modal').on('hidden.bs.modal', function (e) {

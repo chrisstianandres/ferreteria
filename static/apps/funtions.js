@@ -33,6 +33,7 @@ $('#cancel').on('click', function () {
 
 function borrar_todo_alert(title, content, callback, callback2) {
     $.confirm({
+        theme: 'supervan',
         title: title,
         icon: 'fas fa-exclamation-triangle',
         type: 'red',
@@ -57,7 +58,7 @@ function borrar_todo_alert(title, content, callback, callback2) {
 
 function save_with_ajax(title, url, content, parametros, callback) {
     $.confirm({
-        theme: 'modern',
+        theme: 'supervan',
         icon: 'fas fa-exclamation-circle',
         title: title,
         type: 'blue',
@@ -195,7 +196,7 @@ function printpdf(title, content, callback, cancel) {
 
 function menssaje_error(title, content, icon, callback) {
     var obj = $.confirm({
-        theme: 'modern',
+        theme: 'supervan',
         icon: icon,
         title: title,
         type: 'red',

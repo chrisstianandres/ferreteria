@@ -46,13 +46,12 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'search_no_stock':
                 data = []
                 term = request.POST['term']
-                query = Producto.objects.values('producto_base__id', 'producto_base__nombre').filter(
-                    producto_base__nombre__icontains=term)[0:10].annotate(Count('producto_base__id'))
-                print(query.query)
+                query = Producto.objects.values('id', 'producto_base__nombre', 'presentacion__nombre').\
+                    filter(producto_base__nombre__icontains=term)
                 for a in query:
-                    result = {'id': int(a['producto_base__id']), 'text': str(a['producto_base__nombre'])}
+                    result = {'id': int(a['id']),
+                              'text': str(a['producto_base__nombre']) + ' / ' + str(a['presentacion__nombre'])}
                     data.append(result)
-                print(data)
             elif action == 'search':
                 data = []
                 term = request.POST['term']
