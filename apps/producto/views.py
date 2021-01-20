@@ -55,9 +55,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'search':
                 data = []
                 term = request.POST['term']
-                query = Producto.objects.filter(producto_base__nombre__icontains=term, producto_base__stock__gte=1)[0:10]
+                query = Producto.objects.filter(producto_base__nombre__icontains=term, stock__gte=1)[0:10]
                 for a in query:
-                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre)}
+                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre + ' / ' + str(a.presentacion.nombre))}
                     data.append(result)
             elif action == 'get':
                 data = []

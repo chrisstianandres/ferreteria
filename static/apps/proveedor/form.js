@@ -2,14 +2,10 @@ $(document).ready(function () {
     $.validator.addMethod("tipo", function (value, element) {
 
         var tipo = $("#id_tipo").val();
-        console.log(tipo);
-
         if (tipo === '0') {
-            console.log(12);
             return ((value.length === 10));
-        } else if (tipo === '1'){
-            console.log(13);
-           return ((value.length === 13));
+        } else if (tipo === '1') {
+            return ((value.length === 13));
         }
     }, "");
     validador();
@@ -28,7 +24,8 @@ $(document).ready(function () {
             num_doc: {
                 required: true,
                 tipo: true,
-                digits: true
+                digits: true,
+                val_ced: true
             },
             correo: {
                 required: true,
@@ -58,6 +55,7 @@ $(document).ready(function () {
                 tipo: "Error en el numero de digitos (10 para cedula o 13 para ruc)",
                 // minlength: "Numero de digitos deficiente (10 para cedula)",
                 digits: "Debe ingresar unicamente numeros",
+                val_ced: "Numero de documento no valido para Ecuador",
             },
             correo: "Debe ingresar un correo valido",
             telefono: {

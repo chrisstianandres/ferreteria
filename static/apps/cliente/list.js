@@ -199,13 +199,10 @@ $(function () {
     $('#nuevo').on('click', function () {
         action = 'add';
         pk = '';
-        reset();
+        reset('#form');
         $('input[name="cedula"]').attr('readonly', false);
         mostrar();
     });
-
-
-    //col-xl-4 col-lg-5
 
     //enviar formulario de nuevo cliente
     $('#form').on('submit', function (e) {
@@ -219,9 +216,11 @@ $(function () {
                 '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
-                    ocultar();
+                    ocultar('#form');
                     });
                 });
         }
     });
+
+
 });

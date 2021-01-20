@@ -1,5 +1,6 @@
 from django.utils.decorators import method_decorator
 
+from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.compra.models import Compra
 from apps.delvoluciones_venta.models import Devolucion
@@ -21,7 +22,7 @@ from apps.backEnd import nombre_empresa
 
 from apps.producto_base.models import Producto_base
 from apps.user.forms import UserForm
-from apps.venta.forms import Detalle_VentaForm
+from apps.venta.forms import Detalle_VentaForm, VentaForm
 from apps.venta.models import Venta, Detalle_venta
 from apps.empresa.models import Empresa
 from apps.producto.models import Producto
@@ -51,7 +52,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data = {}
         try:
             action = request.POST['action']
-            if action == 'venta':
+            if action == 'list':
                 start = request.POST['start_date']
                 end = request.POST['end_date']
                 data = []
@@ -75,17 +76,17 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     result = Detalle_venta.objects.filter(venta_id=id).values('inventario__producto__producto_base_id',
                                                                               'cantidad', 'pvp_actual', 'subtotal'). \
                         annotate(Count('inventario__producto__producto_base_id'))
-                    for p in result:
-                        pr = Producto_base.objects.get(id=int(p['inventario__producto__producto_base_id']))
-                        pb = Producto.objects.get(producto_base_id=pr.id)
-                        data.append({
-                            'producto': pr.nombre,
-                            'categoria': pr.categoria.nombre,
-                            'presentacion': pr.presentacion.nombre,
-                            'cantidad': p['cantidad'],
-                            'pvp': p['pvp_actual'],
-                            'subtotal': p['subtotal']
-                        })
+                    # for p in result:
+                    #     pr = Producto_base.objects.get(id=int(p['inventario__producto__producto_base_id']))
+                    #     pb = Producto.objects.get(producto_base_id=pr.id)
+                    #     data.append({
+                    #         'producto': pr.nombre,
+                    #         'categoria': pr.categoria.nombre,
+                    #         'presentacion': pb.presentacion.nombre,
+                    #         'cantidad': p['cantidad'],
+                    #         'pvp': p['pvp_actual'],
+                    #         'subtotal': p['subtotal']
+                    #     })
             elif action == 'estado':
                 id = request.POST['id']
                 if id:
@@ -231,6 +232,11 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['form2'] = Detalle_VentaForm()
         data['detalle'] = []
         data['formc'] = UserForm()
+        data['formp'] = ClienteForm()
+        data['titulo_modal_person'] = 'Registro de un nuevo Cliente'
+        data['boton_fac'] = 'Facturar Venta'
+        data['titulo_lista'] = 'Detalle de productos'
+        data['titulo_detalle'] = 'Datos de la factura'
         return data
 
 
@@ -271,7 +277,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock = Producto.objects.get(id=i['id'])
                                 stock.stock = int(
                                     Inventario.objects.filter(producto_id=i['id'], estado=1).count())
                                 stock.save()
@@ -305,7 +311,7 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
+                                stock = Producto.objects.get(id=i['id'])
                                 stock.stock = int(
                                     Inventario.objects.filter(producto_id=i['id'], estado=1).count())
                                 stock.save()

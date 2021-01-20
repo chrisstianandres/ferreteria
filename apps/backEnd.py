@@ -132,6 +132,17 @@ def disconnect(request):
     return HttpResponseRedirect('/login')
 
 
+@csrf_exempt
+def check_ced(request):
+    data = {}
+    nro = request.POST['data']
+    if verificar(nro):
+        data['resp'] = True
+    else:
+        data['error'] = "Numero de Cedula no valido para Ecuador"
+    return JsonResponse(data)
+
+
 def verificar(nro):
     l = len(nro)
     if l == 10 or l == 13:  # verificar la longitud correcta

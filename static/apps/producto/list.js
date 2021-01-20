@@ -20,7 +20,7 @@ function datatable_fun() {
             {"data": "producto_base.nombre"},
             {"data": "producto_base.categoria.nombre"},
             {"data": "presentacion.nombre"},
-            {"data": "producto_base.stock"},
+            {"data": "stock"},
             {"data": "producto_base.descripcion"},
             {"data": "pvp"},
             {"data": "pcp"},
@@ -110,11 +110,11 @@ function datatable_fun() {
             },
         ],
         createdRow: function (row, data, dataIndex) {
-            if (data.producto_base.stock >= 51) {
+            if (data.stock >= 51) {
                 $('td', row).eq(3).find('span').addClass('badge badge-success').attr("style", "color: white");
-            } else if (data.producto_base.stock >= 10) {
+            } else if (data.stock >= 10) {
                 $('td', row).eq(3).find('span').addClass('badge badge-warning').attr("style", "color: white");
-            } else if (data.producto_base.stock <= 9) {
+            } else if (data.stock <= 9) {
                 $('td', row).eq(3).find('span').addClass('badge badge-danger').attr("style", "color: white");
             }
 
@@ -151,7 +151,7 @@ $(function () {
 
     //botones de formulario
     $('#nuevo').on('click', function () {
-        reset();
+        reset('#form');
         mostrar();
         cal_pvp();
         action = 'add';
@@ -159,7 +159,7 @@ $(function () {
     });
     $('#cancel_2').on('click', function () {
         $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
-        ocultar();
+        ocultar('#form');
         $('select[name="producto_base"]').val('').trigger('change');
         $('select[name="presentacion"]').val('').trigger('change');
         $('#check_image').html(
@@ -361,7 +361,7 @@ $(function () {
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este producto!', 'far fa-smile-wink', function () {
                         $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
-                        ocultar();
+                        ocultar('#form');
                         $('select[name="producto_base"]').val('').trigger('change');
                         $('select[name="presentacion"]').val('').trigger('change');
                         $('#check_image').html(

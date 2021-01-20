@@ -1,7 +1,6 @@
 var datatable;
 var logotipo;
 
-
 var datos = {
     fechas: {
         'start_date': '',
@@ -28,7 +27,6 @@ var datos = {
 
     },
 };
-
 
 function datatable_fun(){
      datatable = $("#datatable").DataTable({

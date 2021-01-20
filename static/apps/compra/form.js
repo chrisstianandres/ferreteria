@@ -16,7 +16,6 @@ var compras = {
             dict.subtotal = dict.cantidad * parseFloat(dict.pcp);
             subtotal += dict.subtotal;
             iva_emp = dict.iva_emp;
-            console.log(dict);
         });
         this.items.subtotal = subtotal;
         this.items.iva = this.items.subtotal * (iva_emp / 100);
@@ -188,7 +187,8 @@ $(function () {
 
     });
 
-    $('#id_proveedor').select2({
+    $('#id_proveedor')
+        .select2({
         theme: "classic",
         language: {
             inputTooShort: function () {
@@ -225,7 +225,8 @@ $(function () {
         minimumInputLength: 1,
     });
 
-    $('#id_producto').select2({
+    $('#id_producto')
+        .select2({
         theme: "classic",
         language: {
             inputTooShort: function () {
@@ -283,9 +284,9 @@ $(function () {
         });
 
 
-    $('#Modal').on('hidden.bs.modal', function (e) {
-        reset();
-        $('#form').trigger("reset");
+    $('#Modal_person').on('hidden.bs.modal', function (e) {
+        reset('#form_person');
+        $('#form_person').trigger("reset");
     });
 
 });

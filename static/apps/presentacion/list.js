@@ -88,8 +88,7 @@ $(function () {
                 '/presentacion/nuevo', 'Esta seguro que desea guardar esta presentacion?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar esta presentacion!', 'far fa-smile-wink', function () {
-                       ocultar();
-                        reset();
+                       ocultar('#form');
                     });
                 });
         }

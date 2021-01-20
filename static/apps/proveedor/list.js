@@ -133,7 +133,7 @@ $(function () {
     $('#nuevo').on('click', function () {
         $('input[name="num_doc"]').attr('readonly', false);
         $('select[name="tipo"]').attr('disabled', false);
-        reset();
+        reset('#form');
         mostrar();
         action = 'add';
         pk = '';
@@ -152,7 +152,7 @@ $(function () {
                 '/proveedor/nuevo', 'Esta seguro que desea guardar este proveedor?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este proveedor!', 'far fa-smile-wink', function () {
-                        ocultar();
+                        ocultar('#form');
                     });
                 });
         }

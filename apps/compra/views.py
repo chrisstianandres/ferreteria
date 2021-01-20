@@ -124,9 +124,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dv.subtotal = float(i['subtotal'])
                             x = Producto.objects.get(pk=i['id'])
                             dv.p_compra_actual = float(x.pcp)
-                            pb = Producto_base.objects.get(producto=x.id)
-                            pb.stock = pb.stock + int(i['cantidad'])
-                            pb.save()
+                            x.stock = x.stock + int(i['cantidad'])
                             x.save()
                             dv.save()
                             for p in range(0, i['cantidad']):
@@ -151,14 +149,16 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar Compra'
         data['titulo'] = 'Nueva Compra'
-        data['titulo_lista'] = 'Detalle de productos'
-        data['titulo_detalle'] = 'Datos de la factura'
         data['nuevo'] = '/compra/nuevo'
         data['empresa'] = empresa
         data['form'] = CompraForm()
         data['form2'] = Detalle_CompraForm()
         data['detalle'] = []
         data['formp'] = ProveedorForm()
+        data['titulo_modal_person'] = 'Registro de un nuevo Proveedor'
+        data['boton_fac'] = 'Guardar Compra'
+        data['titulo_lista'] = 'Detalle de productos'
+        data['titulo_detalle'] = 'Datos de la factura'
         return data
 
 

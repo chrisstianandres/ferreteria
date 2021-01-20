@@ -17,8 +17,8 @@ function mostrar() {
     $('#nuevo').hide();
 }
 
-function ocultar() {
-    reset();
+function ocultar(form) {
+    reset(form);
     $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
     $('#div_form').hide();
     datatable.destroy();
@@ -28,7 +28,7 @@ function ocultar() {
 
 $('#cancel').on('click', function () {
     $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
-    ocultar();
+    ocultar('#form');
 });
 
 function borrar_todo_alert(title, content, callback, callback2) {
@@ -318,9 +318,9 @@ function save_with_ajax2(title, url, content, parametros, callback) {
     });
 }
 
-function reset() {
-    $("#form")[0].reset();
-    var validator = $("#form").validate();
+function reset(formulario) {
+    $(formulario)[0].reset();
+    var validator = $(formulario).validate();
     validator.resetForm();
     $('.is-valid').removeClass('is-valid');
     $('.is-invalid').removeClass('is-invalid');
@@ -471,6 +471,24 @@ function validador() {
                 .removeClass("is-invalid");
         }
     });
+
+    jQuery.validator.addMethod("val_ced", function (value, element) {
+         if (value.length === 10 || value.length === 13) {
+          $.ajax({
+                type: "POST",
+                url: '/verificar/',
+                data: {'data': value.toString()},
+                dataType: 'json',
+                success: function (data) {
+                    if (!data.hasOwnProperty('error')) {
+                        $(element).addClass("is-valid").removeClass("is-invalid");
+                        return false;
+                    }
+                    $(element).addClass("is-invalid").removeClass("is-valid");
+                },
+            })} return false
+        // return this.optional(element) || /^[a-z," "]+$/i.test(value);
+    }, "");
 }
 
 

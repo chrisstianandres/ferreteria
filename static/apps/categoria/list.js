@@ -74,7 +74,7 @@ $(function () {
 
 
     $('#nuevo').on('click', function () {
-        reset();
+        reset('#form');
         mostrar();
         action = 'add';
     });
@@ -91,8 +91,8 @@ $(function () {
                 '/categoria/nuevo', 'Esta seguro que desea guardar esta categoria?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar esta categoria!', 'far fa-smile-wink', function () {
-                        reset();
-                        ocultar();
+                         reset('#form');
+                        ocultar( '#form');
                     });
                 });
         }

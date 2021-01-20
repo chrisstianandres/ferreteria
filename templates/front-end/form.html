@@ -17,7 +17,10 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label> Buscar Productos:</label>
-                            {{ form2.producto }}
+                            {% block buscador %}
+                             {{ form2.producto }}
+                            {% endblock %}
+
                         </div>
                         <br>
                         <button type="button" class="btn btn-danger btn-sm btn-flat btnRemoveall">
@@ -87,7 +90,7 @@
                                     <button type="button" class="btn btn-danger" data-dismiss="modal"><i
                                             class="fas fa-times"></i> Cancelar
                                     </button>
-                                    <button id="facturar" type="button" class="btn btn-success"><i class="fas fa-hand-holding-usd"></i>&nbsp;Facturar
+                                    <button id="facturar" type="button" class="btn btn-success"><i class="fas fa-hand-holding-usd"></i>&nbsp;{{ boton_fac }}
                                     </button>
                                 </div>
                             </div>
@@ -100,8 +103,7 @@
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-plus"></i>&nbsp;Registro
-                                        de un Proveedor</h5>
+                                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-plus"></i>&nbsp;{{ titulo_modal_person }}</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -122,7 +124,6 @@
                                             class="fas fa-user-times"></i> Cancelar
                                     </button>
                                     <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
-                                        Proveedor
                                     </button>
                                 </div>
                             </div>

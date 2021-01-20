@@ -11,6 +11,7 @@ class Producto(models.Model):
     presentacion = models.ForeignKey(Presentacion, on_delete=models.PROTECT)
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
     pcp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, null=True, blank=True)
+    stock = models.IntegerField(default=0)
     imagen = models.ImageField(upload_to='producto/imagen', blank=True, null=True)
 
     def __str__(self):

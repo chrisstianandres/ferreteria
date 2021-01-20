@@ -15,7 +15,7 @@ var ventas = {
         $.each(this.items.productos, function (pos, dict) {
             dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
-            iva_emp = (dict.iva_emp/100);
+            iva_emp = (dict.iva_emp / 100);
         });
         this.items.subtotal = subtotal;
         this.items.iva = this.items.subtotal * iva_emp;
@@ -28,11 +28,10 @@ var ventas = {
         this.items.productos.push(data[0]);
         this.items.productos = this.exclude_duplicados(this.items.productos);
         this.list();
-        console.log(this.items)
     },
     list: function () {
         this.calculate();
-        tblventa = $("#tblproductos").DataTable({
+        tblventa = $("#datatable").DataTable({
             destroy: true,
             autoWidth: false,
             dataSrc: "",
@@ -45,8 +44,8 @@ var ventas = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "producto_base.presentacion.nombre"},
-                {data: "producto_base.stock"},
+                {data: "presentacion.nombre"},
+                {data: "stock"},
                 {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
@@ -80,7 +79,7 @@ var ventas = {
 
                     }
                 }
-            ],  rowCallback: function (row, data) {
+            ], rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
                     max: data.producto_base.stock,
@@ -89,7 +88,7 @@ var ventas = {
             }
         });
     },
-     exclude_duplicados: function (array) {
+    exclude_duplicados: function (array) {
         this.items.productos = [];
         let hash = {};
         result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
@@ -98,7 +97,7 @@ var ventas = {
     }
 };
 $(function () {
-        if (localStorage.getItem('carrito')) {
+    if (localStorage.getItem('carrito')) {
         carro_respaldo = JSON.parse(localStorage.getItem('carrito'));
         ventas.items.productos = carro_respaldo;
         ventas.list();
@@ -107,43 +106,23 @@ $(function () {
     }
     var action = '';
     var pk = '';
-    //seleccionar producto del select producto
-    $('#id_inventario').on('select2:select', function (e) {
-        $.ajax({
-            type: "POST",
-            url: '/producto/lista',
-            data: {
-                "id": $('#id_inventario option:selected').val(),
-                'action': 'get'
-            },
-            dataType: 'json',
-            success: function (data) {
-                ventas.add(data);
-                $('#id_inventario').val(null).trigger('change');
-            },
-            error: function (xhr, status, data) {
-                alert(data);
-            },
-
-        })
-    });
     //remover producto del detalle
-    $('#tblproductos tbody')
+    $('#datatable tbody')
         .on('click', 'a[rel="remove"]', function () {
-        var tr = tblventa.cell($(this).closest('td, li')).index();
-        borrar_todo_alert('Alerta de Eliminación',
-            'Esta seguro que desea eliminar este producto de tu detalle <br> ' +
-            '<strong>CONTINUAR?</strong>', function () {
-                ventas.items.productos.splice(tr.row, 1);
-                ventas.list();
-            })
-    })
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            borrar_todo_alert('Alerta de Eliminación',
+                'Esta seguro que desea eliminar este producto de tu detalle <br> ' +
+                '<strong>CONTINUAR?</strong>', function () {
+                    ventas.items.productos.splice(tr.row, 1);
+                    ventas.list();
+                })
+        })
         .on('change keyup', 'input[name="cantidad"]', function () {
             var cantidad = parseInt($(this).val());
             var tr = tblventa.cell($(this).closest('td, li')).index();
             ventas.items.productos[tr.row].cantidad = cantidad;
             ventas.calculate();
-            $('td:eq(6)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
         });
     //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {
@@ -157,52 +136,56 @@ $(function () {
     });
     //boton guardar
     $('#save').on('click', function () {
-        if ($('select[name="cliente"]').val() === "") {
-            menssaje_error('Error!', "Debe seleccionar un cliente", 'far fa-times-circle');
-            return false
-        } else if (ventas.items.productos.length === 0) {
+        if (ventas.items.productos.length === 0) {
             menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
             return false
+        } else {
+            $('#Modal_detalle').modal('show');
         }
-        var parametros;
-        ventas.items.fecha_venta = $('input[name="fecha_trans"]').val();
-        ventas.items.cliente = $('#id_cliente option:selected').val();
-        parametros = {'ventas': JSON.stringify(ventas.items)};
-        parametros['action']='add';
-        parametros['id']='';
-        save_with_ajax('Alerta',
-            '/venta/nuevo', 'Esta seguro que desea guardar esta venta?', parametros,
-            function (response) {
-            localStorage.clear();
-                printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
-                    window.open('/venta/printpdf/' + response['id'], '_blank');
-                    // location.href = '/venta/printpdf/' + response['id'];
-                    location.href = '/venta/lista';
-                }, function () {
-                    location.href = '/venta/lista';
-                })
-
-            });
-
     });
+    $('#facturar').on('click', function () {
+            if ($('select[name="cliente"]').val() === "") {
+                menssaje_error('Error!', "Debe seleccionar un cliente", 'far fa-times-circle');
+                return false
+            }
+            var parametros;
+            ventas.items.fecha_venta = $('input[name="fecha"]').val();
+            ventas.items.cliente = $('#id_cliente option:selected').val();
+            parametros = {'ventas': JSON.stringify(ventas.items)};
+            parametros['action'] = 'add';
+            parametros['id'] = '';
+            save_with_ajax('Alerta',
+                '/venta/nuevo', 'Esta seguro que desea guardar esta venta?', parametros,
+                function (response) {
+                    localStorage.clear();
+                    printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+                        window.open('/venta/printpdf/' + response['id'], '_blank');
+                        // location.href = '/venta/printpdf/' + response['id'];
+                        location.href = '/venta/lista';
+                    }, function () {
+                        location.href = '/venta/lista';
+                    })
+
+                });
+        }
+    );
     //boton agregar cliente
-    $('#id_new_client').on('click', function () {
-        $('#Modal').modal('show');
+    $('#id_new_cliente').on('click', function () {
+        $('#Modal_person').modal('show');
     });
     //enviar formulario de nuevo cliente
-    $('#form').on('submit', function (e) {
+    $('#form_person').on('submit', function (e) {
         e.preventDefault();
-        action = 'add';
         var parametros = new FormData(this);
-        parametros.append('action', action);
-        parametros.append('id', pk);
+        parametros.append('action', 'add');
+        parametros.append('id', '');
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
                 '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
-                        $('#Modal').modal('hide');
+                        $('#Modal_person').modal('hide');
                         var newOption = new Option(response.cliente['full_name'], response.cliente['id'], false, true);
                         $('#id_cliente').append(newOption).trigger('change');
                     });
@@ -211,84 +194,105 @@ $(function () {
 
     });
     //buscar cliente en el select cliente
-    $('#id_cliente').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
+    $('#id_cliente')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
             },
-            "noResults": function () {
-                return "Sin resultados";
-            },
-            "searching": function () {
-                return "Buscando...";
-            }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: '/cliente/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search'
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/cliente/lista',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+
+                },
 
             },
-
-        },
-        placeholder: 'Busca un cliente',
-        minimumInputLength: 1,
-    });
+            placeholder: 'Busca un cliente',
+            minimumInputLength: 1,
+        });
     //mostrar el modal con el formulario cliente
-    $('#Modal').on('hidden.bs.modal', function (e) {
-        reset();
-        $('#form').trigger("reset");
+    $('#Modal_person').on('hidden.bs.modal', function (e) {
+        reset('#form_person');
+        $('#form_person').trigger("reset");
     });
     //buscar produto del select producto
-    $('#id_inventario').select2({
-        theme: "classic",
-        language: {
-            inputTooShort: function () {
-                return "Ingresa al menos un caracter...";
+    $('#id_inventario')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
             },
-            "noResults": function () {
-                return "Sin resultados";
-            },
-            "searching": function () {
-                return "Buscando...";
-            }
-        },
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: '/producto/lista',
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    'action': 'search',
-                    'id': ''
-                };
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/producto/lista',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search',
+                        'id': ''
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+
+                },
 
             },
+            placeholder: 'Busca un Producto',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/producto/lista',
+                data: {
+                    "id": $('#id_inventario option:selected').val(),
+                    'action': 'get'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    ventas.add(data);
+                    $('#id_inventario').val(null).trigger('change');
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
 
-        },
-        placeholder: 'Busca un Producto',
-        minimumInputLength: 1,
-    });
+            })
+        });
 });
 

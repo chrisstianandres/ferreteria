@@ -1,26 +1,88 @@
-# from django import forms
-#
-# from .models import Detalle_venta
-# from apps.inventario_productos.models import Inventario_producto
-#
-#
-# class Detalle_VentaForm(forms.ModelForm):
-#     # constructor
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         for field in self.Meta.fields:
-#             self.fields[field].widget.attrs.update({
-#                 'class': 'form-control'
-#             })
-#             self.fields['inventario'].widget.attrs = {
-#                 'class': 'form-control select2',
-#                 'data-live-search': "true"
-#             }
-#             self.fields["inventario"].queryset = Inventario_producto.objects.none()
-#         # habilitar, desabilitar, y mas
-#
-#     class Meta:
-#         model = Detalle_venta
-#         fields = [
-#             'inventario',
-#         ]
+from datetime import datetime
+
+from django import forms
+
+from .models import Detalle_venta, Venta
+from apps.inventario.models import Inventario
+
+
+class VentaForm(forms.ModelForm):
+    # constructor
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+            self.fields['fecha'].widget.attrs = {
+                'readonly': True,
+                'class': 'form-control'
+            }
+            self.fields['cliente'].widget.attrs = {
+                'class': 'form-control select2',
+                'style': "width: 93%"
+            }
+            self.fields['subtotal'].widget.attrs = {
+                'value': '0.00',
+                'class': 'form-control',
+                'readonly': True
+            }
+            self.fields['iva'].widget.attrs = {
+                'value': '0.00',
+                'class': 'form-control',
+                'readonly': True
+            }
+            self.fields['total'].widget.attrs = {
+                'value': '0.00',
+                'class': 'form-control',
+                'readonly': True
+            }
+
+        # habilitar, desabilitar, y mas
+
+    class Meta:
+        model = Venta
+        fields = [
+            'fecha',
+            'cliente',
+            'subtotal',
+            'iva',
+            'total'
+        ]
+        labels = {
+            'fecha': 'Fecha de Venta',
+            'cliente': 'Cliente',
+            'subtotal': 'Subtotal',
+            'iva': 'I.V.A.',
+            'total': 'TOTAL'
+        }
+        widgets = {
+            'fecha': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={'value': datetime.now().strftime('%Y-%m-%d')},
+            ),
+            'iva': forms.TextInput(),
+            'total': forms.TextInput(),
+        }
+
+
+class Detalle_VentaForm(forms.ModelForm):
+    # constructor
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+            self.fields['inventario'].widget.attrs = {
+                'class': 'form-control select2',
+                'data-live-search': "true"
+            }
+            self.fields["inventario"].queryset = Inventario.objects.none()
+        # habilitar, desabilitar, y mas
+
+    class Meta:
+        model = Detalle_venta
+        fields = [
+            'inventario',
+        ]

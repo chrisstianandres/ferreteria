@@ -68,7 +68,7 @@ $(function () {
 
 
     $('#nuevo').on('click', function () {
-        reset();
+        reset('#form');
         mostrar();
         action = 'add';
         pk = '';
@@ -86,8 +86,7 @@ $(function () {
                 '/tipo_gasto/nuevo', 'Esta seguro que desea guardar este tipo de gasto?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este tipo de gasto!', 'far fa-smile-wink', function () {
-                        reset();
-                        ocultar();
+                        ocultar('#form');
                     });
                 });
         }

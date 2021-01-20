@@ -1,22 +1,12 @@
 var datatable;
 var user_tipo = $('input[name="user_tipo"]').val();
 var logotipo;
-const toDataURL = url => fetch(url).then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob)
-    }));
 
-toDataURL('/media/imagen.PNG').then(dataUrl => {
-    logotipo = dataUrl;
-});
 var datos = {
     fechas: {
         'start_date': '',
         'end_date': '',
-        'action': 'venta',
+        'action': 'list',
     },
     add: function (data) {
         if (data.key === 1) {
@@ -38,8 +28,8 @@ var datos = {
 
     },
 };
-$(function () {
-    daterange();
+
+function datatable_fun() {
     datatable = $("#datatable").DataTable({
         // responsive: true,
         destroy: true,
@@ -161,12 +151,11 @@ $(function () {
             ],
         },
         columns: [
-            {data: 'transaccion.fecha_trans'},
-            {data: "transaccion.cliente.full_name_list"},
-            {data: "transaccion.user.full_name"},
-            {data: "transaccion.subtotal"},
-            {data: "transaccion.iva"},
-            {data: "transaccion.total"},
+            {data: 'fecha'},
+            {data: "cliente.full_name_list"},
+            {data: "subtotal"},
+            {data: "iva"},
+            {data: "total"},
             {data: "id"},
             {data: "estado"},
             {data: "id"},
@@ -220,15 +209,14 @@ $(function () {
             }
 
         ],
-        drawCallback: draw,
         createdRow: function (row, data, dataIndex) {
             if (data.estado === 'FINALIZADA') {
                 if (user_tipo === '0') {
                     $('td', row).eq(6).find('span').addClass('badge bg-success').attr("style", "color: white");
                     $('td', row).eq(7).find('a[rel="devolver"]').hide();
                 }
-                $('td', row).eq(7).find('span').addClass('badge bg-success').attr("style", "color: white");
-                $('td', row).eq(8).find('a[rel="devolver"]').hide();
+                $('td', row).eq(6).find('span').addClass('badge bg-success').attr("style", "color: white");
+
             } else if (data.estado === 'DEVUELTA') {
                 if (user_tipo === '0') {
                     $('td', row).eq(6).find('span').addClass('badge bg-danger').attr("style", "color: white");
@@ -236,10 +224,10 @@ $(function () {
                     $('td', row).eq(7).find('a[rel="detalle"]').hide();
                     $('td', row).eq(7).find('a[rel="pdf"]').hide();
                 }
-                $('td', row).eq(7).find('span').addClass('badge bg-danger').attr("style", "color: white");
-                $('td', row).eq(8).find('a[rel="devolver"]').hide();
-                $('td', row).eq(8).find('a[rel="detalle"]').hide();
-                $('td', row).eq(8).find('a[rel="pdf"]').hide();
+                $('td', row).eq(6).find('span').addClass('badge bg-danger').attr("style", "color: white");
+                $('td', row).eq(7).find('a[rel="devolver"]').hide();
+                $('td', row).eq(7).find('a[rel="detalle"]').hide();
+                $('td', row).eq(7).find('a[rel="pdf"]').hide();
             } else if (data.estado === 'RESERVADA') {
                 if (user_tipo === '0') {
                     $('td', row).eq(7).find('a[rel="pagar"]').hide();
@@ -249,6 +237,38 @@ $(function () {
             }
         },
     });
+}
+
+function daterange() {
+    $("div.toolbar").html('<br><div class="col-lg-3"><input type="text" name="fecha" class="form-control form-control-sm input-sm"></div> <br>');
+    $('input[name="fecha"]').daterangepicker({
+        locale: {
+            format: 'YYYY-MM-DD',
+            applyLabel: '<i class="fas fa-search"></i> Buscar',
+            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
+        }
+    }).on('apply.daterangepicker', function (ev, picker) {
+        picker['key'] = 1;
+        datos.add(picker);
+        // filter_by_date();
+
+    }).on('cancel.daterangepicker', function (ev, picker) {
+        picker['key'] = 0;
+        datos.add(picker);
+    });
+
+}
+
+function pad(str, max) {
+    str = str.toString();
+    return str.length < max ? pad("0" + str, max) : str;
+}
+
+
+$(function () {
+    daterange();
+    datatable_fun();
+
     $('#datatable tbody')
         .on('click', 'a[rel="devolver"]', function () {
             $('.tooltip').remove();
@@ -365,40 +385,12 @@ $(function () {
         if (user_tipo === '0') {
             window.location.href = '/venta/online'
         } else {
-             window.location.href = '/venta/nuevo'
+            window.location.href = '/venta/nuevo'
         }
 
 
     })
 });
 
-function daterange() {
-    $("div.toolbar").html('<br><div class="col-lg-3"><input type="text" name="fecha" class="form-control form-control-sm input-sm"></div> <br>');
-    $('input[name="fecha"]').daterangepicker({
-        locale: {
-            format: 'YYYY-MM-DD',
-            applyLabel: '<i class="fas fa-search"></i> Buscar',
-            cancelLabel: '<i class="fas fa-times"></i> Cancelar',
-        }
-    }).on('apply.daterangepicker', function (ev, picker) {
-        picker['key'] = 1;
-        datos.add(picker);
-        // filter_by_date();
 
-    }).on('cancel.daterangepicker', function (ev, picker) {
-        picker['key'] = 0;
-        datos.add(picker);
-    });
 
-}
-
-var draw = function () {
-    if (user_tipo === '0') {
-        datatable.columns([2]).visible(false);
-    }
-};
-
-function pad(str, max) {
-    str = str.toString();
-    return str.length < max ? pad("0" + str, max) : str;
-}

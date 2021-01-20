@@ -29,6 +29,7 @@ class Venta(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['estado'] = self.get_estado_display()
+        item['cliente'] = self.cliente.toJSON()
         return item
 
     class Meta:
