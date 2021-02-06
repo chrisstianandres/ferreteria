@@ -41,7 +41,7 @@ function datatable_fun() {
             },
             buttons: [
                 {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel',
+                    text: '<i class="fa fa-file-excel"></i> Excel',
                     className: "btn btn-success btn-space float-right",
                     extend: 'excel'
                 },
@@ -144,7 +144,7 @@ function datatable_fun() {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
+                    var edit = '<a style="color: white" type="button" class="btn btn-primary btn-xs" rel="edit" ' +
                         'data-toggle="tooltip" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
                     var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
                         'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';

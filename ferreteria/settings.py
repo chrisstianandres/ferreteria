@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.venta',
     'apps.compra',
-    'apps.sitioweb'
+    'apps.sitioweb',
+    'apps.ubicacion'
 ]
 
 MIDDLEWARE = [

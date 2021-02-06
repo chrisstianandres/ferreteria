@@ -47,7 +47,7 @@
 
     table th {
         color: #fff;
-        background-color: #1d4061;
+        background-color: #4e73df;
     }
 </style>
 <body>
@@ -62,33 +62,23 @@
     {{ title|upper }}</h1>
 <p class="fact">
     <b>FACTURA N°:</b><br>
-    <b class="n">{{ sale.transaccion.id|stringformat:"010d" }}</b>
+    <b class="n">{{ sale.id|stringformat:"010d" }}</b>
 </p>
 <p>
-    <b>FECHA DE VENTA:</b> {{ sale.transaccion.fecha_trans }}<br>
-    {% if sale.transaccion.fecha_ingreso != None %}<b>FECHA DE RECEPCION:</b> {{ sale.fecha_ingreso }}<br>{% endif %}
-    {% if sale.transaccion.fecha_entrega != None %}<b>FECHA DE ENTREGA:</b> {{ sale.transaccion.fecha_entrega }}<br>{% endif %}
-    <b>CLIENTE:</b> {{ sale.transaccion.cliente.nombres|upper }}&nbsp;{{ sale.transaccion.cliente.apellidos|upper }}<br>
-    <b>CEDULA:</b> {{ sale.transaccion.cliente.cedula }}<br>
+    <b>FECHA DE VENTA:</b> {{ sale.fecha }}<br>
+    <b>CLIENTE:</b> {{ sale.cliente.nombres|upper }}&nbsp;{{ sale.cliente.apellidos|upper }}<br>
+    <b>CEDULA:</b> {{ sale.cliente.cedula }}<br>
 
 </p>
 <table id="invoice">
     <thead>
     <tr>
-        <th style="width: 40%;"> PRODUCTO</th>
+        <th style="width: 30%;"> PRODUCTO</th>
         <th style="width: 20%;"> CATEGORIA</th>
         <th style="width: 20%;"> PRESENTACION</th>
-        <th style="width: 10%;" class="text-center">&nbsp;CANT</th>
-        {% if sale.transaccion.tipo == 0 %}
-            <th style="width: 15%;"> P.VENTA</th>{% endif %}
-        {% if sale.transaccion.tipo == 1 %}
-            <th style="width: 15%;"> P.REPARACION</th>{% endif %}
-        {% if sale.transaccion.tipo == 2 %}
-            <th style="width: 15%;"> P.ALQUILER</th>{% endif %}
-        {% if sale.transaccion.tipo == 3 %}
-            <th style="width: 15%;"> P.CONFECCION</th>{% endif %}
+        <th style="width: 15%;" >&nbsp;CANTIDAD</th>
+        <th style="width: 20%;"> PRECIO DE VENTA</th>
         <th style="width: 15%;"> SUBTOTAL</th>
-
     </tr>
     </thead>
     <tbody>
@@ -96,10 +86,10 @@
         <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
             <td>{{ d.producto.producto.producto_base.nombre }}</td>
             <td>{{ d.producto.producto.producto_base.categoria.nombre }}</td>
-            <td>{{ d.producto.producto.producto_base.presentacion.nombre }}</td>
-            <td class="text-center">{{ d.cantidad }}</td>
+            <td>{{ d.producto.producto.presentacion.nombre }}</td>
+            <td style="text-align: center;">{{ d.cantidad }}</td>
             <td class="text-center">${{ d.pvp }}</td>
-            <td style="text-align: right;">${{ d.subtotal }}</td>
+            <td style="text-align: center;">${{ d.subtotal }}</td>
         </tr>
         <tr></tr>
         <tr style="border-top: 1px solid black; padding-top: 4px;"></tr>
@@ -108,15 +98,15 @@
     <tr></tr>
     <tr style="padding-top: 0px;">
         <td colspan="5" style="text-align: right"><b>SUBTOTAL</b></td>
-        <td style="text-align: right">${{ sale.transaccion.subtotal }}</td>
+        <td style="text-align: right">${{ sale.subtotal }}</td>
     </tr>
     <tr style="padding-top: 0px;">
         <td colspan="5" style="text-align: right"><b>IVA {{ empresa.iva }}%</b></td>
-        <td style="text-align: right">${{ sale.transaccion.iva }}</td>
+        <td style="text-align: right">${{ sale.iva }}</td>
     </tr>
     <tr style="padding-top: 0px;">
         <td colspan="5" style="text-align: right"><b>TOTAL A PAGAR</b></td>
-        <td style="text-align: right">${{ sale.transaccion.total }}</td>
+        <td style="text-align: right">${{ sale.total }}</td>
     </tr>
     </tbody>
 </table>

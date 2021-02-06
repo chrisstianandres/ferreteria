@@ -12,7 +12,6 @@ function datatable_fun() {
             dataSrc: ""
         },
         columns: [
-            {"data": "id"},
             {"data": "nombre"},
             {"data": "tipo"},
             {"data": "num_doc"},
@@ -23,20 +22,6 @@ function datatable_fun() {
         ],
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
-            searchPanes: {
-                clearMessage: 'Limpiar Filtros',
-                collapse: {
-                    0: 'Filtros de Busqueda',
-                    _: 'Filtros seleccionados (%d)'
-                },
-                title: {
-                    _: 'Filtros seleccionados - %d',
-                    0: 'Ningun Filtro seleccionados',
-                },
-                activeMessage: 'Filtros activos (%d)',
-                emptyPanes: 'No existen suficientes datos para generar filtros :('
-
-            }
         },
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
             "<'row'<'col-sm-12 col-md-3'l>>" +
@@ -70,7 +55,7 @@ function datatable_fun() {
                     customize,
                 },
                 {
-                    text: '<i class="fa fa-file-excel"></i> Reporte Excel',
+                    text: '<i class="fa fa-file-excel"></i> Excel',
                     className: "btn btn-success btn-space float-right",
                     extend: 'excel'
                 }
@@ -82,8 +67,8 @@ function datatable_fun() {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" type="button" class="btn btn-warning btn-xs" rel="edit" ' +
-                        'data-toggle="tooltip" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
+                    var edit = '<a style="color: white" type="button" class="btn btn-primary btn-xs" rel="edit" ' +
+                        'data-toggle="tooltip" title="Editar Datos"><i class="fas fa-edit"></i></a>' + ' ';
                     var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
                         'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
                     return edit + del

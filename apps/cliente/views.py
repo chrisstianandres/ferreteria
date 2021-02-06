@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
@@ -10,6 +11,7 @@ from apps.backEnd import nombre_empresa, verificar
 from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.mixins import ValidatePermissionRequiredMixin
+from apps.ubicacion.models import *
 
 opc_icono = 'fa fa-user'
 opc_entidad = 'Clientes'
@@ -28,12 +30,14 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         data = {}
+
         try:
             action = request.POST['action']
             if action == 'list':
                 data = []
                 for c in Cliente.objects.all():
                     data.append(c.toJSON())
+
             elif action == 'search':
                 data = []
                 term = request.POST['term']
@@ -45,8 +49,10 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
+            import json
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
+            print(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -148,3 +154,25 @@ class report(ValidatePermissionRequiredMixin, ListView):
         data['titulo'] = 'Reporte de Clientes'
         data['empresa'] = empresa
         return data
+
+
+def ciudad(request):
+    data = {}
+    with open('D:/PycharmProjects/ferreteria/apps/ciudades.json', encoding="utf8") as f:
+        data = json.load(f)
+        for c in data:
+            pro = Provincia()
+            pro.nombre = str(data[c]['provincia'])
+            pro.save()
+            for x in data[c]['cantones']:
+                can = Canton()
+                can.provincia_id = pro.id
+                can.nombre = str(data[c]['cantones'][x]['canton'])
+                can.save()
+                for p in data[c]['cantones'][x]['parroquias']:
+                    par = Parroquia()
+                    par.canton_id = can.id
+                    par.nombre = str(data[c]['cantones'][x]['parroquias'][p])
+                    par.save()
+        data = Parroquia.objects.all()
+    return HttpResponse(data)

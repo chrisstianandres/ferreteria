@@ -96,8 +96,10 @@ function datatable_fun() {
                 class: 'text-center',
                 render: function (data, type, row) {
 
-                    var devolver = '<a type="button" rel="del" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>';
-                    var editar = '<a type="button" rel="edit" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Editar"><i class="fa fa-edit"></i></a>' + ' ';
+                    var devolver = '<a type="button" rel="del" class="btn btn-danger btn-xs btn-round" ' +
+                        'style="color: white" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>';
+                    var editar = '<a type="button" rel="edit" class="btn btn-primary btn-xs btn-round" ' +
+                        'style="color: white" data-toggle="tooltip" title="Editar"><i class="fa fa-edit"></i></a>' + ' ';
                     return editar + devolver;
                 }
             },

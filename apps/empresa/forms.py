@@ -21,8 +21,8 @@ class EmpresaForm(forms.ModelForm):
                        'class': 'form-control form-rounded'})
             self.fields['correo'].widget = TextInput(attrs={'placeholder': 'Ingrese numero la direccion de la empresa',
                                                             'class': 'form-control form-rounded'})
-            self.fields['ciudad'].widget = TextInput(attrs={'placeholder': 'Ingrese numero la direccion de la empresa',
-                                                            'class': 'form-control form-rounded'})
+            # self.fields['ciudad'].widget = TextInput(attrs={'placeholder': 'Ingrese numero la direccion de la empresa',
+            #                                                 'class': 'form-control form-rounded'})
             self.fields['telefono'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese numero la direccion de la empresa',
                        'class': 'form-control form-rounded'})
@@ -43,7 +43,7 @@ class EmpresaForm(forms.ModelForm):
     class Meta:
         model = Empresa
         fields = ['nombre',
-                  'ciudad',
+                  'ubicacion',
                   'ruc',
                   'correo',
                   'direccion',
@@ -56,7 +56,7 @@ class EmpresaForm(forms.ModelForm):
                   ]
         labels = {
             'nombre': 'Nombre',
-            'ciudad': 'Ciudad',
+            'ubicacion': 'Parroquia',
             'ruc': 'Ruc',
             'correo': 'Correo',
             'direccion': 'Direecion',
@@ -69,7 +69,7 @@ class EmpresaForm(forms.ModelForm):
         }
         widgets = {
             'nombre': forms.TextInput(),
-            'ciudad': forms.TextInput(),
+            # 'ciudad': forms.TextInput(),
             'ruc': forms.TextInput(),
             'correo': forms.TextInput(),
             'direccion': forms.TextInput(),

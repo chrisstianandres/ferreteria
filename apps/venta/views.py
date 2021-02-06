@@ -73,20 +73,19 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 id = request.POST['id']
                 if id:
                     data = []
-                    result = Detalle_venta.objects.filter(venta_id=id).values('inventario__producto__producto_base_id',
+                    result = Detalle_venta.objects.filter(venta_id=id).values('inventario__producto_id',
                                                                               'cantidad', 'pvp_actual', 'subtotal'). \
-                        annotate(Count('inventario__producto__producto_base_id'))
-                    # for p in result:
-                    #     pr = Producto_base.objects.get(id=int(p['inventario__producto__producto_base_id']))
-                    #     pb = Producto.objects.get(producto_base_id=pr.id)
-                    #     data.append({
-                    #         'producto': pr.nombre,
-                    #         'categoria': pr.categoria.nombre,
-                    #         'presentacion': pb.presentacion.nombre,
-                    #         'cantidad': p['cantidad'],
-                    #         'pvp': p['pvp_actual'],
-                    #         'subtotal': p['subtotal']
-                    #     })
+                        annotate(Count('inventario__producto_id'))
+                    for p in result:
+                        pb = Producto.objects.get(id=int(p['inventario__producto_id']))
+                        data.append({
+                            'producto': pb.producto_base.nombre,
+                            'categoria': pb.producto_base.categoria.nombre,
+                            'presentacion': pb.presentacion.nombre,
+                            'cantidad': p['cantidad'],
+                            'pvp': p['pvp_actual'],
+                            'subtotal': p['subtotal']
+                        })
             elif action == 'estado':
                 id = request.POST['id']
                 if id:
@@ -146,7 +145,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 datos = json.loads(request.POST['ventas'])
@@ -400,12 +398,11 @@ class printpdf(View):
         data = []
         try:
             result = Detalle_venta.objects.filter(venta_id=self.kwargs['pk']).values(
-                'inventario__producto__producto_base_id',
+                'inventario__producto_id',
                 'cantidad', 'pvp_actual', 'subtotal'). \
-                annotate(Count('inventario__producto__producto_base_id'))
+                annotate(Count('inventario__producto_id'))
             for i in result:
-                pr = Producto_base.objects.get(id=int(i['inventario__producto__producto_base_id']))
-                pb = Producto.objects.get(producto_base_id=pr.id)
+                pb = Producto.objects.get(id=int(i['inventario__producto_id']))
                 item = {'producto': {'producto': pb.toJSON()}}
                 item['pvp'] = format(i['pvp_actual'], '.2f')
                 item['cantidad'] = i['cantidad']

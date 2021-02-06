@@ -25,14 +25,15 @@
                     </div>
                     <div class="card-footer">
                         <br>
-                        <a type="button" class="btn btn-warning btn-sm" id="nuevo" style="color: white">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Nuevo
-                        </a>
-                        <a type="button" class="btn btn-success btn-sm" id="reload"
-                           onclick=" location.reload();">
-                            <i class="fas fa-sync-alt"></i> Actualizar
-                        </a>
-
+                        {% block table_footer %}
+                            <a type="button" class="btn btn-warning btn-sm" id="nuevo" style="color: white">
+                                <i class="fa fa-plus" aria-hidden="true"></i> Nuevo
+                            </a>
+                            <a type="button" class="btn btn-success btn-sm" id="reload"
+                               onclick=" location.reload();">
+                                <i class="fas fa-sync-alt"></i> Actualizar
+                            </a>
+                        {% endblock %}
                     </div>
                 </div>
             </div>

@@ -1,6 +1,8 @@
 from django.db import models
 from django.forms import model_to_dict
 
+from apps.ubicacion.models import Parroquia
+
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=50)
@@ -14,6 +16,7 @@ class Empresa(models.Model):
     facebook = models.CharField(max_length=25, blank=True, null=True)
     instagram = models.CharField(max_length=25, blank=True, null=True)
     twitter = models.CharField(max_length=25, blank=True, null=True)
+    ubicacion = models.ForeignKey(Parroquia, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return '%s %s' % (self.nombre, self.ruc)

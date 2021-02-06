@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 from apps.empresa.forms import EmpresaForm
 from apps.empresa.models import Empresa
+import json
 
 opc_icono = 'fa fa-cogs'
 opc_entidad = 'Configuracion'

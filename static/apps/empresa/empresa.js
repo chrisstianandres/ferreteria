@@ -27,7 +27,71 @@ $(document).ready(function () {
         maxboostedstep: 10,
         prefix: '%'
     }).prop('disabled', true);
+    $('#id_canton').select2();
+    $('#id_provincia')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/ubicacion/lista',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'provincia',
+                        'id': ''
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
 
+                },
+
+            },
+            placeholder: 'Busca una Provincia',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/ubicacion/lista',
+                data: {
+                    "id": $('#id_provincia option:selected').val(),
+                    'action': 'canton_insert'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#id_canton')
+                        .empty().trigger("change")
+                        .select2({data: data})
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        })
+        .on("change", function () {
+            console.log($(this).val());
+            if ($(this).val()===null){
+                $('#id_canton').empty().trigger("change");
+            }
+        });
 });
 
 function editar() {
@@ -44,6 +108,7 @@ function editar() {
     $('#id_iva').prop('disabled', false);
     $('#id_indice').prop('disabled', false);
     $('#id_telefono').attr('readonly', false);
+
 }
 
 jQuery.validator.addMethod("lettersonly", function (value, element) {
