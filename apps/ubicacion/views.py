@@ -36,16 +36,19 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 id = request.POST['id']
                 query = Canton.objects.filter(provincia_id=id).order_by('nombre')
-                for a in query:
-                    result = {'id': int(a.id), 'text': str(a.nombre)}
+                result = {'id': '', 'text': '--------------------------'}
+                data.append(result)
+                for c in query:
+                    result = {'id': int(c.id), 'text': str(c.nombre)}
                     data.append(result)
             elif action == 'parroquia':
                 data = []
                 id = request.POST['id']
-                print(id)
+                result = {'id': '', 'text': '--------------------------'}
+                data.append(result)
                 query = Parroquia.objects.filter(canton_id=id)
-                for a in query:
-                    result = {'id': int(a.id), 'text': str(a.nombre)}
+                for p in query:
+                    result = {'id': int(p.id), 'text': str(p.nombre)}
                     data.append(result)
             else:
                 data['error'] = 'No ha seleccionado una opcion'

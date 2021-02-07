@@ -9,20 +9,18 @@ $(document).ready(function () {
     $('#id_twitter').attr('readonly', true);
     $('#id_telefono').attr('readonly', true);
     $('#id_indice').TouchSpin({
-        min: 0,
+        min: 1,
         max: 100,
-        step: 0.01,
-        decimals: 2,
+        step: 1,
         boostat: 5,
         maxboostedstep: 10,
         prefix: '%'
     }).prop('disabled', true);
     $('#editar').on("click", editar);
     $('input[name="iva"]').TouchSpin({
-        min: 0,
+        min: 1,
         max: 100,
-        step: 0.01,
-        decimals: 2,
+        step: 1,
         boostat: 5,
         maxboostedstep: 10,
         prefix: '%'
@@ -113,6 +111,34 @@ $(document).ready(function () {
         .append(newOption3).trigger('change')
         .prop('disabled', true);
 
+    // $('#signupForm').on('submit', function (e) {
+    //     e.preventDefault();
+    //     // var parametros = new FormData(this);
+    //     var parametros = {};
+    //     parametros['nombre'] = $('input[name="nombre"]').val();
+    //     parametros['ubicacion'] = $('select[name="ubicacion"]').val();
+    //     parametros['direccion'] = $('input[name="direccion"]').val();
+    //     parametros['ruc'] = $('input[name="ruc"]').val();
+    //     parametros['correo'] = $('input[name="correo"]').val();
+    //     parametros['telefono'] = $('input[name="telefono"]').val();
+    //     parametros['facebook'] = $('input[name="facebook"]').val();
+    //     parametros['twitter'] = $('input[name="twitter"]').val();
+    //     parametros['instagram'] = $('input[name="instagram"]').val();
+    //     parametros['iva'] = parseInt($('input[name="iva"]').val());
+    //     parametros['indice'] = parseInt($('input[name="indice"]').val());
+    //     var isvalid = $(this).valid();
+    //     if (isvalid) {
+    //         save_with_ajax('Alerta',
+    //             window.location.pathname, 'Esta seguro que desea editar los parametros de la empresa?', parametros,
+    //             function () {
+    //                 menssaje_ok('Exito!', 'Exito al actulizar los parametros de la empresa!', 'far fa-smile-wink', function () {
+    //                    location.reload();
+    //                 });
+    //             });
+    //     }
+    //
+    // })
+
 
 });
 
@@ -145,13 +171,17 @@ function editar() {
                 success: function (data) {
                     $('#id_ubicacion')
                         .empty().trigger("change")
-                        .select2({
-                            data: data, language: {
+                        .select2({ data:data,
+                            language: {
                                 "noResults": function () {
                                     return "Sin resultados";
                                 },
                             }
                         });
+                    // $.each(data, function (key, value) {
+                    //     var newOption = new Option(value.text, value.id, false, true);
+                    //     $('#id_canton').append(newOption).trigger('change');
+                    // })
                 },
                 error: function (xhr, status, data) {
                     alert(data);
@@ -159,7 +189,12 @@ function editar() {
 
             })
         })
-        .prop('disabled', false);
+        .prop('disabled', false)
+        .on('change', function () {
+           if ($(this).val() === null) {
+                $('#id_ubicacion').empty().trigger("change");
+            }
+        });
 
 
     $('#id_provincia')
@@ -213,12 +248,17 @@ function editar() {
                     $('#id_canton')
                         .empty().trigger("change")
                         .select2({
-                            data: data, language: {
+                            data: data,
+                            language: {
                                 "noResults": function () {
                                     return "Sin resultados";
                                 },
                             }
                         });
+                    // $.each(data, function (key, value) {
+                    //     var newOption = new Option(value.text, value.id, false, false);
+                    //     $('#id_canton').append(newOption).trigger('change');
+                    // })
                 },
                 error: function (xhr, status, data) {
                     alert(data);
