@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 
 from apps.mixins import ValidatePermissionRequiredMixin
-from apps.ubicacion.models import Provincia, Canton
+from apps.ubicacion.models import Provincia, Canton, Parroquia
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
@@ -25,7 +25,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for c in Provincia.objects.all():
                     data.append({'id': c.id, 'nombre': c.nombre})
-
             elif action == 'provincia':
                 data = []
                 term = request.POST['term']
@@ -36,7 +35,15 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             elif action == 'canton_insert':
                 data = []
                 id = request.POST['id']
-                query = Canton.objects.filter(provincia_id=id)
+                query = Canton.objects.filter(provincia_id=id).order_by('nombre')
+                for a in query:
+                    result = {'id': int(a.id), 'text': str(a.nombre)}
+                    data.append(result)
+            elif action == 'parroquia':
+                data = []
+                id = request.POST['id']
+                print(id)
+                query = Parroquia.objects.filter(canton_id=id)
                 for a in query:
                     result = {'id': int(a.id), 'text': str(a.nombre)}
                     data.append(result)

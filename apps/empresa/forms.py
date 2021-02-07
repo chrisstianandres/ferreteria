@@ -3,6 +3,7 @@ from datetime import *
 from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput
 
 from .models import Empresa
+from ..ubicacion.models import Parroquia
 
 
 class EmpresaForm(forms.ModelForm):
@@ -37,6 +38,7 @@ class EmpresaForm(forms.ModelForm):
                                                             'class': 'form-control form-rounded'})
             self.fields['twitter'].widget = TextInput(attrs={'placeholder': 'Ingrese la direccion en Twitter',
                                                             'class': 'form-control form-rounded'})
+            self.fields['ubicacion'].queryset = Parroquia.objects.none()
 
         # habilitar, desabilitar, y mas
 

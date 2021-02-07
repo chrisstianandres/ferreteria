@@ -27,7 +27,10 @@ $(document).ready(function () {
         maxboostedstep: 10,
         prefix: '%'
     }).prop('disabled', true);
-    $('#id_canton').select2();
+    var newOption = new Option($('#id_text').val(), $('#id_prov').val(), false, true);
+    var newOption2 = new Option($('#id_text_cant').val(), $('#id_cant').val(), false, true);
+    var newOption3 = new Option($('#id_text_parr').val(), $('#id_parr').val(), false, true);
+
     $('#id_provincia')
         .select2({
             theme: "classic",
@@ -78,7 +81,13 @@ $(document).ready(function () {
                 success: function (data) {
                     $('#id_canton')
                         .empty().trigger("change")
-                        .select2({data: data})
+                        .select2({
+                            data: data, language: {
+                                "noResults": function () {
+                                    return "Sin resultados";
+                                },
+                            }
+                        });
                 },
                 error: function (xhr, status, data) {
                     alert(data);
@@ -87,11 +96,24 @@ $(document).ready(function () {
             })
         })
         .on("change", function () {
-            console.log($(this).val());
-            if ($(this).val()===null){
+            if ($(this).val() === null) {
                 $('#id_canton').empty().trigger("change");
+                $('#id_ubicacion').empty().trigger("change");
             }
-        });
+        })
+        .append(newOption).trigger('change')
+        .prop('disabled', true);
+    $('#id_canton')
+        .select2({theme: "classic", allowClear: true})
+        .append(newOption2).trigger('change')
+        .prop('disabled', true);
+
+    $('#id_ubicacion')
+        .select2({theme: "classic", allowClear: true})
+        .append(newOption3).trigger('change')
+        .prop('disabled', true);
+
+
 });
 
 function editar() {
@@ -109,6 +131,112 @@ function editar() {
     $('#id_indice').prop('disabled', false);
     $('#id_telefono').attr('readonly', false);
 
+    $('#id_canton')
+        .select2({theme: "classic", allowClear: true})
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/ubicacion/lista',
+                data: {
+                    "id": $('#id_canton option:selected').val(),
+                    'action': 'parroquia'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#id_ubicacion')
+                        .empty().trigger("change")
+                        .select2({
+                            data: data, language: {
+                                "noResults": function () {
+                                    return "Sin resultados";
+                                },
+                            }
+                        });
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        })
+        .prop('disabled', false);
+
+
+    $('#id_provincia')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/ubicacion/lista',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'provincia',
+                        'id': ''
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+
+                },
+
+            },
+            placeholder: 'Busca una Provincia',
+            minimumInputLength: 1,
+        })
+        .on('select2:select', function (e) {
+            $.ajax({
+                type: "POST",
+                url: '/ubicacion/lista',
+                data: {
+                    "id": $('#id_provincia option:selected').val(),
+                    'action': 'canton_insert'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $('#id_canton')
+                        .empty().trigger("change")
+                        .select2({
+                            data: data, language: {
+                                "noResults": function () {
+                                    return "Sin resultados";
+                                },
+                            }
+                        });
+                },
+                error: function (xhr, status, data) {
+                    alert(data);
+                },
+
+            })
+        })
+        .on("change", function () {
+            if ($(this).val() === null) {
+                $('#id_canton').empty().trigger("change");
+                $('#id_ubicacion').empty().trigger("change");
+            }
+        })
+        .prop('disabled', false);
+
+    $('#id_ubicacion')
+        .select2({theme: "classic", allowClear: true})
+        .prop('disabled', false);
 }
 
 jQuery.validator.addMethod("lettersonly", function (value, element) {
