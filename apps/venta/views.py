@@ -169,9 +169,8 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                     in_pr.estado = 0
                                     in_pr.save()
                                     dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
-                                stock.stock = int(
-                                    Inventario.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock = Producto.objects.get(id=i['id'])
+                                stock.stock = int(Inventario.objects.filter(producto_id=i['id'], estado=1).count())
                                 stock.save()
                         data['id'] = c.id
                         data['resp'] = True

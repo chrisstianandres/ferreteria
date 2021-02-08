@@ -52,7 +52,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     data.append(result)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
-            import json
         except Exception as e:
             data['error'] = str(e)
             print(e)

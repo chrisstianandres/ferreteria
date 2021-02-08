@@ -1,3 +1,4 @@
+var tbl_productos;
 const toDataURL = url => fetch(url).then(response => response.blob())
     .then(blob => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -473,8 +474,11 @@ function validador() {
     });
 
     jQuery.validator.addMethod("val_ced", function (value, element) {
-         if (value.length === 10 || value.length === 13) {
-          $.ajax({
+        if (element.classList.contains('is-valid')){
+            return true
+        } else {
+            if (value.length === 10 || value.length === 13) {
+            $.ajax({
                 type: "POST",
                 url: '/verificar/',
                 data: {'data': value.toString()},
@@ -482,11 +486,17 @@ function validador() {
                 success: function (data) {
                     if (!data.hasOwnProperty('error')) {
                         $(element).addClass("is-valid").removeClass("is-invalid");
-                        return false;
+                        return true
+                    } else {
+                        $(element).addClass("is-invalid").removeClass("is-valid");
+                        return false
                     }
-                    $(element).addClass("is-invalid").removeClass("is-valid");
+
                 },
-            })} return false
+            })
+        }
+        }
+
         // return this.optional(element) || /^[a-z," "]+$/i.test(value);
     }, "");
 }

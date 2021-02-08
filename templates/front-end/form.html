@@ -17,10 +17,15 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label> Buscar Productos:</label>
-                            {% block buscador %}
-                             {{ form2.producto }}
-                            {% endblock %}
-
+                            <div class="input-group">
+                                {% block buscador %}
+                                    {{ form2.producto }}
+                                {% endblock %}
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary btn-xs" id="id_search_table" type="button"><i
+                                            class="fas fa-search"></i></button>
+                                </div>
+                            </div>
                         </div>
                         <br>
                         <button type="button" class="btn btn-danger btn-sm btn-flat btnRemoveall">
@@ -64,72 +69,111 @@
                 </div>
             </div>
             <div class="modal fade" id="Modal_detalle" tabindex="-1" aria-labelledby="exampleModalLabel"
-                     aria-hidden="true">
-                    <form method="post" id="form_detalle" enctype="multipart/form-data" action=".">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-plus"></i>&nbsp;{{ titulo_detalle }}
-                                    </h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="container-fluid">
-                                        {% block datos_trans %}
+                 aria-hidden="true">
+                <form method="post" id="form_detalle" enctype="multipart/form-data" action=".">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"><i
+                                        class="fas fa-user-plus"></i>&nbsp;{{ titulo_detalle }}
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    {% block datos_trans %}
 
-                                        {% endblock %}
-                                        <div class="form-group">
-                                            <input type="hidden" value="{{ action }}">
-                                        </div>
+                                    {% endblock %}
+                                    <div class="form-group">
+                                        <input type="hidden" value="{{ action }}">
                                     </div>
+                                </div>
 
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i
-                                            class="fas fa-times"></i> Cancelar
-                                    </button>
-                                    <button id="facturar" type="button" class="btn btn-success"><i class="fas fa-hand-holding-usd"></i>&nbsp;{{ boton_fac }}
-                                    </button>
-                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal"><i
+                                        class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button id="facturar" type="button" class="btn btn-success"><i
+                                        class="fas fa-hand-holding-usd"></i>&nbsp;{{ boton_fac }}
+                                </button>
                             </div>
                         </div>
-                    </form>
-                </div>
-         <div class="modal fade" id="Modal_person" tabindex="-1" aria-labelledby="exampleModalLabel"
-                     aria-hidden="true">
-                    <form method="post" id="form_person" enctype="multipart/form-data" action=".">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-plus"></i>&nbsp;{{ titulo_modal_person }}</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="container-fluid">
-                                        <div class="form-group">
-                                            {{ formp.as_p }}
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="hidden" value="{{ action }}">
-                                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal fade" id="Modal_person" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <form method="post" id="form_person" enctype="multipart/form-data" action=".">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"><i
+                                        class="fas fa-user-plus"></i>&nbsp;{{ titulo_modal_person }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="form-group">
+                                        {{ formp.as_p }}
                                     </div>
+                                    <div class="form-group">
+                                        <input type="hidden" value="{{ action }}">
+                                    </div>
+                                </div>
 
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i
-                                            class="fas fa-user-times"></i> Cancelar
-                                    </button>
-                                    <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
-                                    </button>
-                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal"><i
+                                        class="fas fa-user-times"></i> Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary"><i class="far fa-save"></i>&nbsp;Guardar
+                                </button>
                             </div>
                         </div>
-                    </form>
+                    </div>
+                </form>
+            </div>
+            <div class="modal fade" id="Modal_search" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i
+                                    class="fa fa-search"></i>&nbsp;Seleciona una producto</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <table id="tbl_productos" class="table table-bordered table-hover" style="width: 100%">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 18%">Nombre</th>
+                                        <th style="width: 10%">Categoria</th>
+                                        <th style="width: 10%;">Presentacion</th>
+                                        <th style="width: 8%">Stock</th>
+                                        <th style="width: 13%">Descripcion</th>
+                                        <th style="width: 8%">Pvp</th>
+                                        <th style="width: 8%">P. Compra</th>
+                                        <th style="width: 8%">Imagen</th>
+                                        <th style="width: 10%" class="text-center"><em class="fa fa-cog"></em></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -22,8 +22,8 @@ class Producto_baseForm(forms.ModelForm):
             self.fields['descripcion'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese una descripcion del producto', 'class': 'form-control'})
             self.fields['categoria'].widget.attrs = {
-                'class': 'form-control select2',
-                'id': 'id_despcripcion_producto'}
+                'class': 'form-control select2', 'style': 'width:93%',
+                'id': 'id_categoria'}
 
     class Meta:
         model = Producto_base

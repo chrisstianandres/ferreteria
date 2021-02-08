@@ -111,33 +111,35 @@ $(document).ready(function () {
         .append(newOption3).trigger('change')
         .prop('disabled', true);
 
-    // $('#signupForm').on('submit', function (e) {
-    //     e.preventDefault();
-    //     // var parametros = new FormData(this);
-    //     var parametros = {};
-    //     parametros['nombre'] = $('input[name="nombre"]').val();
-    //     parametros['ubicacion'] = $('select[name="ubicacion"]').val();
-    //     parametros['direccion'] = $('input[name="direccion"]').val();
-    //     parametros['ruc'] = $('input[name="ruc"]').val();
-    //     parametros['correo'] = $('input[name="correo"]').val();
-    //     parametros['telefono'] = $('input[name="telefono"]').val();
-    //     parametros['facebook'] = $('input[name="facebook"]').val();
-    //     parametros['twitter'] = $('input[name="twitter"]').val();
-    //     parametros['instagram'] = $('input[name="instagram"]').val();
-    //     parametros['iva'] = parseInt($('input[name="iva"]').val());
-    //     parametros['indice'] = parseInt($('input[name="indice"]').val());
-    //     var isvalid = $(this).valid();
-    //     if (isvalid) {
-    //         save_with_ajax('Alerta',
-    //             window.location.pathname, 'Esta seguro que desea editar los parametros de la empresa?', parametros,
-    //             function () {
-    //                 menssaje_ok('Exito!', 'Exito al actulizar los parametros de la empresa!', 'far fa-smile-wink', function () {
-    //                    location.reload();
-    //                 });
-    //             });
-    //     }
-    //
-    // })
+    $('#signupForm').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        // var parametros = {};
+        // parametros['nombre'] = String($('input[name="nombre"]').val());
+        // parametros['ubicacion'] = $('select[name="ubicacion"]').val();
+        // parametros['direccion'] = $('input[name="direccion"]').val();
+        // parametros['ruc'] = $('input[name="ruc"]').val();
+        // parametros['correo'] = $('input[name="correo"]').val();
+        // parametros['telefono'] = $('input[name="telefono"]').val();
+        // parametros['facebook'] = $('input[name="facebook"]').val();
+        // parametros['twitter'] = $('input[name="twitter"]').val();
+        // parametros['instagram'] = $('input[name="instagram"]').val();
+        // parametros['iva'] = parseInt($('input[name="iva"]').val());
+        // parametros['indice'] = parseInt($('input[name="indice"]').val());
+        // var dato = parametros;
+        console.log(parametros);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                window.location.pathname, 'Esta seguro que desea editar los parametros de la empresa?', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al actulizar los parametros de la empresa!', 'far fa-smile-wink', function () {
+                       location.reload();
+                    });
+                });
+        }
+
+    })
 
 
 });

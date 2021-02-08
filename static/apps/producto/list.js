@@ -211,7 +211,6 @@ $(function () {
                 },
                 dataType: 'json',
                 success: function (data) {
-                    console.log(data);
                     $('#id_des').val(data[0].descripcion);
                     $('#id_cat').val(data[0]['categoria'].nombre);
                 },
@@ -220,6 +219,49 @@ $(function () {
                 },
 
             })
+        })
+        .on('change', function () {
+            if ($(this).val() === '') {
+                $('#id_des').val(null);
+                $('#id_cat').val(null);
+            }
+
+        });
+
+    $('#id_categoria')
+        .select2({
+            theme: "classic",
+            language: {
+                inputTooShort: function () {
+                    return "Ingresa al menos un caracter...";
+                },
+                "noResults": function () {
+                    return "Sin resultados";
+                },
+                "searching": function () {
+                    return "Buscando...";
+                }
+            },
+            allowClear: true,
+            ajax: {
+                delay: 250,
+                type: 'POST',
+                url: '/categoria/lista',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                        'action': 'search'
+                    };
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    return {
+                        results: data,
+                    };
+                },
+            },
+            placeholder: 'Busca una Categoria',
+            minimumInputLength: 1,
         });
 
     $('#id_presentacion_producto')
@@ -307,6 +349,8 @@ $(function () {
                         $('#Modal_prod').modal('hide');
                         var newOption = new Option(response.producto_base['nombre'], response.producto_base['id'], false, true);
                         $('#id_producto_base').append(newOption).trigger('change');
+                        $('#id_des').val(response.producto_base['descripcion']);
+                        $('#id_cat').val(response.producto_base['categoria'].nombre);
                     });
                 });
         }
@@ -326,6 +370,7 @@ $(function () {
                         var newOption = new Option(response.categoria['nombre'], response.categoria['id'], false, true);
                         $('#id_categoria').append(newOption).trigger('change');
                     });
+
                 });
         }
     });
@@ -342,7 +387,7 @@ $(function () {
                     menssaje_ok('Exito!', 'Exito al guardar esta presentacion!', 'far fa-smile-wink', function () {
                         $('#Modal2').modal('hide');
                         var newOption = new Option(response.presentacion['full'], response.presentacion['id'], false, true);
-                        $('#id_presentacion').append(newOption).trigger('change');
+                        $('#id_presentacion_producto').append(newOption).trigger('change');
                     });
                 });
         }

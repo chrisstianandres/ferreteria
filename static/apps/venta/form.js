@@ -9,6 +9,13 @@ var ventas = {
         total: 0.00,
         productos: []
     },
+    get_ids: function () {
+        var ids = [];
+        $.each(this.items.productos, function (key, value) {
+            ids.push(value.id);
+        });
+        return ids;
+    },
     calculate: function () {
         var subtotal = 0.00;
         var iva_emp = 0.00;
@@ -25,8 +32,7 @@ var ventas = {
         $('input[name="total"]').val(this.items.total.toFixed(2));
     },
     add: function (data) {
-        this.items.productos.push(data[0]);
-        this.items.productos = this.exclude_duplicados(this.items.productos);
+        this.items.productos.push(data);
         this.list();
     },
     list: function () {
@@ -88,13 +94,6 @@ var ventas = {
             }
         });
     },
-    exclude_duplicados: function (array) {
-        this.items.productos = [];
-        let hash = {};
-        result = array.filter(o => hash[o.id] ? false : hash[o.id] = true);
-        return result;
-
-    }
 };
 $(function () {
     if (localStorage.getItem('carrito')) {
@@ -236,6 +235,7 @@ $(function () {
         reset('#form_person');
         $('#form_person').trigger("reset");
     });
+
     //buscar produto del select producto
     $('#id_inventario')
         .select2({
@@ -294,5 +294,102 @@ $(function () {
 
             })
         });
+
+    $('#id_search_table').on('click', function () {
+        $('#Modal_search').modal('show');
+        tbl_productos = $("#tbl_productos").DataTable({
+            destroy: true,
+            autoWidth: false,
+            dataSrc: "",
+            responsive: true,
+            ajax: {
+                url: '/producto/lista',
+                type: 'POST',
+                data: {'action': 'list_list', 'ids': JSON.stringify(ventas.get_ids())},
+                dataSrc: ""
+            },
+            language: {
+                "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+            },
+            columns: [
+                {data: "producto_base.nombre"},
+                {data: "producto_base.categoria.nombre"},
+                {data: "presentacion.nombre"},
+                {data: "stock"},
+                {data: "producto_base.descripcion"},
+                {data: "pvp"},
+                {data: "pcp"},
+                {data: "imagen"},
+                {data: "id"}
+            ],
+            columnDefs: [
+                {
+                    targets: [-3, -4],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '$' + parseFloat(data).toFixed(2);
+                    }
+                },
+                {
+                    targets: [3],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span class="badge badge-primary">' + data + '</span>';
+                    }
+                },
+                {
+                    targets: [-2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" rel="">';
+                    }
+                },
+                {
+                    targets: [-1],
+                    class: 'text-center',
+                    width: '10%',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return row.stock > 1 ? '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="take" ' +
+                            'data-toggle="tooltip" title="Seleccionar Producto"><i class="fa fa-check"></i></a>' : ' ';
+
+                    }
+                },
+            ],
+            rowCallback: function (row, data) {
+                if (data.stock === 0) {
+                    $('td', row).css('background-color', 'rgba(249,0,13,0.51)').css('color', 'black');
+                }
+            }
+        });
+    });
+
+    $('#tbl_productos tbody')
+        .on('click', 'a[rel="take"]', function () {
+            var tr = tbl_productos.cell($(this).closest('td, li')).index();
+            var data = tbl_productos.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'get'};
+            $.ajax({
+                dataType: 'JSON',
+                type: 'POST',
+                url: '/producto/lista',
+                data: parametros,
+            })
+                .done(function (data) {
+                    if (!data.hasOwnProperty('error')) {
+                        ventas.add(data[0]);
+                        $('#Modal_search').modal('hide');
+                        return false;
+                    }
+                    menssaje_error(data.error, data.content, 'fa fa-times-circle');
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    alert(textStatus + ': ' + errorThrown);
+                });
+        });
+
 });
 

@@ -41,14 +41,21 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
+
                 for c in Producto.objects.all():
                     data.append(c.toJSON())
+            elif action == 'list_list':
+                data = []
+                ids = json.loads(request.POST['ids'])
+                for c in Producto.objects.all().exclude(id__in=ids):
+                    data.append(c.toJSON())
             elif action == 'search_no_stock':
+                ids = json.loads(request.POST['ids'])
                 data = []
                 term = request.POST['term']
                 query = Producto.objects.values('id', 'producto_base__nombre', 'presentacion__nombre').\
                     filter(producto_base__nombre__icontains=term)
-                for a in query:
+                for a in query.exclude(id__in=ids):
                     result = {'id': int(a['id']),
                               'text': str(a['producto_base__nombre']) + ' / ' + str(a['presentacion__nombre'])}
                     data.append(result)

@@ -75,8 +75,7 @@ class Detalle_VentaForm(forms.ModelForm):
                 'class': 'form-control'
             })
             self.fields['inventario'].widget.attrs = {
-                'class': 'form-control select2',
-                'data-live-search': "true"
+                'class': 'form-control select2'
             }
             self.fields["inventario"].queryset = Inventario.objects.none()
         # habilitar, desabilitar, y mas
