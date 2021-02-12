@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
@@ -22,7 +23,7 @@ empresa = nombre_empresa()
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
-    model = Cliente
+    model = Cta_x_cobrar
     template_name = "front-end/ctas_cobrar/list.html"
     permission_required = 'ctas_cobrar.ctas_cobrar'
 
@@ -37,7 +38,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
-                for c in Cta_x_cobrar.objects.all():
+                for c in self.model.objects.all():
                     data.append(c.toJSON())
             elif action == 'detalle':
                 id = request.POST['id']
@@ -46,9 +47,23 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                     result = Pago_cta_x_cobrar.objects.filter(cta_cobrar_id=id)
                     for p in result:
                         data.append(p.toJSON())
-            else:
-                data['error'] = 'No ha seleccionado una opcion'
-            import json
+            elif action == 'check':
+                data = []
+                result = Pago_cta_x_cobrar.objects.filter(fecha__lt=datetime.now(), estado=0)
+                for p in result:
+                    p.estado = 1
+                    p.save()
+                data = 1
+            elif action == 'pagar':
+                data = []
+                id = request.POST['id']
+                result = Pago_cta_x_cobrar.objects.get(id=id)
+                print(result.cta_cobrar)
+                # result.estado = 2
+                # result.fecha_pago = datetime.now()
+                # cta = Cta_x_cobrar.objects.get(id=result.cta_cobrar_id)
+                # cta.saldo = cta.saldo-
+                # result.save()
         except Exception as e:
             data['error'] = str(e)
             print(e)
@@ -61,6 +76,53 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data['boton'] = 'Guardar'
         data['titulo'] = 'Listado de Cuentas por Cobrar'
         data['titulo_lista'] = 'Listado de Cuentas por Cobrar'
+        data['empresa'] = empresa
+        return data
+
+
+class pagar(ValidatePermissionRequiredMixin, ListView):
+    model = Pago_cta_x_cobrar
+    template_name = 'front-end/ctas_cobrar/pagar.html'
+    permission_required = 'ctas_cobrar.view_ctas_cobrar'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'pagar':
+                data = []
+                for c in self.model.objects.filter(cta_cobrar_id=self.kwargs['pk']):
+                    print(c)
+            elif action == 'letras':
+                data = []
+                for c in self.model.objects.filter(cta_cobrar_id=self.kwargs['pk']):
+                    data.append(c.toJSON())
+            elif action == 'cuenta':
+                data = []
+                cta = Cta_x_cobrar.objects.get(id=self.kwargs['pk'])
+                data.append(float(cta.saldo))
+            elif action == 'abono':
+                data = []
+                datos = json.loads(request.POST['abono'])
+
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Guardar'
+        data['titulo'] = 'Listado de Productos'
+        data['titulo_lista'] = 'Listado de Productos'
+        data['nuevo'] = '/producto/nuevo'
         data['empresa'] = empresa
         return data
 

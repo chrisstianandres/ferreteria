@@ -26,6 +26,8 @@ class Pago_cta_x_cobrar(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['cta_cobrar'] = self.cta_cobrar.toJSON()
+        item['estado_text'] = self.get_estado_display()
+        item['valor_total'] = self.cta_cobrar.saldo
         return item
 
     class Meta:

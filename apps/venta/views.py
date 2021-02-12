@@ -204,7 +204,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                     let.save()
                                     x = x+1
                             else:
-                                print(verf)
                                 data['error'] = 'Este cliente tiene mas de dos creditos activos, Por favor intenta ' \
                                                 'con otro cliente'
                         data['id'] = c.id

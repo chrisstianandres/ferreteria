@@ -1,5 +1,7 @@
 var logotipo;
 var datatable;
+var datatable_pagos;
+var row_data;
 
 
 function datatable_fun() {
@@ -145,16 +147,31 @@ function datatable_fun() {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" type="button" class="btn btn-primary btn-xs" rel="edit" ' +
-                        'data-toggle="tooltip" title="Editar Datos"><i class="fa fa-user-edit"></i></a>' + ' ';
-                    var del = '<a type="button" class="btn btn-danger btn-xs"  style="color: white" rel="del" ' +
-                        'data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>' + ' ';
-                    return edit + del
+                    var edit = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="detalle" ' +
+                        'data-toggle="tooltip" title="Detalle"><i class="fa fa-search"></i></a>' + ' ';
+                    return edit
+
+                }
+            },
+            {
+                targets: [-2],
+                class: 'text-center',
+                orderable: false,
+                render: function (data, type, row) {
+                    return '<span>' + data + '</span>'
 
                 }
             },
         ],
-
+        createdRow: function (row, data, dataIndex) {
+            if (data.estado === 2) {
+                $('td', row).eq(6).find('span').addClass('badge bg-success').attr("style", "color: white");
+            } else if (data.estado === 1) {
+                $('td', row).eq(6).find('span').addClass('badge bg-danger').attr("style", "color: white");
+            } else if (data.estado === 0) {
+                $('td', row).eq(6).find('span').addClass('badge bg-warning').attr("style", "color: white");
+            }
+        },
     });
 }
 
@@ -163,65 +180,122 @@ $(function () {
     var pk = '';
     datatable_fun();
     $('#datatable tbody')
-        .on('click', 'a[rel="del"]', function () {
-            action = 'delete';
+        .on('click', 'a[rel="detalle"]', function () {
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var parametros = {'id': data.id};
-            parametros['action'] = action;
-            save_estado('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea eliminar este cliente?', parametros,
-                function () {
-                    menssaje_ok('Exito!', 'Exito al eliminar este cliente!', 'far fa-smile-wink', function () {
-                        datatable.ajax.reload(null, false)
-                    })
-                })
-        })
-        .on('click', 'a[rel="edit"]', function () {
-            var tr = datatable.cell($(this).closest('td, li')).index();
-            var data = datatable.row(tr.row).data();
-            var sexo = '1';
-            if (data.sexo==='Femenino'){
-                sexo = '0';
-            }
-            $('input[name="nombres"]').val(data.nombres);
-            $('input[name="apellidos"]').val(data.apellidos);
-            $('input[name="cedula"]').val(data.cedula).attr('readonly', true);
-            $('input[name="correo"]').val(data.correo);
-            $('select[name="sexo"]').val(sexo);
-            $('input[name="telefono"]').val(data.telefono);
-            $('input[name="celular"]').val(data.celular);
-            $('input[name="direccion"]').val(data.direccion);
-            mostrar();
-            action = 'edit';
-            pk = data.id;
+            row_data = data.id;
+            $('#Modal').modal('show');
+            datatable_pagos = $("#tbldetalle_ctas_cobrar").DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    "url": '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+                },
+                destroy: true,
+                ajax: {
+                    url: window.location.pathname,
+                    type: 'POST',
+                    data: {
+                        'id': data.id,
+                        'action': 'detalle'
+                    },
+                    dataSrc: ""
+                },
+                columns: [
+                    {data: 'fecha'},
+                    {data: 'fecha_pago'},
+                    {data: 'valor'},
+                    {data: 'estado_text'},
+                    {data: 'id'},
+                ],
+                columnDefs: [
+                    {
+                        targets: '_all',
+                        class: 'text-center'
+                    },
+                    {
+                        targets: [-2],
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '<span>' + data + '</span>'
+
+                        }
+                    },
+                    {
+                        targets: [-3],
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '$' + parseFloat(data).toFixed(2);
+                        }
+                    },
+                    {
+                        targets: [-1],
+                        width: "15%",
+                        render: function (data, type, row) {
+                            return '<a type="button" rel="pagar" class="btn btn-success btn-xs btn-round" ' +
+                                'style="color: white" data-toggle="tooltip" title="Realizar pago" >' +
+                                '<i class="fas fa-hand-holding-usd"></i></a>' + ' ';
+                        }
+                    },
+                ],
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api(), data;
+
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+                    // Total over this page
+                    pageTotal = api
+                        .column(2, {page: 'current'})
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Update footer
+                    $(api.column(2).footer()).html(
+                        '$' + parseFloat(pageTotal).toFixed(2)
+                        // parseFloat(data).toFixed(2)
+                    );
+                },
+                createdRow: function (row, data, dataIndex) {
+                    if (data.estado === 2) {
+                        $('td', row).eq(3).find('span').addClass('badge bg-success').attr("style", "color: white");
+                        $('td', row).eq(4).find('a[rel="pagar"]').hide();
+                    } else if (data.estado === 1) {
+                        $('td', row).eq(3).find('span').addClass('badge bg-danger').attr("style", "color: white");
+                        if (data.fecha_pago === null) {
+                            $('td', row).eq(1).html('<span class="badge bg-danger" style="color: white">' + data.estado_text + '</span>');
+                        }
+                    } else if (data.estado === 0) {
+                        $('td', row).eq(3).find('span').addClass('badge bg-warning').attr("style", "color: white");
+                        if (data.fecha_pago === null) {
+                            $('td', row).eq(1).html('<span class="badge bg-warning" style="color: white">' + data.estado_text + '</span>');
+                        }
+                    }
+                },
+            });
         });
     //boton agregar cliente
-    $('#nuevo').on('click', function () {
-        action = 'add';
-        pk = '';
-        reset('#form');
-        $('input[name="cedula"]').attr('readonly', false);
-        mostrar();
+    $('#abono').on('click', function () {
+        window.location.href = '/ctas_cobrar/pagar/' + row_data
     });
-
-    //enviar formulario de nuevo cliente
-    $('#form').on('submit', function (e) {
-        e.preventDefault();
-        var parametros = new FormData(this);
-        parametros.append('action', action);
-        parametros.append('id', pk);
-        var isvalid = $(this).valid();
-        if (isvalid) {
-            save_with_ajax2('Alerta',
-                '/cliente/nuevo', 'Esta seguro que desea guardar este cliente?', parametros,
-                function (response) {
-                    menssaje_ok('Exito!', 'Exito al guardar este cliente!', 'far fa-smile-wink', function () {
-                    ocultar('#form');
-                    });
+    $('#tbldetalle_ctas_cobrar tbody')
+        .on('click', 'a[rel="pagar"]', function () {
+            var tr = datatable_pagos.cell($(this).closest('td, li')).index();
+            var data = datatable_pagos.row(tr.row).data();
+            var parametros = {'id': data.id, 'action': 'pagar'};
+            save_estado('Alerta',
+                window.location.pathname, 'Esta seguro que desea realizar el pago de esta letra', parametros,
+                function () {
+                    menssaje_ok('Exito!', 'Exito al realizar el pago de esta letra', 'far fa-smile-wink', function () {
+                        datatable_pagos.ajax.reload(null, false);
+                    })
                 });
-        }
-    });
 
-
+        })
 });
