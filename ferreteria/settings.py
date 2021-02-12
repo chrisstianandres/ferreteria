@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'apps.venta',
     'apps.compra',
     'apps.sitioweb',
+    'apps.cta_x_cbr',
+    'apps.pago_cta_x_cbr',
     'apps.ubicacion'
 ]
 

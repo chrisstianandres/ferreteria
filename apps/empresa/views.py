@@ -42,6 +42,7 @@ def editar(request):
                 config.instagram = dato['instagram']
                 config.iva = dato['iva']
                 config.indice = dato['indice']
+                config.tasa = dato['tasa']
                 config.save()
                 data['resp'] = True
                 return JsonResponse(data, safe=False)

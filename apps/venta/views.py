@@ -1,13 +1,17 @@
+from dateutil.relativedelta import relativedelta
 from django.utils.decorators import method_decorator
 
 from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.compra.models import Compra
+from apps.cta_x_cbr.forms import Cta_cobrarForm
+from apps.cta_x_cbr.models import Cta_x_cobrar
 from apps.delvoluciones_venta.models import Devolucion
 from apps.inventario.models import Inventario
 from apps.mixins import ValidatePermissionRequiredMixin
 import json
 from datetime import datetime
+import datetime as dt
 
 from django.db import transaction
 from django.db.models import Sum, Count
@@ -19,6 +23,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
 from apps.backEnd import nombre_empresa
+from apps.pago_cta_x_cbr.models import Pago_cta_x_cobrar
 
 from apps.producto_base.models import Producto_base
 from apps.user.forms import UserForm
@@ -172,6 +177,36 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                 stock = Producto.objects.get(id=i['id'])
                                 stock.stock = int(Inventario.objects.filter(producto_id=i['id'], estado=1).count())
                                 stock.save()
+                        if int(datos['forma_pago']) == 1:
+                            verf = Cta_x_cobrar.objects.filter(venta__cliente_id=c.cliente_id, estado=0).count()
+                            if verf <= 2:
+                                cta = Cta_x_cobrar()
+                                cta.venta_id = c.id
+                                cta.valor = float(datos['total'])
+                                cta.interes = float(datos['interes'])
+                                cta.tolal_deuda = float(datos['total_deuda'])
+                                cta.saldo = float(datos['total_deuda'])
+                                cta.nro_cuotas = int(datos['nro_cuotas'])
+                                cta.save()
+                                x = 1
+                                ahora = datetime.now()
+                                for n in range(0, int(datos['nro_cuotas'])):
+                                    fech = ahora + relativedelta(months=x)
+                                    let = Pago_cta_x_cobrar()
+                                    let.cta_cobrar_id = cta.id
+                                    if fech.weekday() == 5:
+                                        let.fecha = fech + dt.timedelta(days=2)
+                                    elif fech.weekday() == 6:
+                                        let.fecha = fech + dt.timedelta(days=1)
+                                    else:
+                                        let.fecha = fech
+                                    let.valor = float(datos['letra'])
+                                    let.save()
+                                    x = x+1
+                            else:
+                                print(verf)
+                                data['error'] = 'Este cliente tiene mas de dos creditos activos, Por favor intenta ' \
+                                                'con otro cliente'
                         data['id'] = c.id
                         data['resp'] = True
                 else:
@@ -229,6 +264,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['form2'] = Detalle_VentaForm()
         data['detalle'] = []
         data['formc'] = UserForm()
+        data['formcredito'] = Cta_cobrarForm()
         data['formp'] = ClienteForm()
         data['titulo_modal_person'] = 'Registro de un nuevo Cliente'
         data['boton_fac'] = 'Facturar Venta'

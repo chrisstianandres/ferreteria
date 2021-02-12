@@ -13,6 +13,10 @@ estado = (
     (1, 'FINALIZADA'),
     (2, 'RESERVADA')
 )
+tipo_pago = (
+    (0, 'CONTADO'),
+    (1, 'CREDITO')
+)
 
 
 class Venta(models.Model):
@@ -22,6 +26,7 @@ class Venta(models.Model):
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     estado = models.IntegerField(choices=estado, default=1)
+    tipo_pago = models.IntegerField(choices=tipo_pago, default=0)
 
     def __str__(self):
         return '%s %s %s' % (self.cliente.nombres, self.fecha, self.total)
@@ -29,6 +34,7 @@ class Venta(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['estado'] = self.get_estado_display()
+        item['tipo_pago'] = self.get_tipo_pago_display()
         item['cliente'] = self.cliente.toJSON()
         return item
 

@@ -16,6 +16,14 @@ $(document).ready(function () {
         maxboostedstep: 10,
         prefix: '%'
     }).prop('disabled', true);
+    $('#id_tasa').TouchSpin({
+        min: 1,
+        max: 100,
+        step: 1,
+        boostat: 5,
+        maxboostedstep: 10,
+        prefix: '%'
+    }).prop('disabled', true);
     $('#editar').on("click", editar);
     $('input[name="iva"]').TouchSpin({
         min: 1,
@@ -114,20 +122,6 @@ $(document).ready(function () {
     $('#signupForm').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
-        // var parametros = {};
-        // parametros['nombre'] = String($('input[name="nombre"]').val());
-        // parametros['ubicacion'] = $('select[name="ubicacion"]').val();
-        // parametros['direccion'] = $('input[name="direccion"]').val();
-        // parametros['ruc'] = $('input[name="ruc"]').val();
-        // parametros['correo'] = $('input[name="correo"]').val();
-        // parametros['telefono'] = $('input[name="telefono"]').val();
-        // parametros['facebook'] = $('input[name="facebook"]').val();
-        // parametros['twitter'] = $('input[name="twitter"]').val();
-        // parametros['instagram'] = $('input[name="instagram"]').val();
-        // parametros['iva'] = parseInt($('input[name="iva"]').val());
-        // parametros['indice'] = parseInt($('input[name="indice"]').val());
-        // var dato = parametros;
-        console.log(parametros);
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
@@ -157,6 +151,7 @@ function editar() {
     $('#id_twitter').attr('readonly', false);
     $('#id_iva').prop('disabled', false);
     $('#id_indice').prop('disabled', false);
+    $('#id_tasa').prop('disabled', false);
     $('#id_telefono').attr('readonly', false);
 
     $('#id_canton')

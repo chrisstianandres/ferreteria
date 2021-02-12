@@ -31,6 +31,7 @@ class EmpresaForm(forms.ModelForm):
             self.fields['ruc'].widget = TextInput(attrs={'placeholder': 'Ingrese numero la direccion de la empresa',
                                                          'class': 'form-control form-rounded'})
             self.fields['indice'].widget = TextInput(attrs={'class': 'form-control form-rounded'})
+            self.fields['tasa'].widget = TextInput(attrs={'class': 'form-control form-rounded'})
 
             self.fields['facebook'].widget = TextInput(attrs={'placeholder': 'Ingrese la direccion en Facebook',
                                                             'class': 'form-control form-rounded'})
@@ -54,6 +55,7 @@ class EmpresaForm(forms.ModelForm):
                   'twitter',
                   'iva',
                   'indice',
+                  'tasa',
                   'telefono'
                   ]
         labels = {
@@ -66,6 +68,7 @@ class EmpresaForm(forms.ModelForm):
             'instagram': 'Sitio en Instagram',
             'twitter': 'Sitio en Twitter',
             'iva': 'Iva',
+            'tasa': 'Tasa de interes',
             'indice': 'Indice de Ganancia',
             'telefono': 'Telefono',
         }
@@ -79,6 +82,7 @@ class EmpresaForm(forms.ModelForm):
             'instagram': forms.TextInput(),
             'twitter': forms.TextInput(),
             'iva': forms.TextInput(),
+            'tasa': forms.TextInput(),
             'indice': forms.TextInput(),
             'telefono': forms.TextInput()
         }

@@ -1,7 +1,7 @@
 {% extends 'front-end/form.html' %}
 {% load static %}
 {% block buscador %}
-{{ form2.inventario }}
+    {{ form2.inventario }}
 {% endblock %}
 {% block table %}
     <thead>
@@ -20,6 +20,7 @@
     </tbody>
 {% endblock %}
 {% block totales %}
+    <input type="hidden" value="{{ empresa.tasa }}" id="tasa_val">
     <form>
         <div class="form-group row">
             <label for="id_subtotal"
@@ -73,11 +74,62 @@
             <label class="col-form-label"><strong>{{ form.cliente.label_tag }}</strong></label>
             <div class="input-group">
                 {{ form.cliente }}
-                 <div class="input-group-append">
+                <div class="input-group-append">
                     <button class="btn btn-primary btn-xs" id="id_new_cliente" type="button"><i
                             class="fas fa-plus"></i></button>
                 </div>
 
+            </div>
+        </div>
+        <div class="form-group col-lg-12">
+            <label class="col-form-label"><strong>{{ form.tipo_pago.label_tag }}</strong></label>
+            <div class="input-group">
+                {{ form.tipo_pago }}
+            </div>
+        </div>
+        <div id="credito" style="display:none">
+            <div class="form-group col-lg-12">
+                <label class="col-form-label"><strong>{{ formcredito.nro_cuotas.label_tag }}</strong></label>
+                <div class="input-group">
+                    {{ formcredito.nro_cuotas }}
+                </div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-form-label"><strong>{{ formcredito.valor.label_tag }}</strong></label>
+                <div class="input-group input-group-sm mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                    </div>
+                    {{ formcredito.valor }}
+                </div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-form-label"><strong>{{ formcredito.interes.label_tag }}</strong></label>
+                <div class="input-group input-group-sm mb-3">
+                     <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                    </div>
+                    {{ formcredito.interes }}
+                </div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-form-label"><strong>Valor por Letra</strong></label>
+                <div class="input-group input-group-sm mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                    </div>
+                    <input type="number" name="letra" value="0.0" class="form-control"
+                           id="id_letra">
+                </div>
+            </div>
+            <div class="form-group col-lg-12">
+                <label class="col-form-label"><strong>{{ formcredito.tolal_deuda.label_tag }}</strong></label>
+                <div class="input-group input-group-sm mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                    </div>
+                    {{ formcredito.tolal_deuda }}
+                </div>
             </div>
         </div>
     </form>

@@ -4,10 +4,15 @@ var ventas = {
         fecha_venta: '',
         cliente: '',
         subtotal: 0.00,
+        forma_pago: 0,
+        nro_cuotas: 0,
+        letra: 0.00,
+        tolal_deuda: 0.00,
+        interes: 0.00,
         iva: 0.00,
         iva_emp: 0.00,
         total: 0.00,
-        productos: []
+        productos: [],
     },
     get_ids: function () {
         var ids = [];
@@ -88,7 +93,7 @@ var ventas = {
             ], rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: data.producto_base.stock,
+                    max: data.stock,
                     step: 1
                 });
             }
@@ -139,7 +144,18 @@ $(function () {
             menssaje_error('Error!', "Debe seleccionar al menos un producto", 'far fa-times-circle');
             return false
         } else {
+            var total_venta = $('#id_total').val();
             $('#Modal_detalle').modal('show');
+            $('#id_valor').val(total_venta);
+            if (total_venta <= 1) {
+                $('#id_tipo_pago').prop('disabled', true).val(0).trigger('change');
+                $('#select2-id_tipo_pago-container').attr('title', 'El valor debe ser mayor a $ 1000 para ' +
+                    'realizar un pago a credito');
+                $('#credito').hide();
+                amortizacion($('#id_nro_cuotas').val(0), ($('#tasa_val').val() / 100), $('#id_total').val());
+            } else {
+                $('#id_tipo_pago').prop('disabled', false);
+            }
         }
     });
     $('#facturar').on('click', function () {
@@ -150,6 +166,11 @@ $(function () {
             var parametros;
             ventas.items.fecha_venta = $('input[name="fecha"]').val();
             ventas.items.cliente = $('#id_cliente option:selected').val();
+            ventas.items.letra = $('#id_letra').val();
+            ventas.items.interes = $('#id_interes').val();
+            ventas.items.total_deuda = $('#id_tolal_deuda').val();
+            ventas.items.forma_pago = $('#id_tipo_pago option:selected').val();
+            ventas.items.nro_cuotas = $('#id_nro_cuotas').val();
             parametros = {'ventas': JSON.stringify(ventas.items)};
             parametros['action'] = 'add';
             parametros['id'] = '';
@@ -260,7 +281,8 @@ $(function () {
                     var queryParameters = {
                         term: params.term,
                         'action': 'search',
-                        'id': ''
+                        'id': '',
+                        'ids': JSON.stringify(ventas.get_ids())
                     };
                     return queryParameters;
                 },
@@ -285,7 +307,7 @@ $(function () {
                 },
                 dataType: 'json',
                 success: function (data) {
-                    ventas.add(data);
+                    ventas.add(data[0]);
                     $('#id_inventario').val(null).trigger('change');
                 },
                 error: function (xhr, status, data) {
@@ -391,5 +413,39 @@ $(function () {
                 });
         });
 
+
+    $('#id_tipo_pago')
+        .select2({
+            theme: "classic"
+        })
+        .on('select2:select', function (e) {
+            if ($(this).val() === '1') {
+                $('#credito').show();
+                $('#id_nro_cuotas').TouchSpin({
+                    min: 1,
+                    max: 60,
+                    step: 1
+                }).val(1);
+                amortizacion($('#id_nro_cuotas').val(), ($('#tasa_val').val() / 100), $('#id_total').val());
+
+            } else {
+                $('#credito').hide();
+                amortizacion($('#id_nro_cuotas').val(0), ($('#tasa_val').val() / 100), $('#id_total').val());
+            }
+        });
+    $('#id_nro_cuotas').on('change keyup', function () {
+        amortizacion($(this).val(), ($('#tasa_val').val() / 100), $('#id_total').val());
+    });
+
+
 });
 
+function amortizacion(cuotas, tasa, valor) {
+    var ta = 1 + tasa;
+    var pot = 1 / 12;
+    var tem = Math.pow(ta, pot) - 1;
+    var letra = valor * Math.pow(((1 - Math.pow(1 + tem, -cuotas)) / tem), -1);
+    $('#id_interes').val(((letra * cuotas) - valor).toFixed(2));
+    $('#id_letra').val(letra.toFixed(2));
+    $('#id_tolal_deuda').val((letra * cuotas).toFixed(2));
+}

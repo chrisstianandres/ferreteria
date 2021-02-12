@@ -22,6 +22,11 @@ class VentaForm(forms.ModelForm):
                 'class': 'form-control select2',
                 'style': "width: 93%"
             }
+            self.fields['tipo_pago'].widget.attrs = {
+                'class': 'form-control select2',
+                'style': "width: 100%",
+                'data-toggle': "tooltip",
+            }
             self.fields['subtotal'].widget.attrs = {
                 'value': '0.00',
                 'class': 'form-control',
@@ -45,6 +50,7 @@ class VentaForm(forms.ModelForm):
         fields = [
             'fecha',
             'cliente',
+            'tipo_pago',
             'subtotal',
             'iva',
             'total'
@@ -52,6 +58,7 @@ class VentaForm(forms.ModelForm):
         labels = {
             'fecha': 'Fecha de Venta',
             'cliente': 'Cliente',
+            'tipo_pago': 'Forma de pago',
             'subtotal': 'Subtotal',
             'iva': 'I.V.A.',
             'total': 'TOTAL'

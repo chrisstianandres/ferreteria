@@ -46,6 +46,7 @@ urlpatterns = [
     # # path('inventario/', include('apps.inventario.urls', namespace='inventario')),
     path('tipo_gasto/', include('apps.tipogasto.urls', namespace='tipo_gasto')),
     path('gasto/', include('apps.gasto.urls', namespace='gasto')),
+    path('ctas_cobrar/', include('apps.cta_x_cbr.urls', namespace='ctas_cobrar')),
     # # path('devolucion/', include('apps.delvoluciones_venta.urls', namespace='devolucion')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)\
                   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
