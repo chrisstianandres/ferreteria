@@ -18,6 +18,8 @@ class Pago_cta_x_cobrar(models.Model):
     fecha_pago = models.DateField(default=None, null=True, blank=True)
     cta_cobrar = models.ForeignKey(Cta_x_cobrar, on_delete=models.PROTECT)
     valor = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    valor_pagado = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    saldo = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     estado = models.IntegerField(choices=ESTADO, default=0)
 
     def __str__(self):

@@ -58,12 +58,17 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 id = request.POST['id']
                 result = Pago_cta_x_cobrar.objects.get(id=id)
-                print(result.cta_cobrar)
-                # result.estado = 2
-                # result.fecha_pago = datetime.now()
-                # cta = Cta_x_cobrar.objects.get(id=result.cta_cobrar_id)
-                # cta.saldo = cta.saldo-
-                # result.save()
+                result.estado = 2
+                result.valor_pagado = result.valor_pagado+result.saldo
+                result.fecha_pago = datetime.now()
+                cta = Cta_x_cobrar.objects.get(id=result.cta_cobrar_id)
+                cta.saldo = float(cta.saldo)-float(result.saldo)
+                result.saldo = 0.00
+                if cta.saldo <= 0:
+                    cta.estado = 1
+                cta.save()
+                result.save()
+
         except Exception as e:
             data['error'] = str(e)
             print(e)
@@ -108,7 +113,33 @@ class pagar(ValidatePermissionRequiredMixin, ListView):
             elif action == 'abono':
                 data = []
                 datos = json.loads(request.POST['abono'])
-
+                abono = datos['abono']
+                cta = Cta_x_cobrar.objects.get(id=self.kwargs['pk'])
+                cta.saldo = float(cta.saldo)-float(abono)
+                if cta.saldo == 0:
+                    cta.estado = 1
+                cta.save()
+                for c in self.model.objects.filter(cta_cobrar_id=self.kwargs['pk']).filter(Q(estado=0) | Q(estado=1)):
+                    if abono <= 0:
+                        break
+                    else:
+                        if float(abono) <= float(c.saldo):
+                                c.saldo = float(c.saldo) - float(abono)
+                                if c.saldo == 0:
+                                    c.estado = 2
+                                c.valor_pagado = float(c.valor_pagado) + float(abono)
+                                c.fecha_pago = datetime.now()
+                                abono = 0
+                                c.save()
+                        else:
+                            cal = float(abono) - float(c.saldo)
+                            c.valor_pagado = (float(abono) - float(cal))
+                            c.saldo = float(c.saldo) - float((float(abono) - float(cal)))
+                            if c.saldo <= 0:
+                                c.estado = 2
+                                c.fecha_pago = datetime.now()
+                                c.save()
+                            abono = abono - (float(abono) - float(cal))
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:

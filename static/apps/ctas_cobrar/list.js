@@ -279,6 +279,11 @@ $(function () {
                     }
                 },
             });
+            if (data.estado === 1){
+                $('#abono').hide();
+            } else {
+                 $('#abono').show();
+            }
         });
     //boton agregar cliente
     $('#abono').on('click', function () {
@@ -294,6 +299,7 @@ $(function () {
                 function () {
                     menssaje_ok('Exito!', 'Exito al realizar el pago de esta letra', 'far fa-smile-wink', function () {
                         datatable_pagos.ajax.reload(null, false);
+                        datatable.ajax.reload(null, false);
                     })
                 });
 

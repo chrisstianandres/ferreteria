@@ -190,6 +190,9 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                 cta.save()
                                 x = 1
                                 ahora = datetime.now()
+                                debito = (float(datos['letra']) * float(datos['nro_cuotas']))
+                                calculo = (float(debito) - float(datos['total_deuda']))
+                                print(calculo)
                                 for n in range(0, int(datos['nro_cuotas'])):
                                     fech = ahora + relativedelta(months=x)
                                     let = Pago_cta_x_cobrar()
@@ -200,7 +203,14 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                         let.fecha = fech + dt.timedelta(days=1)
                                     else:
                                         let.fecha = fech
-                                    let.valor = float(datos['letra'])
+                                    if x == int(datos['nro_cuotas']):
+                                        let.valor = float(datos['letra'])-float(calculo)
+                                        let.saldo = float(datos['letra'])-float(calculo)
+                                        print('valor ultimo')
+                                        print(let.valor)
+                                    else:
+                                        let.valor = float(datos['letra'])
+                                        let.saldo = float(datos['letra'])
                                     let.save()
                                     x = x+1
                             else:
