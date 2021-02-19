@@ -1,3 +1,5 @@
+import locale
+
 from dateutil.relativedelta import relativedelta
 from django.utils.decorators import method_decorator
 
@@ -478,25 +480,25 @@ class printpdf(View):
 @csrf_exempt
 def grap(request):
     data = {}
+    fecha = datetime.now()
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
     try:
         action = request.POST['action']
         if action == 'chart':
             data = {
                 'dat': {
-                    'name': 'Total de ventas',
-                    'type': 'column',
-                    'colorByPoint': True,
-                    'showInLegend': True,
                     'data': grap_data(),
+                    'titulo': str('Total de ventas del año' + " " + str(fecha.year)),
                 },
                 'year': datetime.now().year,
                 'chart2': {
                     'data': dataChart2(),
+                    'titulo': str('Total de ventas del mes de' + " " + str(fecha.strftime("%B"))),
                 },
-                'chart3': {
-                    'compras': datachartcontr(),
-                    'ventas': grap_data()
-                },
+                # 'chart3': {
+                #     'compras': datachartcontr(),
+                #     'ventas': grap_data()
+                # },
                 'tarjets': {
                     'data': data_tarjets()
                 }
@@ -513,24 +515,31 @@ def grap_data():
     data = []
     for y in range(1, 13):
         total = Venta.objects.filter(fecha__year=year, fecha__month=y, estado=1).aggregate(r=Coalesce
-        (Sum('transaccion__total'), 0)).get('r')
+        (Sum('total'), 0)).get('r')
         data.append(float(total))
     return data
 
 
 def data_tarjets():
-    year = datetime.now().year
-    ventas = Venta.objects.filter(fecha__year=year, estado=1).aggregate(
-        r=Coalesce(Count('id'), 0)).get('r')
-    compras = Compra.objects.filter(fecha_compra__year=year, estado=1).aggregate(r=Coalesce(Count('id'), 0)).get('r')
-    inventario = Inventario.objects.filter(produccion__fecha_ingreso__year=year, estado=1).aggregate(
-        r=Coalesce(Count('id'), 0)).get('r')
-    agotados = Producto.objects.filter(producto_base__stock__lte=0).count()
+    year = datetime.now()
+    ventas = Venta.objects.filter(fecha__month=year.month, estado=1).aggregate(
+        r=Coalesce(Sum('total'), 0)).get('r')
+    ventas_anual = Venta.objects.filter(fecha__year=year.year, estado=1).aggregate(
+        r=Coalesce(Sum('total'), 0)).get('r')
+    compras = Compra.objects.filter(fecha_compra__month=year.month, estado=1).aggregate(
+        r=Coalesce(Sum('total'), 0)).get('r')
+    compras_anual = Compra.objects.filter(fecha_compra__year=year.year, estado=1).aggregate(
+        r=Coalesce(Sum('total'), 0)).get('r')
+    # inventario = Inventario.objects.filter(produccion__fecha_ingreso__year=year, estado=1).aggregate(
+    #     r=Coalesce(Count('id'), 0)).get('r')
+    # agotados = Producto.objects.filter(producto_base__stock__lte=0).count()
     data = {
-        'ventas': int(ventas),
-        'compras': int(compras),
-        'inventario': int(inventario),
-        'agotados': int(agotados),
+        'ventas': float(ventas),
+        'ventas_anuales': float(ventas_anual),
+        'compras': float(compras),
+        'compras_anual': float(compras_anual),
+        # 'inventario': int(inventario),
+        # 'agotados': int(agotados),
     }
     return data
 

@@ -402,9 +402,10 @@ function customize(doc) {
         return {
             columns: [
                 {
-                    alignment: 'left', image: logotipo, width: 100, height: 100},
+                    alignment: 'left', image: logotipo, width: 100, height: 100
+                },
                 {
-                    text: $('#nombre_empresa').text(), fontSize: 45, alignment: 'center', margin:[-90,30,0]
+                    text: $('#nombre_empresa').text(), fontSize: 45, alignment: 'center', margin: [-90, 30, 0]
                 },
             ],
             margin: [20, 10, 0, 0],  //[izquierda, arriba, derecha, abajo]
@@ -451,6 +452,7 @@ function customize(doc) {
     doc.styles.tableBodyEven.alignment = 'center';
     doc.styles.tableBodyOdd.alignment = 'center';
 }
+
 function customize_report(doc) {
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
         "Noviembre", "Diciembre"
@@ -477,7 +479,7 @@ function customize_report(doc) {
     doc.content[1].table.body[0].forEach(function (h) {
         h.fillColor = '#4e73df'
     });
-    doc.content[1].table.body[doc.content[1].table.body.length-1].forEach(function (h) {
+    doc.content[1].table.body[doc.content[1].table.body.length - 1].forEach(function (h) {
         h.fillColor = '#4e73df'
     });
     doc.styles.title = {color: '#2D1D10', fontSize: '16', alignment: 'center'};
@@ -485,9 +487,10 @@ function customize_report(doc) {
         return {
             columns: [
                 {
-                    alignment: 'left', image: logotipo, width: 100, height: 100},
+                    alignment: 'left', image: logotipo, width: 100, height: 100
+                },
                 {
-                    text: $('#nombre_empresa').text(), fontSize: 45, alignment: 'center', margin:[-90,30,0]
+                    text: $('#nombre_empresa').text(), fontSize: 45, alignment: 'center', margin: [-90, 30, 0]
                 },
             ],
             margin: [20, 10, 0, 0],  //[izquierda, arriba, derecha, abajo]
@@ -591,3 +594,30 @@ function year_footer() {
     $('#year').text(ano);
 
 }
+
+function reloj() {
+    var fecha_js = new Date;
+    var segundos = fecha_js.getSeconds();
+    var hora = fecha_js.getHours();
+    var minutos = fecha_js.getMinutes();
+
+    segundos++;
+
+    if (segundos === 60) {
+        segundos = 0;
+        minutos++;
+        if (minutos === 60) {
+            minutos = 0;
+            hora++;
+            if (hora === 24) {
+                hora = 0;
+            }
+        }
+    }
+    document.getElementById("reloj").innerHTML = " " + hora + ":" + minutos + ":" + segundos;
+}
+
+$(document).ready(function() {
+    setInterval(reloj, 1000);
+});
+

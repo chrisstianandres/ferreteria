@@ -37,9 +37,9 @@ class User(AbstractUser):
         if self.avatar:
             return '{}{}'.format(MEDIA_URL, self.avatar)
         if self.sexo == 1:
-            return '{}{}'.format(MEDIA_URL, 'user/admin.png')
+            return '{}{}'.format(MEDIA_URL, 'user/user_men.png')
         else:
-            return '{}{}'.format(MEDIA_URL, 'user/user_woman.png')
+            return '{}{}'.format(MEDIA_URL, 'user/user_women.png')
 
     def toJSON(self):
         item = model_to_dict(self)

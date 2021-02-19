@@ -77,6 +77,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         data['nuevo'] = '/usuario/nuevo'
         data['form'] = UserForm
         data['empresa'] = empresa
+        data['titulo_lista'] = 'Listado de Usuarios'
         return data
 
 
