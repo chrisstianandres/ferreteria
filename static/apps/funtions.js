@@ -6,7 +6,7 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.onerror = reject;
         reader.readAsDataURL(blob)
     }));
-toDataURL('/static/sitio_web/assets/img/header-bg.jpg').then(dataUrl => {
+toDataURL('/media/logo_pdf.png').then(dataUrl => {
     logotipo = dataUrl;
 });
 
@@ -391,13 +391,28 @@ function customize(doc) {
 
     var jsDate = formatDateToString(date);
     //[izquierda, arriba, derecha, abajo]
-    doc.pageMargins = [25, 120, 25, 50];
+    doc.pageMargins = [25, 150, 25, 50];
     doc.defaultStyle.fontSize = 12;
-    doc.styles.tableHeader.fontSize = 14;
+    doc.styles.tableHeader.fontSize = 12;
+    doc.content[1].table.body[0].forEach(function (h) {
+        h.fillColor = '#4e73df'
+    });
+    doc.content[1].table.body[doc.content[1].table.body.length-1].forEach(function (h) {
+        h.fillColor = '#4e73df'
+    });
+    doc.styles.title = {color: '#2D1D10', fontSize: '16', alignment: 'center'};
     doc['header'] = (function () {
         return {
-            columns: [{alignment: 'center', image: logotipo, width: 300}],
-            margin: [280, 10, 0, 0] //[izquierda, arriba, derecha, abajo]
+            columns: [
+                {
+                    alignment: 'left', image: logotipo, width: 100, height: 100},
+                {
+                    text: $('#nombre_empresa').text(), fontSize: 45, alignment: 'center', margin:[-90,30,0]
+                },
+            ],
+            margin: [20, 10, 0, 0],  //[izquierda, arriba, derecha, abajo]
+
+
         }
     });
     doc['footer'] = (function (page, pages) {
@@ -435,18 +450,7 @@ function customize(doc) {
         return 4;
     };
     doc.content[0].layout = objLayout;
-    // doc.content[1].table.widths = [35, '*', 55, 90, 180, 70, 150];
-    var colCount = new Array();
-    $('#datatable').find('tbody tr:first-child td').each(function () {
-        if ($(this).attr('colspan')) {
-            for (var i = 1; i <= $(this).attr('colspan'); $i++) {
-                colCount.push('*');
-            }
-        } else {
-            colCount.push('*');
-        }
-    });
-    doc.content[1].table.widths = colCount;
+    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split('');
     doc.styles.tableBodyEven.alignment = 'center';
     doc.styles.tableBodyOdd.alignment = 'center';
 }
@@ -474,27 +478,27 @@ function validador() {
     });
 
     jQuery.validator.addMethod("val_ced", function (value, element) {
-        if (element.classList.contains('is-valid')){
+        if (element.classList.contains('is-valid')) {
             return true
         } else {
             if (value.length === 10 || value.length === 13) {
-            $.ajax({
-                type: "POST",
-                url: '/verificar/',
-                data: {'data': value.toString()},
-                dataType: 'json',
-                success: function (data) {
-                    if (!data.hasOwnProperty('error')) {
-                        $(element).addClass("is-valid").removeClass("is-invalid");
-                        return true
-                    } else {
-                        $(element).addClass("is-invalid").removeClass("is-valid");
-                        return false
-                    }
+                $.ajax({
+                    type: "POST",
+                    url: '/verificar/',
+                    data: {'data': value.toString()},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (!data.hasOwnProperty('error')) {
+                            $(element).addClass("is-valid").removeClass("is-invalid");
+                            return true
+                        } else {
+                            $(element).addClass("is-invalid").removeClass("is-valid");
+                            return false
+                        }
 
-                },
-            })
-        }
+                    },
+                })
+            }
         }
 
         // return this.optional(element) || /^[a-z," "]+$/i.test(value);

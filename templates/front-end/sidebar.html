@@ -7,7 +7,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
            <i class="fas fa-tools"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">{{ empresa.nombre }}</div>
+        <div class="sidebar-brand-text mx-3" id="nombre_empresa">{{ empresa.nombre }}</div>
     </a>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
@@ -88,6 +88,11 @@
         <a class="nav-link" href="{% url 'compra:lista' %}">
             <i class="fas fa-shopping-bag"></i>
             <span>Compras</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'ctas_cobrar:lista' %}">
+            <i class="fas fa-search-dollar"></i>
+            <span>Cuentas por Cobrar</span></a>
     </li>
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"

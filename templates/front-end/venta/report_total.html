@@ -14,7 +14,6 @@
     <tr>
         <th>Fecha</th>
         <th>Cliente</th>
-        <th>Usuario</th>
         <th>Total (sin Iva)</th>
         <th>Total (Iva)</th>
         <th>Total (con Iva)</th>
@@ -24,7 +23,6 @@
     </tbody>
     <tfoot>
     <tr>
-        <th></th>
         <th></th>
         <th><strong>Totales:  Esta pagina (Total filtrado)</strong></th>
         <th></th>
@@ -40,5 +38,5 @@
     </a>
 {% endblock %}
 {% block extra %}
-    <script src="{% static 'apps/venta/venta_report_total.js' %}"></script>
+    <script src="{% static 'apps/venta/report_total.js' %}"></script>
 {% endblock %}

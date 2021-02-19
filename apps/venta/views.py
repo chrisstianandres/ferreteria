@@ -627,7 +627,7 @@ class report(ValidatePermissionRequiredMixin, ListView):
 
 class report_total(ValidatePermissionRequiredMixin, ListView):
     model = Venta
-    template_name = 'front-end/venta/venta_report_total.html'
+    template_name = 'front-end/venta/report_total.html'
     permission_required = 'venta.view_venta'
 
     @csrf_exempt
@@ -646,25 +646,22 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 data = []
                 if start_date == '' and end_date == '':
-                    query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
-                        .annotate(Sum('transaccion__subtotal')). \
-                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=1)
+                    query = Venta.objects.values('fecha', 'cliente__nombres',
+                                                 'cliente__apellidos').annotate(Sum('subtotal')). \
+                        annotate(Sum('iva')).annotate(Sum('total')).filter(estado=1)
                 else:
-                    query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos',
-                                                 'transaccion__user__username').filter(
-                        transaccion__fecha_trans__range=[start_date, end_date], estado=1). \
-                        annotate(Sum('transaccion__subtotal')). \
-                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                    query = Venta.objects.values('fecha', 'cliente__nombres',
+                                                 'cliente__apellidos').filter(fecha__range=[start_date, end_date],
+                                                                              estado=1).annotate(Sum('subtotal')). \
+                        annotate(Sum('iva')).annotate(Sum('total'))
+                print(query)
                 for p in query:
                     data.append([
-                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
-                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
-                        p['transaccion__user__username'],
-                        format(p['transaccion__subtotal__sum'], '.2f'),
-                        format((p['transaccion__iva__sum']), '.2f'),
-                        format(p['transaccion__total__sum'], '.2f')
+                        p['fecha'].strftime("%d/%m/%Y"),
+                        p['cliente__nombres'] + " " + p['cliente__apellidos'],
+                        format(p['subtotal__sum'], '.2f'),
+                        format((p['iva__sum']), '.2f'),
+                        format(p['total__sum'], '.2f')
                     ])
             else:
                 data['error'] = 'No ha seleccionado una opcion'

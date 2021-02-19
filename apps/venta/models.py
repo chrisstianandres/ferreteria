@@ -18,6 +18,11 @@ tipo_pago = (
     (1, 'CREDITO')
 )
 
+tipo_venta = (
+    (0, 'FISICA'),
+    (1, 'ONLINE')
+)
+
 
 class Venta(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
@@ -27,6 +32,7 @@ class Venta(models.Model):
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     estado = models.IntegerField(choices=estado, default=1)
     tipo_pago = models.IntegerField(choices=tipo_pago, default=0)
+    tipo_venta = models.IntegerField(choices=tipo_venta, default=0)
 
     def __str__(self):
         return '%s %s %s' % (self.cliente.nombres, self.fecha, self.total)

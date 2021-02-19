@@ -151,9 +151,8 @@ class pagar(ValidatePermissionRequiredMixin, ListView):
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
         data['boton'] = 'Guardar'
-        data['titulo'] = 'Listado de Productos'
-        data['titulo_lista'] = 'Listado de Productos'
-        data['nuevo'] = '/producto/nuevo'
+        data['titulo'] = 'Cuenta por cobrar'
+        data['titulo_lista'] = 'Letras de credito'
         data['empresa'] = empresa
         return data
 
