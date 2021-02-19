@@ -35,14 +35,14 @@
     </tr>
     </tfoot>
 {% endblock %}
-{% block botones %}
+{% block table_footer %}
 <a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
         <i class="fas fa-sync-alt"></i> Actualizar
     </a>
 {% endblock %}
 
 {% block extra %}
-    <script src="{% static 'apps/venta/venta_report_product.js' %}"></script>
+    <script src="{% static 'apps/venta/report_product.js' %}"></script>
 {% endblock %}
 {% block javascript %}
 

@@ -300,7 +300,7 @@ $("#signupForm").validate({
         nombre: {
             required: true,
             minlength: 3,
-            maxlength: 20
+            maxlength: 50
         },
         ciudad: {
             required: true,
@@ -342,7 +342,7 @@ $("#signupForm").validate({
         nombre: {
             required: "Porfavor ingresa el nombre de la empresa",
             minlength: "Debe ingresar al menos 3 letras",
-            maxlength: "Debe ingresar hasta 20 letras",
+            maxlength: "Debe ingresar hasta 50 letras",
             lettersonly: "Debe ingresar unicamente letras y espacios"
         },
         ciudad: {

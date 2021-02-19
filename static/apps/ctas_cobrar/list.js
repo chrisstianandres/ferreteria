@@ -55,14 +55,14 @@ function datatable_fun() {
                     //filename: 'dt_custom_pdf',
                     orientation: 'landscape', //portrait
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
-                    // download: 'open',
+                    download: 'open',
                     exportOptions:
                         {
                             columns: [0, 1, 2, 3, 4, 5, 6],
                             search: 'applied',
                             order: 'applied'
                         },
-                    customize,
+                    customize: customize,
                 },
 
             ]

@@ -2,11 +2,11 @@
 {% load static %}
 {% block elements %}
     <br>
-        <div class="row">
+    <div class="row">
         <div class="col-lg-4">
             <label for="fecha"><strong>Rango de Fechas:</strong></label>
             <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm"></div>
-        </div>
+    </div>
     <br>
 {% endblock %}
 {% block table %}
@@ -14,6 +14,7 @@
     <tr>
         <th>Fecha</th>
         <th>Cliente</th>
+        <th>Tipo Venta</th>
         <th>Total (sin Iva)</th>
         <th>Total (Iva)</th>
         <th>Total (con Iva)</th>
@@ -24,7 +25,8 @@
     <tfoot>
     <tr>
         <th></th>
-        <th><strong>Totales:  Esta pagina (Total filtrado)</strong></th>
+        <th></th>
+        <th><strong>Totales: Esta pagina (Total filtrado)</strong></th>
         <th></th>
         <th></th>
         <th></th>
@@ -32,8 +34,9 @@
     </tr>
     </tfoot>
 {% endblock %}
-{% block botones %}
-    <a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
+{% block table_footer %}
+    <a type="button" class="btn btn-success btn-sm" id="reload"
+       onclick=" location.reload();">
         <i class="fas fa-sync-alt"></i> Actualizar
     </a>
 {% endblock %}

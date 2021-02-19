@@ -564,7 +564,7 @@ def datachartcontr():
 
 class report(ValidatePermissionRequiredMixin, ListView):
     model = Venta
-    template_name = 'front-end/venta/venta_report_product.html'
+    template_name = 'front-end/venta/report_product.html'
     permission_required = 'venta.view_venta'
 
     @csrf_exempt
@@ -585,23 +585,19 @@ class report(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 data = []
                 if start_date == '' and end_date == '':
-                    query = Detalle_venta.objects.values('venta__transaccion__fecha_trans',
-                                                         'inventario__producto__producto_base_id',
+                    query = Detalle_venta.objects.values('venta__fecha', 'inventario__producto__producto_base_id',
                                                          'pvp_actual').order_by().annotate(
                         Sum('cantidad')).filter(venta__estado=1)
                 else:
-                    query = Detalle_venta.objects.values('venta__transaccion__fecha_trans',
-                                                         'inventario__producto__producto_base_id',
+                    query = Detalle_venta.objects.values('venta__fecha', 'inventario__producto__producto_base_id',
                                                          'pvp_actual') \
-                        .filter(venta__transaccion__fecha_trans__range=[start_date, end_date],
-                                venta__estado=1).order_by().annotate(
+                        .filter(venta__fecha__range=[start_date, end_date], venta__estado=1).order_by().annotate(
                         Sum('cantidad'))
                 for p in query:
                     total = p['pvp_actual'] * p['cantidad__sum']
-                    print(iva)
                     pr = Producto_base.objects.get(id=int(p['inventario__producto__producto_base_id']))
                     data.append([
-                        p['venta__transaccion__fecha_trans'].strftime("%d/%m/%Y"),
+                        p['venta__fecha'].strftime("%d/%m/%Y"),
                         pr.nombre,
                         int(p['cantidad__sum']),
                         format(p['pvp_actual'], '.2f'),
@@ -619,9 +615,9 @@ class report(ValidatePermissionRequiredMixin, ListView):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['titulo'] = 'Reporte de Ventas'
+        data['titulo'] = 'Reporte de Ventas por productos'
         data['empresa'] = empresa
-        data['filter_prod'] = '/venta/lista'
+        data['titulo_lista'] = 'Ventas por productos'
         return data
 
 
@@ -646,19 +642,23 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 data = []
                 if start_date == '' and end_date == '':
-                    query = Venta.objects.values('fecha', 'cliente__nombres',
+                    query = Venta.objects.values('fecha', 'cliente__nombres', 'tipo_venta',
                                                  'cliente__apellidos').annotate(Sum('subtotal')). \
                         annotate(Sum('iva')).annotate(Sum('total')).filter(estado=1)
                 else:
-                    query = Venta.objects.values('fecha', 'cliente__nombres',
+                    query = Venta.objects.values('fecha', 'cliente__nombres', 'tipo_venta',
                                                  'cliente__apellidos').filter(fecha__range=[start_date, end_date],
-                                                                              estado=1).annotate(Sum('subtotal')). \
-                        annotate(Sum('iva')).annotate(Sum('total'))
-                print(query)
+                                                                              estado=1)\
+                        .annotate(Sum('subtotal')).annotate(Sum('iva')).annotate(Sum('total'))
                 for p in query:
+                    if p['tipo_venta'] == 0:
+                        tipo = 'Fisica'
+                    else:
+                        tipo = 'OnLine'
                     data.append([
                         p['fecha'].strftime("%d/%m/%Y"),
                         p['cliente__nombres'] + " " + p['cliente__apellidos'],
+                        tipo,
                         format(p['subtotal__sum'], '.2f'),
                         format((p['iva__sum']), '.2f'),
                         format(p['total__sum'], '.2f')
@@ -672,16 +672,17 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
-        data['entidad'] = 'Ventas Finalizadas'
-        data['titulo'] = 'Reporte de Ventas'
+        data['entidad'] = 'Ventas Finalizadas (Fisicas)'
+        data['titulo'] = 'Reporte de Ventas (Fisicas)'
         data['empresa'] = empresa
         data['filter_prod'] = '/venta/lista'
+        data['titulo_lista'] = 'Lista de Ventas finalizadas (Fisicas)'
         return data
 
 
 class report_total_reserva(ValidatePermissionRequiredMixin, ListView):
     model = Venta
-    template_name = 'front-end/venta/venta_report_total_reserva.html'
+    template_name = 'front-end/venta/report_total_reserva.html'
     permission_required = 'venta.view_venta'
 
     @csrf_exempt
@@ -701,25 +702,21 @@ class report_total_reserva(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 data = []
                 if start_date == '' and end_date == '':
-                    query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos', 'transaccion__user__username')\
-                        .annotate(Sum('transaccion__subtotal')). \
-                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total')).filter(estado=2)
+                    query = Venta.objects.values('fecha', 'cliente__nombres',
+                                                 'cliente__apellidos')\
+                        .annotate(Sum('subtotal')). \
+                        annotate(Sum('iva')).annotate(Sum('total')).filter(estado=2)
                 else:
-                    query = Venta.objects.values('transaccion__fecha_trans', 'transaccion__cliente__nombres',
-                                                 'transaccion__cliente__apellidos',
-                                                 'transaccion__user__username').filter(
-                        transaccion__fecha_trans__range=[start_date, end_date], estado=2). \
-                        annotate(Sum('transaccion__subtotal')). \
-                        annotate(Sum('transaccion__iva')).annotate(Sum('transaccion__total'))
+                    query = Venta.objects.values('fecha', 'cliente__nombres','cliente__apellidos').filter(
+                        fecha__range=[start_date, end_date], estado=2).annotate(Sum('subtotal')). \
+                        annotate(Sum('iva')).annotate(Sum('total'))
                 for p in query:
                     data.append([
-                        p['transaccion__fecha_trans'].strftime("%d/%m/%Y"),
-                        p['transaccion__cliente__nombres'] + " " + p['transaccion__cliente__apellidos'],
-                        p['transaccion__user__username'],
-                        format(p['transaccion__subtotal__sum'], '.2f'),
-                        format((p['transaccion__iva__sum']), '.2f'),
-                        format(p['transaccion__total__sum'], '.2f')
+                        p['fecha'].strftime("%d/%m/%Y"),
+                        p['cliente__nombres'] + " " + p['cliente__apellidos'],
+                        format(p['subtotal__sum'], '.2f'),
+                        format((p['iva__sum']), '.2f'),
+                        format(p['total__sum'], '.2f')
                     ])
             else:
                 data['error'] = 'No ha seleccionado una opcion'
@@ -732,5 +729,6 @@ class report_total_reserva(ValidatePermissionRequiredMixin, ListView):
         data['icono'] = opc_icono
         data['entidad'] = 'Ventas Reservadas'
         data['titulo'] = 'Reporte de Pedidos'
+        data['titulo_lista'] = 'Lista de Ventas reservadas'
         data['empresa'] = empresa
         return data

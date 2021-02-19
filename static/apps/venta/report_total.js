@@ -69,30 +69,16 @@ $(function () {
                 pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                 download: 'open',
                 exportOptions: {
-                    columns: [0, 1, 2, 3, 4],
+                    columns: [0, 1, 2, 3, 4, 5],
                     search: 'applied',
                     order: 'applied'
                 },
-                customize,
+                customize: customize_report,
             },
             {
                 text: '<i class="far fa-file-excel"></i> Excel', className: "btn btn-success my_class",
                 extend: 'excel',
                 footer: true
-            },
-            {
-                text: '<i class="fas fa-tags"></i> Ventas Reservadas',
-                className: 'btn btn-secondary',
-                action: function (e, dt, node, config) {
-                    window.location.href = '/venta/report_total_pedidos'
-                }
-            },
-            {
-                text: '<i class="fab fa-amazon"></i> Reporte por Productos',
-                className: 'btn btn-warning',
-                action: function (e, dt, node, config) {
-                    window.location.href = '/venta/report_by_product'
-                }
             },
         ]
         },
@@ -115,6 +101,18 @@ $(function () {
                     return '$ ' + parseFloat(data).toFixed(2);
                 }
             },
+             {
+                targets: [2],
+                render: function (data, type, row) {
+                    var bage;
+                    if (data==='Fisica'){
+                        bage = 'badge badge-primary'
+                    } else {
+                        bage = 'badge badge-success'
+                    }
+                    return '<span class="'+bage+'">'+data+' </span>'
+                }
+            },
         ],
         footerCallback: function (row, data, start, end, display) {
             var api = this.api(), data;
@@ -127,43 +125,42 @@ $(function () {
                         i : 0;
             };
             // Total over this page
-            pageTotalsiniva = api.column(2, {page: 'current'}).data().reduce(function (a, b) {
+            pageTotalsiniva = api.column(3, {page: 'current'}).data().reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
             // total full table
-            pageTotalsiniva = api.column(2).data().reduce(function (a, b) {
+            pageTotalsiniva = api.column(3).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
 
             // Total over this page
-            pageTotaliva = api
-                .column(3, {page: 'current'}).data().reduce(function (a, b) {
+            pageTotaliva = api.column(4, {page: 'current'}).data().reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
             // total full table
-            totaliva = api.column(3).data().reduce(function (a, b) {
+            totaliva = api.column(4).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
 // Total over this page
-            pageTotalconiva = api.column(4, {page: 'current'}).data().reduce(function (a, b) {
+            pageTotalconiva = api.column(5, {page: 'current'}).data().reduce(function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0);
             // total full table
-            totalconiva = api.column(4).data().reduce(function (a, b) {
+            totalconiva = api.column(5).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
 
 
             // Update footer
-            $(api.column(2).footer()).html(
+            $(api.column(3).footer()).html(
                 '$ ' + parseFloat(pageTotalsiniva).toFixed(2) + ' ( $ ' + parseFloat(pageTotalsiniva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
-             $(api.column(3).footer()).html(
+             $(api.column(4).footer()).html(
                 '$ ' + parseFloat(pageTotaliva).toFixed(2) + ' ( $ ' + parseFloat(pageTotaliva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
-              $(api.column(4).footer()).html(
+              $(api.column(5).footer()).html(
                 '$ ' + parseFloat(pageTotalconiva).toFixed(2) + ' ( $ ' + parseFloat(pageTotalconiva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
