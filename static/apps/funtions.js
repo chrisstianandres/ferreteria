@@ -586,6 +586,41 @@ function validador() {
 
         // return this.optional(element) || /^[a-z," "]+$/i.test(value);
     }, "");
+
+    jQuery.validator.addMethod("validar", function (value, element) {
+        return validar(element);
+    }, "Número de documento no valido para Ecuador");
+
+    function validar(element) {
+        var cad = document.getElementById(element.id).value.trim();
+        var total = 0;
+        var longitud = cad.length;
+        var longcheck = longitud - 1;
+        if (longitud === 10) {
+            return aux(total, cad);
+        } else if (longitud === 13 && cad.slice(10, 13) !== '000') {
+            return aux(total, cad);
+        } else {
+            return false;
+        }
+    }
+
+    function aux(total, cad) {
+        if (cad !== "") {
+            for (var i = 0; i < 9; i++) {
+                if (i % 2 === 0) {
+                    var aux = cad.charAt(i) * 2;
+                    if (aux > 9) aux -= 9;
+                    total += aux;
+                } else {
+                    total += parseInt(cad.charAt(i)); // parseInt o concatenará en lugar de sumar
+                }
+            }
+
+            total = total % 10 ? 10 - total % 10 : 0;
+            return parseInt(cad.charAt(9)) === total;
+        }
+    }
 }
 
 
@@ -617,7 +652,7 @@ function reloj() {
     document.getElementById("reloj").innerHTML = " " + hora + ":" + minutos + ":" + segundos;
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     setInterval(reloj, 1000);
 });
 

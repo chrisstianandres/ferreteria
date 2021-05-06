@@ -25,7 +25,7 @@ $(document).ready(function () {
                 minlength: 10,
                 maxlength: 10,
                 digits: true,
-                val_ced: true
+                validar: true
             },
             correo: {
                 required: true,
@@ -55,6 +55,7 @@ $(document).ready(function () {
             nombres: {
                 required: "Por favor ingresa tus nombres",
                 minlength: "Debe ingresar al menos un nombre",
+                maxlength: "Debe ingresar maximo 50 caracteres",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             apellidos: {
@@ -67,7 +68,6 @@ $(document).ready(function () {
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
                 maxlength: "Tu numero de documento debe tener maximo 10 digitos",
-                val_ced: "Numero de cedula no valido para Ecuador",
             },
             correo: "Debe ingresar un correo valido",
             telefono: {
