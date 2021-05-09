@@ -1,6 +1,8 @@
 from datetime import *
 
 from django import forms
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Group
 from django.forms import TextInput, EmailInput
 
 from .models import Cliente
@@ -66,3 +68,35 @@ class ClienteForm(forms.ModelForm):
             'celular': forms.TextInput(),
             'direccion': forms.TextInput()
         }
+
+    def save(self, commit=True):
+        data = {}
+        form = super()
+        try:
+            pwd = self.cleaned_data['cedula']
+            u = form.save(commit=False)
+            if u.pk is None:
+                cliente = User(
+                    username=pwd,
+                    first_name=self.cleaned_data['first_name'],
+                    last_name=self.cleaned_data['last_name'],
+                    cedula=pwd,
+                    email=self.cleaned_data['email'],
+                    sexo=self.cleaned_data['sexo'],
+                    telefono=self.cleaned_data['telefono'],
+                    celular=self.cleaned_data['celular'],
+                    direccion=self.cleaned_data['direccion'],
+                    tipo=0,
+                    password=make_password(pwd)
+                )
+                cliente.save()
+                grupo = Group.objects.filter(name__icontains='cliente').first()
+                usersave = User.objects.get(id=cliente.id)
+                usersave.groups.add(grupo)
+                usersave.save()
+            else:
+                u.save()
+        except Exception as e:
+            data['error'] = str(e)
+            print(e)
+        return data

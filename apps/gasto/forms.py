@@ -17,6 +17,7 @@ class GastoForm(forms.ModelForm):
                 'readonly': True,
                 'class': 'form-control'
             }
+            self.fields['fecha_pago'].initial = datetime.now().strftime('%Y-%m-%d')
             self.fields['tipo_gasto'].widget.attrs = {
                 'class': 'form-control select2',
                 'data-live-search': "true"
@@ -27,9 +28,9 @@ class GastoForm(forms.ModelForm):
             }
             self.fields["empresa"].initial = Empresa.objects.first()
             self.fields['valor'].widget.attrs = {
-                'value': '0.00',
                 'class': 'form-control'
             }
+            self.fields['valor'].initial = format(1.00, '.2f')
             self.fields['detalle'].widget.attrs = {
                 'class': 'form-control'
             }

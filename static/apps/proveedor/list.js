@@ -12,10 +12,10 @@ function datatable_fun() {
             dataSrc: ""
         },
         columns: [
-            {"data": "nombre"},
+            {"data": "nombre", width: '50px'},
             {"data": "tipo"},
             {"data": "num_doc"},
-            {"data": "correo"},
+            {"data": "correo", width: '10px'},
             {"data": "telefono"},
             {"data": "direccion"},
             {"data": "id"}
@@ -23,44 +23,11 @@ function datatable_fun() {
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
         },
-        dom: "<'row'<'col-sm-12 col-md-12'B>>" +
+        dom:
             "<'row'<'col-sm-12 col-md-3'l>>" +
             "<'row'<'col-sm-12 col-md-12'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-        buttons: {
-            dom: {
-                button: {
-                    className: '',
-
-                },
-                container: {
-                    className: 'float-md-right'
-                }
-            },
-            buttons: [
-                {
-                    text: '<i class="fa fa-file-pdf"></i> PDF',
-                    className: 'btn btn-danger btn-space',
-                    extend: 'pdfHtml5',
-                    //filename: 'dt_custom_pdf',
-                    orientation: 'landscape', //portrait
-                    pageSize: 'A4', //A3 , A5 , A6 , legal , letter
-                    download: 'open',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6],
-                        search: 'applied',
-                        order: 'applied'
-                    },
-                    customize,
-                },
-                {
-                    text: '<i class="fa fa-file-excel"></i> Excel',
-                    className: "btn btn-success btn-space float-right",
-                    extend: 'excel'
-                }
-            ]
-        },
         columnDefs: [
             {
                 targets: [-1],
@@ -74,7 +41,7 @@ function datatable_fun() {
                     return edit + del
 
                 }
-            },
+            }
         ],
 
     });

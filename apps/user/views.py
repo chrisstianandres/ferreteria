@@ -35,7 +35,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
-                user = User.objects.all()
+                user = User.objects.filter(tipo=1)
                 for c in user:
                     data.append(c.toJSON())
             elif action == 'estado':
@@ -92,7 +92,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        print(request.POST)
         try:
             if action == 'add':
                 f = UserForm(request.POST, request.FILES)

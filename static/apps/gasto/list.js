@@ -128,12 +128,18 @@ $(function () {
                 '/gasto/nuevo', 'Esta seguro que desea guardar este gasto?', parametros,
                 function (response) {
                     menssaje_ok('Exito!', 'Exito al guardar este gasto!', 'far fa-smile-wink', function () {
-                        ocultar( '#form');
+                        ocultar('#form');
+                        $('input[name="fecha_pago"]').data('daterangepicker').remove();
                     });
                 });
         }
     });
 
+    $('#cancel_gasto').on('click', function () {
+        $('#div_table').removeClass('col-xl-8 col-lg-12').addClass('col-xl-12');
+        ocultar('#form');
+        $('input[name="fecha_pago"]').data('daterangepicker').remove();
+    });
 
     //nuevo tipo
     $('#id_new_tipo_gasto').on('click', function () {

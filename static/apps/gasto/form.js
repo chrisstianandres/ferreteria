@@ -1,6 +1,6 @@
 $(document).ready(function () {
     $('input[name="valor"]').TouchSpin({
-        min: 0.05,
+        min: 1.00,
         max: 1000000,
         step: 0.01,
         decimals: 2,
@@ -8,21 +8,12 @@ $(document).ready(function () {
         boostat: 5,
         maxboostedstep: 10,
         prefix: '$'
-    });
-    $.validator.setDefaults({
-        errorClass: 'invalid-feedback',
-
-        highlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-invalid")
-                .removeClass("is-valid");
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-valid")
-                .removeClass("is-invalid");
+    }).keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
         }
-    });
+    });//Para solo numeros
+    validador();
     $("#form").validate({
         rules: {
             tipo_gasto: {

@@ -327,13 +327,39 @@ function reset(formulario) {
     $('.is-invalid').removeClass('is-invalid');
 }
 
-function menssaje_error_form(title, content, icon, callback) {
-    var html = '<ul>';
-    $.each(content, function (key, value) {
-        html += '<li>' + key + ': ' + value + '</li>'
-    });
-    html += '</ul>';
-    $.confirm({
+// function menssaje_error_form(title, content, icon, callback) {
+//     var html = '<ul>';
+//     $.each(content, function (key, value) {
+//         html += '<li>' + key + ': ' + value + '</li>'
+//     });
+//     html += '</ul>';
+//     $.confirm({
+//         theme: 'modern',
+//         icon: icon,
+//         title: title,
+//         type: 'red',
+//         content: html,
+//         draggable: true,
+//         buttons: {
+//             info: {
+//                 text: '<i class="fas fa-check"></i> Ok',
+//                 btnClass: 'btn-blue'
+//             },
+//         }
+//     });
+// }
+function menssaje_error_form(title, obj, icon, callback) {
+   var html = '';
+   if (typeof (obj) === 'object') {
+       html = '<ul style="text-align: left;">';
+       $.each(obj, function (key, value) {
+           html += '<li>' + key + ': ' + value + '</li>';
+       });
+      html += '</ul>';
+   } else {
+       html = '<p>' + obj + '</p>';
+   }
+   $.confirm({
         theme: 'modern',
         icon: icon,
         title: title,

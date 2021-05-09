@@ -2,6 +2,7 @@
 {% load static %}
 {% block content %}
     <div class="container-fluid">
+    <input type="hidden" id="action" name="action" value="{{ action }}">
         <!-- Page Heading -->
         <h1 class="h3 mb-2 text-gray-800"><i class="{{ icono }}"></i> {{ entidad }}</h1>
         <!-- Content Row -->
@@ -49,8 +50,6 @@
                             </div>
                             <!-- Card Body -->
                             <div class="card-body">
-
-                                <input type="hidden" id="action" name="action" value="{{ action }}">
                                 <input type="hidden" id="indice" name="indice" value="{{ empresa.indice }}">
                                 <input type="hidden" id="iva" name="iva" value="{{ empresa.iva }}">
                                 <input type="hidden" name="option" value="{{ option }}">
