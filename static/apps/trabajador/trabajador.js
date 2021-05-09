@@ -1,30 +1,11 @@
-var user_tipo = $('input[name="user_tipo"]').val();
+var user_tipo = $('input[name="user_tipo"]').val(), action = $('input[name="action"]').val();
 $(document).ready(function () {
     var option = $('input[name="option"]').val();
     if (option === 'editar') {
         $('#id_cedula').attr('readonly', 'true');
-
     }
 
-    jQuery.validator.addMethod("lettersonly", function (value, element) {
-        return this.optional(element) || /^[a-z," "]+$/i.test(value);
-    }, "Letters and spaces only please");
-
-
-    $.validator.setDefaults({
-        errorClass: 'invalid-feedback',
-
-        highlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-invalid")
-                .removeClass("is-valid");
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element)
-                .addClass("is-valid")
-                .removeClass("is-invalid");
-        }
-    });
+    validador();
     $("#form").validate({
         rules: {
             username: {
@@ -48,7 +29,8 @@ $(document).ready(function () {
                 required: true,
                 minlength: 10,
                 maxlength: 10,
-                digits: true
+                digits: true,
+                validar: true
             },
             correo: {
                 required: true,
@@ -58,13 +40,15 @@ $(document).ready(function () {
                 required: false
             },
             telefono: {
-                required: true,
+                required: false,
                 minlength: 9,
+                maxlength: 9,
                 digits: true
             },
             celular: {
                 required: true,
                 minlength: 10,
+                maxlength: 10,
                 digits: true
             },
             direccion: {
@@ -98,19 +82,18 @@ $(document).ready(function () {
                 required: "Por favor ingresa tu numero de cedula",
                 minlength: "Tu numero de documento debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+                maxlength: "Tu numero de cedula debe tener maximo 10 digitos",
+                validar: "Tu numero de cedula no es valido",
             },
             correo: "Debe ingresar un correo valido",
-            cargo: "Debe seleccionar un cargo",
             password: {
                 required: "Debe Ingresar una contraseña",
                 minlength: "Tu contraseña debe tener al menos 5 digitos"
             },
             telefono: {
-                required: "Por favor ingresa tu numero convencional",
                 minlength: "Tu numero de documento debe tener al menos 9 digitos",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+                maxlength: "Tu numero de documento debe tener maximo 9 digitos",
             },
             celular: {
                 required: "Por favor ingresa tu numero celular",
@@ -152,5 +135,22 @@ $(document).ready(function () {
     });
     }
 
+
+        //enviar formulario de nuevo cliente
+    $('#form').on('submit', function (e) {
+        e.preventDefault();
+        var parametros = new FormData(this);
+        parametros.append('action', action);
+        var isvalid = $(this).valid();
+        if (isvalid) {
+            save_with_ajax2('Alerta',
+                window.location.pathname, 'Esta seguro que desea guardar este usuario?', parametros,
+                function (response) {
+                    menssaje_ok('Exito!', 'Exito al guardar este usuario!', 'far fa-smile-wink', function () {
+                    window.location.href = '/usuario/lista'
+                    });
+                });
+        }
+    });
 
 });

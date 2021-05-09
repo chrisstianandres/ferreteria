@@ -101,12 +101,10 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
         try:
             if action == 'add':
                 datos = json.loads(request.POST['compras'])
                 if datos:
-                    pr = []
                     with transaction.atomic():
                         c = Compra()
                         c.fecha_compra = datos['fecha_compra']
@@ -124,19 +122,38 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                             dv.subtotal = float(i['subtotal'])
                             x = Producto.objects.get(pk=i['id'])
                             dv.p_compra_actual = float(x.pcp)
-                            x.stock = x.stock + int(i['cantidad'])
+                            x.stock += int(i['cantidad'])
                             x.save()
                             dv.save()
-                            for p in range(0, i['cantidad']):
-                                inv = Inventario()
-                                inv.compra_id = c.id
-                                inv.producto_id = x.id
-                                inv.save()
                         data['id'] = c.id
                         data['resp'] = True
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
+            elif action == 'list_list':
+                data = []
+                ids = json.loads(request.POST['ids'])
+                for c in Producto.objects.all().exclude(id__in=ids):
+                    data.append(c.toJSON())
+            elif action == 'search_no_stock':
+                ids = json.loads(request.POST['ids'])
+                data = []
+                term = request.POST['term']
+                query = Producto.objects.filter(producto_base__nombre__icontains=term)
+                for a in query.exclude(id__in=ids)[0:10]:
+                    result = {'id': a.id, 'text': str(a.producto_base.nombre) + ' / ' + str(a.presentacion.nombre)}
+                    data.append(result)
+            elif action == 'get':
+                data = []
+                id = request.POST['id']
+                producto = Producto.objects.filter(pk=id)
+                empresa = Empresa.objects.first()
+                for i in producto:
+                    item = i.toJSON()
+                    item['cantidad'] = 1
+                    item['subtotal'] = 0.00
+                    item['iva_emp'] = empresa.iva
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:

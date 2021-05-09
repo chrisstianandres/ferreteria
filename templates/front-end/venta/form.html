@@ -1,7 +1,7 @@
 {% extends 'front-end/form.html' %}
 {% load static %}
 {% block buscador %}
-    {{ form2.inventario }}
+    {{ form2.producto }}
 {% endblock %}
 {% block table %}
     <thead>
@@ -74,10 +74,12 @@
             <label class="col-form-label"><strong>{{ form.cliente.label_tag }}</strong></label>
             <div class="input-group">
                 {{ form.cliente }}
-                <div class="input-group-append">
-                    <button class="btn btn-primary btn-xs" id="id_new_cliente" type="button"><i
-                            class="fas fa-plus"></i></button>
-                </div>
+                {% if perms.cliente.add_user %}
+                    <div class="input-group-append">
+                        <button class="btn btn-primary btn-xs" id="id_new_cliente" type="button"><i
+                                class="fas fa-plus"></i></button>
+                    </div>
+                {% endif %}
 
             </div>
         </div>
@@ -106,7 +108,7 @@
             <div class="form-group col-lg-12">
                 <label class="col-form-label"><strong>{{ formcredito.interes.label_tag }}</strong></label>
                 <div class="input-group input-group-sm mb-3">
-                     <div class="input-group-prepend">
+                    <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
                     </div>
                     {{ formcredito.interes }}

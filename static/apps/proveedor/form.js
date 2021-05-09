@@ -25,7 +25,7 @@ $(document).ready(function () {
                 required: true,
                 tipo: true,
                 digits: true,
-                val_ced: true
+                validar: true
             },
             correo: {
                 required: true,
@@ -53,19 +53,17 @@ $(document).ready(function () {
             num_doc: {
                 required: "Por favor ingresa tu numero de documento",
                 tipo: "Error en el numero de digitos (10 para cedula o 13 para ruc)",
-                // minlength: "Numero de digitos deficiente (10 para cedula)",
                 digits: "Debe ingresar unicamente numeros",
-                val_ced: "Numero de documento no valido para Ecuador",
+                validar: "Numero de cedula o ruc no valido",
             },
             correo: "Debe ingresar un correo valido",
             telefono: {
-                required: "Por favor ingresa tu numero celular",
-                minlength: "Tu numero de documento debe tener al menos 10 digitos",
+                minlength: "Tu numero de telefono debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
                 maxlength: "Tu numero de documento debe tener maximo 10 digitos",
             },
             direccion: {
-                required: "Porfavor ingresa una direccion",
+                required: "Por favor ingresa una direccion",
                 minlength: "Ingresa al menos 5 letras",
                 maxlength: "Tu direccion debe tener maximo 50 caracteres",
             },
@@ -86,7 +84,7 @@ $(document).ready(function () {
                 required: true,
                 tipo: true,
                 digits: true,
-                val_ced: true
+                validar: true
             },
             correo: {
                 required: true,
@@ -107,16 +105,16 @@ $(document).ready(function () {
         },
         messages: {
             nombre: {
-                required: "Por favor ingresa tus nombres y apellidos",
-                minlength: "Debe ingresar al menos un nombre y un apellido",
+                required: "Por favor ingresa el nombre",
+                minlength: "Debe ingresar al menos 5 caracteres",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             num_doc: {
-                required: "Por favor ingresa tu numero de documento",
+                required: "Por favor ingresa tu numero de cedula o ruc",
                 tipo: "Error en el numero de digitos (10 para cedula o 13 para ruc)",
                 // minlength: "Numero de digitos deficiente (10 para cedula)",
                 digits: "Debe ingresar unicamente numeros",
-                val_ced: "Numero de documento no valido para Ecuador",
+                validar: "Numero de cedula o ruc no valido",
             },
             correo: "Debe ingresar un correo valido",
             telefono: {

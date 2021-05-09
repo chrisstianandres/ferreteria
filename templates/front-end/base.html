@@ -62,7 +62,7 @@
 
         <!-- Main Content -->
         <div id="content">
-
+            <input type="hidden" name="user_tipo" value="{{ request.user.tipo }}">
             {% include 'front-end/header.html' %}
 
             {% block content %}

@@ -12,6 +12,7 @@ from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.ubicacion.models import *
+from apps.user.models import User
 
 opc_icono = 'fa fa-user'
 opc_entidad = 'Clientes'
@@ -35,18 +36,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
-                for c in Cliente.objects.all():
+                for c in User.objects.filter(tipo=0):
                     data.append(c.toJSON())
-
-            elif action == 'search':
-                data = []
-                term = request.POST['term']
-                query = Cliente.objects.filter(
-                    Q(nombres__icontains=term) | Q(apellidos__icontains=term) | Q(cedula__icontains=term))[0:10]
-                for a in query:
-                    item = a.toJSON()
-                    item['text'] = a.get_full_name()
-                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
             import json
@@ -72,6 +63,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = ClienteForm
     template_name = 'front-end/cliente/form.html'
+    permission_required = 'cliente.add_cliente'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -86,7 +78,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 data = self.save_data(f)
             elif action == 'edit':
                 pk = request.POST['id']
-                cliente = Cliente.objects.get(pk=int(pk))
+                cliente = User.objects.get(pk=int(pk))
                 f = ClienteForm(request.POST, instance=cliente)
                 data = self.save_data(f)
             elif action == 'delete':
@@ -103,14 +95,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def save_data(self, f):
         data = {}
         if f.is_valid():
-            f.save(commit=False)
-            if verificar(f.data['cedula']):
-                cli = f.save()
-                data['resp'] = True
-                data['cliente'] = cli.toJSON()
-            else:
-                f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
-                data['error'] = f.errors
+            f.save()
         else:
             data['error'] = f.errors
         return data

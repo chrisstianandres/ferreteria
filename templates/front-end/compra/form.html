@@ -71,10 +71,11 @@
             <label class="col-form-label"><strong>{{ form.proveedor.label_tag }}</strong></label>
             <div class="input-group">
                 {{ form.proveedor }}
-                 <div class="input-group-append">
+                {% if perms.proveedor.add_proveedor %} <div class="input-group-append">
                     <button class="btn btn-primary btn-xs" id="id_new_proveedor" type="button"><i
                             class="fas fa-plus"></i></button>
                 </div>
+                {% endif %}
 
             </div>
         </div>

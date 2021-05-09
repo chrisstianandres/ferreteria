@@ -92,25 +92,20 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         action = request.POST['action']
-        pk = request.POST['id']
+        print(request.POST)
         try:
             if action == 'add':
                 f = UserForm(request.POST, request.FILES)
                 if f.is_valid():
-                    f.save(commit=False)
-                    if verificar(f.data['cedula']):
-                        f.save()
-                        return HttpResponseRedirect('/empleado/lista')
-                    else:
-                        f.add_error("cedula", "Numero de Cedula no valido para Ecuador")
-                        data['form'] = f
+                    f.save()
+                    data['resp'] = True
                 else:
                     data['form'] = f
-                return render(request, 'front-end/user/form.html', data)
             elif action == 'delete':
-               cli = User.objects.get(pk=pk)
-               cli.delete()
-               data['resp'] = True
+                pk = request.POST['id']
+                cli = User.objects.get(pk=pk)
+                cli.delete()
+                data['resp'] = True
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
@@ -125,6 +120,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['titulo'] = 'Registro de Usuarios'
         data['nuevo'] = '/usuario/nuevo'
         data['form'] = UserForm
+        data['action'] = 'add'
         data['empresa'] = empresa
         return data
 
@@ -147,7 +143,8 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
             pk = self.kwargs.get('pk', 0)
             user = self.model.objects.get(id=pk)
             data = {
-                'icono': opc_icono, 'crud': '/user/editar/' + str(self.kwargs['pk']), 'entidad': opc_entidad, 'empresa': empresa,
+                'icono': opc_icono, 'crud': '/user/editar/' + str(self.kwargs['pk']), 'entidad': opc_entidad,
+                'empresa': empresa,
                 'boton': 'Guardar Edicion', 'titulo': 'Edicion del Registro de un Usuario',
                 'action': 'edit'
             }
@@ -259,10 +256,10 @@ class CrudViewGroup(ValidatePermissionRequiredMixin, TemplateView):
                     data['form'] = f
                 return render(request, 'front-end/group/group_form.html', data)
             elif action == 'delete':
-               pk = request.POST['id']
-               cli = Group.objects.get(pk=pk)
-               cli.delete()
-               data['resp'] = True
+                pk = request.POST['id']
+                cli = Group.objects.get(pk=pk)
+                cli.delete()
+                data['resp'] = True
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
         except Exception as e:
@@ -321,7 +318,7 @@ def profile(request):
         else:
             data['form'] = form
     return render(request, 'front-end/profile.html', data)
-        # return render(request, 'front-end/profile.html', data)
+    # return render(request, 'front-end/profile.html', data)
 
 
 def verificar(nro):

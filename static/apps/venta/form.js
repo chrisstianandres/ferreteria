@@ -232,13 +232,12 @@ $(function () {
             ajax: {
                 delay: 250,
                 type: 'POST',
-                url: '/cliente/lista',
+                url: window.location.pathname,
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
-                        'action': 'search'
+                        'action': 'search_cli'
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -258,7 +257,7 @@ $(function () {
     });
 
     //buscar produto del select producto
-    $('#id_inventario')
+    $('#id_producto')
         .select2({
             theme: "classic",
             language: {
@@ -276,15 +275,14 @@ $(function () {
             ajax: {
                 delay: 250,
                 type: 'POST',
-                url: '/producto/lista',
+                url: window.location.pathname,
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search',
                         'id': '',
                         'ids': JSON.stringify(ventas.get_ids())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -300,15 +298,15 @@ $(function () {
         .on('select2:select', function (e) {
             $.ajax({
                 type: "POST",
-                url: '/producto/lista',
+                url: window.location.pathname,
                 data: {
-                    "id": $('#id_inventario option:selected').val(),
+                    "id": $('#id_producto option:selected').val(),
                     'action': 'get'
                 },
                 dataType: 'json',
                 success: function (data) {
                     ventas.add(data[0]);
-                    $('#id_inventario').val(null).trigger('change');
+                    $('#id_producto').val(null).trigger('change');
                 },
                 error: function (xhr, status, data) {
                     alert(data);
@@ -325,7 +323,7 @@ $(function () {
             dataSrc: "",
             responsive: true,
             ajax: {
-                url: '/producto/lista',
+                url: window.location.pathname,
                 type: 'POST',
                 data: {'action': 'list_list', 'ids': JSON.stringify(ventas.get_ids())},
                 dataSrc: ""
@@ -366,7 +364,7 @@ $(function () {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" rel="">';
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" rel="" alt="foto">';
                     }
                 },
                 {
@@ -397,7 +395,7 @@ $(function () {
             $.ajax({
                 dataType: 'JSON',
                 type: 'POST',
-                url: '/producto/lista',
+                url: window.location.pathname,
                 data: parametros,
             })
                 .done(function (data) {

@@ -230,11 +230,10 @@ $(function () {
                 type: 'POST',
                 url: '/proveedor/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search'
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -266,14 +265,13 @@ $(function () {
             ajax: {
                 delay: 250,
                 type: 'POST',
-                url: '/producto/lista',
+                url: window.location.pathname,
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search_no_stock',
                         'ids': JSON.stringify(compras.get_ids())
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -289,7 +287,7 @@ $(function () {
         .on('select2:select', function (e) {
             $.ajax({
                 type: "POST",
-                url: '/producto/lista',
+                url: window.location.pathname,
                 data: {
                     "id": $('#id_producto option:selected').val(),
                     "action": 'get'
@@ -322,7 +320,7 @@ $(function () {
             dataSrc: "",
             responsive: true,
             ajax: {
-                url: '/producto/lista',
+                url: window.location.pathname,
                 type: 'POST',
                 data: {'action': 'list_list', 'ids': JSON.stringify(compras.get_ids())},
                 dataSrc: ""
@@ -355,7 +353,7 @@ $(function () {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2">';
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="img">';
                     }
                 },
                 {
@@ -364,9 +362,8 @@ $(function () {
                     width: '10%',
                     orderable: false,
                     render: function (data, type, row) {
-                        var edit = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="take" ' +
-                            'data-toggle="tooltip" title="Seleccionar Producto"><i class="fa fa-check"></i></a>' + ' ';
-                        return edit
+                        return '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="take" ' +
+                            'data-toggle="tooltip" title="Seleccionar Producto"><i class="fa fa-check"></i></a>' + ' '
 
                     }
                 },
@@ -374,7 +371,7 @@ $(function () {
             rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
-                    max: data.producto_base.stock,
+                    max: data.stock,
                     step: 1
                 });
             }
@@ -389,7 +386,7 @@ $(function () {
             $.ajax({
                 dataType: 'JSON',
                 type: 'POST',
-                url: '/producto/lista',
+                url: window.location.pathname,
                 data: parametros,
             }).done(function (data) {
                 if (!data.hasOwnProperty('error')) {

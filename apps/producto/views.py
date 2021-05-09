@@ -44,40 +44,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
 
                 for c in Producto.objects.all():
                     data.append(c.toJSON())
-            elif action == 'list_list':
-                data = []
-                ids = json.loads(request.POST['ids'])
-                for c in Producto.objects.all().exclude(id__in=ids):
-                    data.append(c.toJSON())
-            elif action == 'search_no_stock':
-                ids = json.loads(request.POST['ids'])
-                data = []
-                term = request.POST['term']
-                query = Producto.objects.values('id', 'producto_base__nombre', 'presentacion__nombre').\
-                    filter(producto_base__nombre__icontains=term)
-                for a in query.exclude(id__in=ids):
-                    result = {'id': int(a['id']),
-                              'text': str(a['producto_base__nombre']) + ' / ' + str(a['presentacion__nombre'])}
-                    data.append(result)
-            elif action == 'search':
-                data = []
-                ids = json.loads(request.POST['ids'])
-                term = request.POST['term']
-                query = Producto.objects.filter(producto_base__nombre__icontains=term, stock__gte=1)
-                for a in query.exclude(id__in=ids)[0:10]:
-                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre + ' / ' + str(a.presentacion.nombre))}
-                    data.append(result)
-            elif action == 'get':
-                data = []
-                id = request.POST['id']
-                producto = Producto.objects.filter(pk=id)
-                empresa = Empresa.objects.first()
-                for i in producto:
-                    item = i.toJSON()
-                    item['cantidad'] = 1
-                    item['subtotal'] = 0.00
-                    item['iva_emp'] = empresa.iva
-                    data.append(item)
             elif action == 'sitio':
                 data = []
                 h = datetime.today()

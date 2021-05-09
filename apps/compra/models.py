@@ -16,7 +16,6 @@ estado = (
 class Compra(models.Model):
     fecha_compra = models.DateField(default=datetime.now)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
@@ -28,7 +27,6 @@ class Compra(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['proveedor'] = self.proveedor.toJSON()
-        item['user'] = self.user.username
         item['subtotal'] = format(self.subtotal, '.2f')
         item['iva'] = format(self.iva, '.2f')
         item['total'] = format(self.total, '.2f')

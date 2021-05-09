@@ -4,6 +4,7 @@ from django import forms
 from django.forms import TextInput, EmailInput
 
 from .models import Cliente
+from ..user.models import User
 
 
 class ClienteForm(forms.ModelForm):
@@ -17,13 +18,13 @@ class ClienteForm(forms.ModelForm):
                 'class': 'form-control'
             })
 
-            self.fields['nombres'].widget = TextInput(
+            self.fields['first_name'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese sus dos nombres', 'class': 'form-control'})
-            self.fields['apellidos'].widget = TextInput(
+            self.fields['last_name'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese sus dos Apellidos', 'class': 'form-control'})
             self.fields['cedula'].widget = TextInput(
                 attrs={'placeholder': 'Ingrese un numero de cedula', 'class': 'form-control'})
-            self.fields['correo'].widget = EmailInput(
+            self.fields['email'].widget = EmailInput(
                 attrs={'placeholder': 'abc@correo.com', 'class': 'form-control'})
             self.fields['direccion'].widget = TextInput(
                 attrs={'placeholder': '(Maximo 50 caracteres)', 'class': 'form-control'})
@@ -34,33 +35,33 @@ class ClienteForm(forms.ModelForm):
         # habilitar, desabilitar, y mas
 
     class Meta:
-        model = Cliente
-        fields = ['nombres',
-                  'apellidos',
+        model = User
+        fields = ['first_name',
+                  'last_name',
                   'cedula',
-                  'correo',
+                  'email',
                   'sexo',
                   'telefono',
                   'celular',
                   'direccion'
                   ]
         labels = {
-            'nombres': 'Nombres',
-            'apellidos': 'Apellidos',
+            'first_name': 'Nombres',
+            'last_name': 'Apellidos',
             'cedula': 'N° de cedula',
-            'correo': 'Correo',
+            'email': 'Correo',
             'sexo': 'Genero',
             'telefono': 'Telefono',
             'celular': 'Celular',
-            'Direccion': 'direccion'
+            'direccion': 'Direccion'
 
         }
         widgets = {
-            'nombres': forms.TextInput(),
-            'apellidos': forms.TextInput(),
+            'first_name': forms.TextInput(),
+            'last_name': forms.TextInput(),
             'cedula': forms.TextInput(),
             'sexo': forms.Select(attrs={'class': 'selectpicker', 'data-width': 'fit'}),
-            'correo': forms.EmailInput(),
+            'email': forms.EmailInput(),
             'telefono': forms.TextInput(),
             'celular': forms.TextInput(),
             'direccion': forms.TextInput()

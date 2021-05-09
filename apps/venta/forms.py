@@ -4,6 +4,7 @@ from django import forms
 
 from .models import Detalle_venta, Venta
 from apps.inventario.models import Inventario
+from ..producto.models import Producto
 
 
 class VentaForm(forms.ModelForm):
@@ -81,14 +82,14 @@ class Detalle_VentaForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-            self.fields['inventario'].widget.attrs = {
+            self.fields['producto'].widget.attrs = {
                 'class': 'form-control select2'
             }
-            self.fields["inventario"].queryset = Inventario.objects.none()
+            self.fields["producto"].queryset = Producto.objects.none()
         # habilitar, desabilitar, y mas
 
     class Meta:
         model = Detalle_venta
         fields = [
-            'inventario',
+            'producto',
         ]

@@ -16,7 +16,7 @@ from datetime import datetime
 import datetime as dt
 
 from django.db import transaction
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -29,6 +29,7 @@ from apps.pago_cta_x_cbr.models import Pago_cta_x_cobrar
 
 from apps.producto_base.models import Producto_base
 from apps.user.forms import UserForm
+from apps.user.models import User
 from apps.venta.forms import Detalle_VentaForm, VentaForm
 from apps.venta.models import Venta, Detalle_venta
 from apps.empresa.models import Empresa
@@ -60,38 +61,27 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         try:
             action = request.POST['action']
             if action == 'list':
-                start = request.POST['start_date']
-                end = request.POST['end_date']
                 data = []
-                if start == '' and end == '':
-                    if request.user.tipo == 1:
-                        query = Venta.objects.all()
-                    else:
-                        query = Venta.objects.filter(user_id=request.user.id)
+                if request.user.tipo == 1:
+                    query = Venta.objects.all()
                 else:
-                    if request.user.tipo == 1:
-                        query = Venta.objects.filter(fecha__range=[start, end])
-                    else:
-                        query = Venta.objects.filter(user_id=request.user.id,
-                                                     fecha__range=[start, end])
+                    query = Venta.objects.filter(user_id=request.user.id)
+
                 for c in query:
                     data.append(c.toJSON())
             elif action == 'detalle':
                 id = request.POST['id']
                 if id:
                     data = []
-                    result = Detalle_venta.objects.filter(venta_id=id).values('inventario__producto_id',
-                                                                              'cantidad', 'pvp_actual', 'subtotal'). \
-                        annotate(Count('inventario__producto_id'))
+                    result = Detalle_venta.objects.filter(venta_id=id)
                     for p in result:
-                        pb = Producto.objects.get(id=int(p['inventario__producto_id']))
                         data.append({
-                            'producto': pb.producto_base.nombre,
-                            'categoria': pb.producto_base.categoria.nombre,
-                            'presentacion': pb.presentacion.nombre,
-                            'cantidad': p['cantidad'],
-                            'pvp': p['pvp_actual'],
-                            'subtotal': p['subtotal']
+                            'producto': p.producto.producto_base.nombre,
+                            'categoria': p.producto.producto_base.categoria.nombre,
+                            'presentacion': p.producto.presentacion.nombre,
+                            'cantidad': p.cantidad,
+                            'pvp': p.pvp_actual,
+                            'subtotal': p.subtotal
                         })
             elif action == 'estado':
                 id = request.POST['id']
@@ -104,9 +94,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         dev.fecha = datetime.now()
                         dev.save()
                         for i in Detalle_venta.objects.filter(venta_id=id):
-                            for a in Inventario.objects.filter(id=i.inventario.id):
-                                a.estado = 1
-                                a.save()
+                            producto = Producto.objects.get(i.producto_id)
+                            producto.stock += i.cantidad
+                            producto.save()
                         es.save()
                 else:
                     data['error'] = 'Ha ocurrido un error'
@@ -122,7 +112,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -132,10 +122,12 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             data['entidad'] = 'Compras'
             data['boton'] = 'Nueva Compra'
             data['titulo'] = 'Listado de Compras realizadas'
+            data['titulo_lista'] = 'Listado de Compras realizadas'
         else:
             data['entidad'] = opc_entidad
             data['boton'] = 'Nueva Venta'
             data['titulo'] = 'Listado de Ventas'
+            data['titulo_lista'] = 'Listado de Ventas'
         data['empresa'] = empresa
         return data
 
@@ -166,18 +158,15 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario.objects.filter(producto_id=i['id'], estado=1)[:i['cantidad']]:
-                                    dv = Detalle_venta()
-                                    dv.venta_id = c.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.producto.pvp)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 0
-                                    in_pr.save()
-                                    dv.save()
+                                dv = Detalle_venta()
+                                dv.venta_id = c.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(Inventario.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock.stock -= int(i['cantidad'])
                                 stock.save()
                         if int(datos['forma_pago']) == 1:
                             verf = Cta_x_cobrar.objects.filter(venta__cliente_id=c.cliente_id, estado=0).count()
@@ -206,15 +195,15 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                     else:
                                         let.fecha = fech
                                     if x == int(datos['nro_cuotas']):
-                                        let.valor = float(datos['letra'])-float(calculo)
-                                        let.saldo = float(datos['letra'])-float(calculo)
+                                        let.valor = float(datos['letra']) - float(calculo)
+                                        let.saldo = float(datos['letra']) - float(calculo)
                                         print('valor ultimo')
                                         print(let.valor)
                                     else:
                                         let.valor = float(datos['letra'])
                                         let.saldo = float(datos['letra'])
                                     let.save()
-                                    x = x+1
+                                    x = x + 1
                             else:
                                 data['error'] = 'Este cliente tiene mas de dos creditos activos, Por favor intenta ' \
                                                 'con otro cliente'
@@ -237,26 +226,65 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario.objects.filter(producto_id=i['id'], estado=1)[
-                                             :i['cantidad']]:
-                                    dv = Detalle_venta()
-                                    dv.venta_id = c.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.producto.pvp)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 0
-                                    in_pr.save()
-                                    dv.save()
-                                stock = Producto_base.objects.get(id=i['producto_base']['id'])
-                                stock.stock = int(
-                                    Inventario.objects.filter(producto_id=i['id'], estado=1).count())
+                                dv = Detalle_venta()
+                                dv.venta_id = c.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                                stock = Producto.objects.get(id=i['id'])
+                                stock.stock -= int(i['cantidad'])
                                 stock.save()
                         data['id'] = c.id
                         data['resp'] = True
                 else:
                     data['resp'] = False
                     data['error'] = "Datos Incompletos"
+            elif action == 'list_list':
+                data = []
+                ids = json.loads(request.POST['ids'])
+                for c in Producto.objects.all().exclude(id__in=ids):
+                    data.append(c.toJSON())
+            elif action == 'search_no_stock':
+                ids = json.loads(request.POST['ids'])
+                data = []
+                term = request.POST['term']
+                query = Producto.objects.values('id', 'producto_base__nombre', 'presentacion__nombre'). \
+                    filter(producto_base__nombre__icontains=term)
+                for a in query.exclude(id__in=ids):
+                    result = {'id': int(a['id']),
+                              'text': str(a['producto_base__nombre']) + ' / ' + str(a['presentacion__nombre'])}
+                    data.append(result)
+            elif action == 'search':
+                data = []
+                ids = json.loads(request.POST['ids'])
+                term = request.POST['term']
+                query = Producto.objects.filter(producto_base__nombre__icontains=term, stock__gte=1)
+                for a in query.exclude(id__in=ids)[0:10]:
+                    result = {'id': int(a.id), 'text': str(a.producto_base.nombre + ' / ' + str(a.presentacion.nombre))}
+                    data.append(result)
+            elif action == 'get':
+                data = []
+                id = request.POST['id']
+                producto = Producto.objects.filter(pk=id)
+                empresa = Empresa.objects.first()
+                for i in producto:
+                    item = i.toJSON()
+                    item['cantidad'] = 1
+                    item['subtotal'] = 0.00
+                    item['iva_emp'] = empresa.iva
+                    data.append(item)
+            elif action == 'search_cli':
+                data = []
+                term = request.POST['term']
+                query = User.objects.filter(
+                    Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(cedula__icontains=term), tipo=0)[
+                        0:10]
+                for a in query:
+                    item = a.toJSON()
+                    item['text'] = a.get_full_name()
+                    data.append(item)
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
@@ -310,20 +338,15 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         c.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario.objects.filter(producto_id=i['id'], estado=1)[
-                                             :i['cantidad']]:
-                                    dv = Detalle_venta()
-                                    dv.venta_id = c.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.producto.pvp)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 0
-                                    in_pr.save()
-                                    dv.save()
+                                dv = Detalle_venta()
+                                dv.venta_id = c.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(
-                                    Inventario.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock.stock -= int(i['cantidad'])
                                 stock.save()
                     data['id'] = c.id
                     data['resp'] = True
@@ -344,20 +367,15 @@ class CrudViewOnline(ValidatePermissionRequiredMixin, TemplateView):
                         c.save()
                         if datos['productos']:
                             for i in datos['productos']:
-                                for in_pr in Inventario.objects.filter(producto_id=i['id'], estado=1)[
-                                             :i['cantidad']]:
-                                    dv = Detalle_venta()
-                                    dv.venta_id = c.id
-                                    dv.inventario_id = in_pr.id
-                                    dv.cantidad = int(i['cantidad'])
-                                    dv.pvp_actual = float(in_pr.producto.pvp)
-                                    dv.subtotal = float(i['subtotal'])
-                                    in_pr.estado = 0
-                                    in_pr.save()
-                                    dv.save()
+                                dv = Detalle_venta()
+                                dv.venta_id = c.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
                                 stock = Producto.objects.get(id=i['id'])
-                                stock.stock = int(
-                                    Inventario.objects.filter(producto_id=i['id'], estado=1).count())
+                                stock.stock -= int(i['cantidad'])
                                 stock.save()
                         data['id'] = c.id
                         data['resp'] = True
@@ -657,7 +675,7 @@ class report_total(ValidatePermissionRequiredMixin, ListView):
                 else:
                     query = Venta.objects.values('fecha', 'cliente__nombres', 'tipo_venta',
                                                  'cliente__apellidos').filter(fecha__range=[start_date, end_date],
-                                                                              estado=1)\
+                                                                              estado=1) \
                         .annotate(Sum('subtotal')).annotate(Sum('iva')).annotate(Sum('total'))
                 for p in query:
                     if p['tipo_venta'] == 0:
@@ -712,11 +730,11 @@ class report_total_reserva(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 if start_date == '' and end_date == '':
                     query = Venta.objects.values('fecha', 'cliente__nombres',
-                                                 'cliente__apellidos')\
+                                                 'cliente__apellidos') \
                         .annotate(Sum('subtotal')). \
                         annotate(Sum('iva')).annotate(Sum('total')).filter(estado=2)
                 else:
-                    query = Venta.objects.values('fecha', 'cliente__nombres','cliente__apellidos').filter(
+                    query = Venta.objects.values('fecha', 'cliente__nombres', 'cliente__apellidos').filter(
                         fecha__range=[start_date, end_date], estado=2).annotate(Sum('subtotal')). \
                         annotate(Sum('iva')).annotate(Sum('total'))
                 for p in query:

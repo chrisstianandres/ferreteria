@@ -1,32 +1,6 @@
 var datatable;
 var logotipo;
 
-var datos = {
-    fechas: {
-        'start_date': '',
-        'end_date': '',
-        'action': 'list',
-    },
-    add: function (data) {
-        if (data.key === 1) {
-            this.fechas['start_date'] = data.startDate.format('YYYY-MM-DD');
-            this.fechas['end_date'] = data.endDate.format('YYYY-MM-DD');
-        } else {
-            this.fechas['start_date'] = '';
-            this.fechas['end_date'] = '';
-        }
-        $.ajax({
-            url: window.location.pathname,
-            type: 'POST',
-            data: this.fechas,
-            success: function (data) {
-                datatable.clear();
-                datatable.rows.add(data).draw();
-            }
-        });
-
-    },
-};
 
 function datatable_fun() {
     datatable = $("#datatable").DataTable({
@@ -37,7 +11,7 @@ function datatable_fun() {
         ajax: {
             url: window.location.pathname,
             type: 'POST',
-            data: datos.fechas,
+            data: {'action': 'list'},
             dataSrc: ""
         },
         dom: "<'row'<'col-sm-12 col-md-12'B>>" +
@@ -55,25 +29,6 @@ function datatable_fun() {
                 }
             },
             buttons: [
-                {
-                    text: '<i class="fa fa-file-pdf"></i> PDF',
-                    className: 'btn btn-danger btn-space',
-                    extend: 'pdfHtml5',
-                    //filename: 'dt_custom_pdf',
-                    orientation: 'landscape', //portrait
-                    pageSize: 'A4', //A3 , A5 , A6 , legal , letter
-                    download: 'open',
-                    exportOptions: {
-                        columns: [0, 1, 2, 3, 4],
-                        search: 'applied',
-                        order: 'applied'
-                    },
-                    customize,
-                },
-                {
-                    text: '<i class="fa fa-file-excel"></i> Excel', className: "btn btn-success btn-space",
-                    extend: 'excel'
-                },
                 {
                     className: 'btn btn-info btn-space',
                     text: '<i class="far fa-keyboard"></i> &nbsp;Tipo de Gasto</a>',

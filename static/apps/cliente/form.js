@@ -8,13 +8,13 @@ $(document).ready(function () {
 
     $("#form").validate({
         rules: {
-            nombres: {
+            first_name: {
                 required: true,
                 minlength: 3,
                 maxlength: 50,
                 lettersonly: true,
             },
-            apellidos: {
+            last_name: {
                 required: true,
                 minlength: 3,
                 maxlength: 50,
@@ -27,12 +27,12 @@ $(document).ready(function () {
                 digits: true,
                 validar: true
             },
-            correo: {
+            email: {
                 required: true,
                 email: true
             },
             telefono: {
-                required: true,
+                required: false,
                 minlength: 9,
                 maxlength: 9,
                 digits: true
@@ -52,35 +52,35 @@ $(document).ready(function () {
 
         },
         messages: {
-            nombres: {
-                required: "Por favor ingresa tus nombres",
-                minlength: "Debe ingresar al menos un nombre",
+            first_name: {
+                required: "Por favor ingresa un nombre",
+                minlength: "Debe ingresar al menos 3 caracteres",
                 maxlength: "Debe ingresar maximo 50 caracteres",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             apellidos: {
-                required: "Por favor ingresa tus apellidos",
-                minlength: "Debe ingresar al menos un apellido",
+                required: "Por favor ingresa u apellido",
+                minlength: "Debe ingresar al menos 3 caracteres",
                 lettersonly: "Debe ingresar unicamente letras y espacios"
             },
             cedula: {
-                required: "Por favor ingresa tu numero de documento",
-                minlength: "Tu numero de documento debe tener al menos 10 digitos",
+                required: "Por favor ingresa tu numero de cedula",
+                minlength: "Tu numero de cedula debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+                maxlength: "Tu numero de cedula debe tener maximo 10 digitos",
+                validar: "Numero de cedula no valido"
             },
-            correo: "Debe ingresar un correo valido",
+            email: "Debe ingresar un correo valido",
             telefono: {
-                required: "Por favor ingresa tu numero de telefono",
-                minlength: "Tu numero de documento debe tener al menos 9 digitos",
+                minlength: "Tu numero de telefono debe tener al menos 9 digitos",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 9 digitos",
+                maxlength: "Tu numero de telefono debe tener maximo 9 digitos",
             },
             celular: {
                 required: "Por favor ingresa tu numero celular",
-                minlength: "Tu numero de documento debe tener al menos 10 digitos",
+                minlength: "Tu numero de celular debe tener al menos 10 digitos",
                 digits: "Debe ingresar unicamente numeros",
-                maxlength: "Tu numero de documento debe tener maximo 10 digitos",
+                maxlength: "Tu numero de celular debe tener maximo 10 digitos",
             },
             direccion: {
                 required: "Por favor ingresa una direccion",
