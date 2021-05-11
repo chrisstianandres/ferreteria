@@ -349,17 +349,17 @@ function reset(formulario) {
 //     });
 // }
 function menssaje_error_form(title, obj, icon, callback) {
-   var html = '';
-   if (typeof (obj) === 'object') {
-       html = '<ul style="text-align: left;">';
-       $.each(obj, function (key, value) {
-           html += '<li>' + key + ': ' + value + '</li>';
-       });
-      html += '</ul>';
-   } else {
-       html = '<p>' + obj + '</p>';
-   }
-   $.confirm({
+    var html = '';
+    if (typeof (obj) === 'object') {
+        html = '<ul style="text-align: left;">';
+        $.each(obj, function (key, value) {
+            html += '<li>' + key + ': ' + value + '</li>';
+        });
+        html += '</ul>';
+    } else {
+        html = '<p>' + obj + '</p>';
+    }
+    $.confirm({
         theme: 'modern',
         icon: icon,
         title: title,
@@ -658,23 +658,22 @@ function year_footer() {
 
 function reloj() {
     var fecha_js = new Date;
-    var segundos = fecha_js.getSeconds();
-    var hora = fecha_js.getHours();
-    var minutos = fecha_js.getMinutes();
+    var segundos = fecha_js.getSeconds()<= 9 ? '0' + fecha_js.getSeconds() : fecha_js.getSeconds();
+    var hora = fecha_js.getHours()<= 9 ? '0' + fecha_js.getHours() : fecha_js.getHours();
+    var minutos = fecha_js.getMinutes() <= 9 ? '0' + fecha_js.getMinutes() : fecha_js.getMinutes();
 
-    segundos++;
-
-    if (segundos === 60) {
-        segundos = 0;
-        minutos++;
-        if (minutos === 60) {
-            minutos = 0;
-            hora++;
-            if (hora === 24) {
-                hora = 0;
-            }
-        }
-    }
+    // segundos++;
+    // if (segundos === 60) {
+    //     segundos = 0;
+    //     minutos++;
+    //     if (minutos === 60) {
+    //         minutos = 0;
+    //         hora++;
+    //         if (hora === 24) {
+    //             hora = 0;
+    //         }
+    //     }
+    // }
     document.getElementById("reloj").innerHTML = " " + hora + ":" + minutos + ":" + segundos;
 }
 

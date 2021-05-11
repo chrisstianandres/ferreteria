@@ -27,40 +27,7 @@ function datatable_fun() {
             {"data": "imagen"},
             {"data": "id"}
         ],
-        buttons: {
-            dom: {
-                button: {
-                    className: '',
-
-                },
-                container: {
-                    className: 'buttons-container float-md-right'
-                }
-            },
-            buttons: [
-                {
-                    text: '<i class="fa fa-file-pdf"></i> PDF',
-                    className: 'btn btn-danger btn-space',
-                    extend: 'pdfHtml5',
-                    //filename: 'dt_custom_pdf',
-                    orientation: 'landscape', //portrait
-                    pageSize: 'A4', //A3 , A5 , A6 , legal , letter
-                    download: 'open',
-                    exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6, 7],
-                        search: 'applied',
-                        order: 'applied'
-                    },
-                    customize,
-                },
-                {
-                    text: '<i class="fa fa-file-excel"></i> Excel', className: "btn btn-success btn-space",
-                    extend: 'excel'
-                }
-            ],
-        },
-
-        dom: "<'row'<'col-sm-12 col-md-12'B>>" +
+        dom:
             "<'row'<'col-sm-12 col-md-3'l>>" +
             "<'row'<'col-sm-12 col-md-12'f>>" +
             "<'row'<'col-sm-12'tr>>" +
