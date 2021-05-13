@@ -677,7 +677,3 @@ function reloj() {
     document.getElementById("reloj").innerHTML = " " + hora + ":" + minutos + ":" + segundos;
 }
 
-$(document).ready(function () {
-    setInterval(reloj, 1000);
-});
-

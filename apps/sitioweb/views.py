@@ -13,6 +13,7 @@ from apps.backEnd import nombre_empresa
 from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.mixins import ValidatePermissionRequiredMixin
+from apps.producto.models import Producto
 from apps.sitioweb.forms import SitiowebForm
 from apps.sitioweb.models import SitioWeb
 
@@ -108,12 +109,34 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         return data
 
 
+@csrf_exempt
 def sitio(request):
-    data = {'empresa': empresa}
+    productos = []
+    model = SitioWeb
+    c = 1
+    for p in Producto.objects.all():
+        productos.append({
+            'nombre': p.producto_base.nombre,
+            'categoria': p.producto_base.categoria.nombre,
+            'pvp': format(p.pvp, '.2f'),
+            'imagen': p.get_image(),
+            'modal_numero': '{}{}'.format('portfolioModal', c),
+            'presentacion': p.presentacion.nombre
+        })
+        c += 1
+    data = {'empresa': empresa, 'productos': productos, 'sitio': model.objects.first()}
     if request.user.is_authenticated:
         data['group'] = request.user.get_tipo_display
     else:
         data['group'] = 'NONE'
+    if request.method == 'POST':
+        action = request.POST['action']
+        data = []
+        if action == 'get':
+            id = request.POST['id']
+            producto = Producto.objects.get(id=id)
+            data.append(producto.toJSON())
+
     return render(request,  'front-end/sitio/index.html', data)
 
 
