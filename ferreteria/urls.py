@@ -26,7 +26,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.sitioweb.urls', namespace='sitio')),
     path('menu', login_required(backEnd.menu), name='menu'),
-    path('verificar/', login_required(backEnd.check_ced), name='verificar'),
     # path('login/', backEnd.logeo, name='login'),
     # path('signin/', backEnd.signin.as_view(), name='signin'),
     # path('accounts/login/', backEnd.logeo, name='login'),

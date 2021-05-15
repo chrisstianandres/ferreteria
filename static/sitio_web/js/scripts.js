@@ -17,7 +17,7 @@ var carrito = {
         var subtotal = 0.00;
         var iva_emp = 0.00;
         $.each(this.items.productos, function (pos, dict) {
-            dict.subtotal = dict.cantidad_venta * parseFloat(dict.pvp);
+            dict.subtotal = dict.cantidad * parseFloat(dict.pvp);
             subtotal += dict.subtotal;
             iva_emp = (dict.iva_emp / 100);
         });
@@ -32,7 +32,7 @@ var carrito = {
         var array = this.items.productos;
         if (array.length === 0) {
             array.push(data[0]);
-            borrar_producto_carito('Trabajando!!', 'Agregando producto al carrito!', function () {
+            borrar_producto_carito('Un momento por favor!!', 'Agregando producto al carrito!', function () {
                 menssaje_ok('Correcto!', 'Producto agregado al carrito!',
                     'fas fa-cart-plus', function () {
                     })
@@ -41,21 +41,20 @@ var carrito = {
             var key = this.verify(array, data);
 
             if (key === 1) {
-                borrar_producto_carito('Trabajando!!', 'Agregando producto al carrito!', function () {
+                borrar_producto_carito('Un momento por favor!!', 'Agregando producto al carrito!', function () {
                     menssaje_error('Atencion!', 'Este producto ya esta en tu carrito agrega mas cantidad desde este',
                         'fas fa-exclamation-circle', function () {
                         })
                 })
             } else {
                 array.push(data[0]);
-                borrar_producto_carito('Trabajando!!', 'Agregando producto al carrito!', function () {
+                borrar_producto_carito('Un momento por favor!!', 'Agregando producto al carrito!', function () {
                     menssaje_ok('Correcto!', 'Producto agregado al carrito!',
                         'fas fa-cart-plus', function () {
                         })
                 })
             }
         }
-        this.items.productos = this.exclude_duplicados(this.items.productos);
         localStorage.setItem('carrito', JSON.stringify(this.items.productos));
         this.list();
     },
@@ -67,7 +66,6 @@ var carrito = {
         } else {
             $('#count').html('');
         }
-
         tblventa = $("#datatable").DataTable({
             autoWidth: false,
             dataSrc: "",
@@ -83,10 +81,9 @@ var carrito = {
                 {data: 'id'},
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
-                {data: "color.nombre"},
-                {data: "talla.talla_full"},
+                {data: "presentacion.nombre"},
                 {data: "stock"},
-                {data: "cantidad_venta"},
+                {data: "cantidad"},
                 {data: "pvp"},
                 {data: "subtotal"}
             ],
@@ -98,7 +95,9 @@ var carrito = {
                     width: '5%',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat rounded-pill" style="color: white" data-toggle="tooltip" title="Quitar Producto"><i class="zmdi zmdi-delete"></i></a>';
+                        return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat rounded-pill" ' +
+                            'style="color: white" data-toggle="tooltip" title="Quitar Producto">' +
+                            '<i class="fa fa-times"></i></a>';
                         //return '<a rel="remove" class="btn btn-danger btn-sm btn-flat"><i class="fas fa-trash-alt"></i></a>';
 
                     }
@@ -116,11 +115,12 @@ var carrito = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<input type="text" name="cantidad" value="' + data + '">';
+                        return '<input type="text" name="cantidad" autocomplete="off" value="' + data + '">';
 
                     }
                 }
-            ], rowCallback: function (row, data) {
+            ],
+            rowCallback: function (row, data) {
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 1,
                     max: data.stock,
@@ -147,7 +147,7 @@ var carrito = {
                         carrito.items.productos[tr.row].cantidad_venta = cantidad;
                         carrito.calculate();
                         localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
-                        $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
+                        $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
                     }
 
                 })
@@ -213,11 +213,14 @@ var carrito = {
 
     // Collapse Navbar
     var navbarCollapse = function () {
-        if ($("#mainNav").offset().top > 100) {
-            $("#mainNav").addClass("navbar-shrink");
-        } else {
-            $("#mainNav").removeClass("navbar-shrink");
+        if (varkey === 0) {
+            if ($("#mainNav").offset().top > 100) {
+                $("#mainNav").addClass("navbar-shrink");
+            } else {
+                $("#mainNav").removeClass("navbar-shrink");
+            }
         }
+
     };
     // Collapse now if page is not at top
     navbarCollapse();
@@ -264,4 +267,28 @@ var carrito = {
 
         })
     });
+
+
+    $('#datatable tbody')
+        .on('click', 'a[rel="remove"]', function () {
+            localStorage.clear();
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            borrar_todo_alert('Alerta de Eliminación',
+                'Esta seguro que desea eliminar este producto del carrito <br> ' +
+                '<strong>CONTINUAR?</strong>', function () {
+                    carrito.items.productos.splice(tr.row, 1);
+                    localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
+                    carrito.list();
+                })
+        })
+        .on('change keyup', 'input[name="cantidad"]', function () {
+            localStorage.clear();
+            var cantidad = parseInt($(this).val());
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            carrito.items.productos[tr.row].cantidad = cantidad;
+            carrito.calculate();
+            localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
+            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
+
+        });
 })(jQuery); // End of use strict

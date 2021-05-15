@@ -378,10 +378,10 @@ function menssaje_error_form(title, obj, icon, callback) {
 
 function borrar_producto_carito(title, content, callback) {
     var obj = $.dialog({
-        icon: 'fa fa-spinner fa-spin',
+        icon: 'fas fa-circle-notch fa-spin',
         title: title,
         content: content,
-        type: 'blue',
+        type: 'orange',
         typeAnimated: true,
         draggable: true,
         onClose: function () {

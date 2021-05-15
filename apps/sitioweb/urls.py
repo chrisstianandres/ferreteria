@@ -9,4 +9,5 @@ urlpatterns = [
     path('lista', login_required(lista.as_view()), name='lista'),
     path('configurar', login_required(CrudView.as_view()), name='configurar'),
     path('', views.sitio, name=''),
+    path('productos/catalogo', views.catalogo, name='productos_catalogo'),
 ]

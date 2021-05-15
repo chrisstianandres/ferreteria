@@ -121,7 +121,8 @@ def sitio(request):
             'pvp': format(p.pvp, '.2f'),
             'imagen': p.get_image(),
             'modal_numero': '{}{}'.format('portfolioModal', c),
-            'presentacion': p.presentacion.nombre
+            'presentacion': p.presentacion.nombre,
+            'id': p.id
         })
         c += 1
     data = {'empresa': empresa, 'productos': productos, 'sitio': model.objects.first()}
@@ -135,10 +136,48 @@ def sitio(request):
         if action == 'get':
             id = request.POST['id']
             producto = Producto.objects.get(id=id)
-            data.append(producto.toJSON())
+            item = producto.toJSON()
+            item['cantidad'] = 1
+            item['subtotal'] = 0
+            data.append(item)
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
     return render(request,  'front-end/sitio/index.html', data)
 
 
+@csrf_exempt
+def catalogo(request):
+    productos = []
+    model = SitioWeb
+    c = 1
+    for p in Producto.objects.all()[0:6]:
+        productos.append({
+            'nombre': p.producto_base.nombre,
+            'categoria': p.producto_base.categoria.nombre,
+            'pvp': format(p.pvp, '.2f'),
+            'imagen': p.get_image(),
+            'modal_numero': '{}{}'.format('portfolioModal', c),
+            'presentacion': p.presentacion.nombre,
+            'id': p.id
+        })
+        c += 1
+    data = {'empresa': empresa, 'productos': productos, 'sitio': model.objects.first()}
+    if request.user.is_authenticated:
+        data['group'] = request.user.get_tipo_display
+    else:
+        data['group'] = 'NONE'
+    if request.method == 'POST':
+        action = request.POST['action']
+        data = []
+        if action == 'get':
+            id = request.POST['id']
+            producto = Producto.objects.get(id=id)
+            item = producto.toJSON()
+            item['cantidad'] = 1
+            item['subtotal'] = 0
+            data.append(item)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    return render(request,  'front-end/sitio/catalogo.html', data)
 
 
