@@ -153,11 +153,10 @@ $(function () {
                 type: 'POST',
                 url: '/producto/nuevo',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search'
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -191,6 +190,11 @@ $(function () {
             if ($(this).val() === '') {
                 $('#id_des').val(null);
                 $('#id_cat').val(null);
+                $('#id_edit_producto').hide();
+                 $('#id_new_producto').show();
+            } else {
+                 $('#id_edit_producto').show();
+                 $('#id_new_producto').hide();
             }
 
         });
@@ -215,11 +219,10 @@ $(function () {
                 type: 'POST',
                 url: '/categoria/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search'
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -251,11 +254,10 @@ $(function () {
                 type: 'POST',
                 url: '/presentacion/nuevo',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'search'
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {
@@ -382,6 +384,8 @@ $(function () {
                 });
         }
     });
+
+
 
     function check_image(data) {
         if (data.check === 1) {

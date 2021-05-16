@@ -4,7 +4,7 @@
     * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-agency/blob/master/LICENSE)
     */
 
-var carro_respaldo;
+var carro_respaldo, superuser=$('#superuser').val(), pagar;
 
 var carrito = {
     items: {
@@ -163,7 +163,6 @@ var carrito = {
     verify: function (array, data) {
         ok = 0;
         $.each(array, function (key, value) {
-                console.log(value.id);
                 if (data[0].id === value.id) {
                     ok = 1;
                     return false;
@@ -238,9 +237,16 @@ var carrito = {
         carro_respaldo = JSON.parse(localStorage.getItem('carrito'));
         carrito.items.productos = carro_respaldo;
         carrito.list();
+         if(carrito.items.productos.length>0){
+        $('#count').html(carrito.items.productos.length);
+    }
     } else {
         carrito.list();
+         if(carrito.items.productos.length>0){
+        $('#count').html(carrito.items.productos.length);
     }
+    }
+
 
     $(document).on('click', 'button[name="vender"]', function (e) {
         e.preventDefault();
@@ -266,6 +272,20 @@ var carrito = {
             },
 
         })
+    });
+
+    $(document).on('click', 'a[rel="pay"]', function (e) {
+        e.preventDefault();
+        if (carrito.items.productos.length === 0) return false;
+        if (superuser === 1) {
+            localStorage.setItem('pagar', '1');
+            localStorage.setItem('superuser', '1');
+            window.location.href = '/venta/nuevo'
+        } else {
+            localStorage.setItem('pagar', '1');
+            localStorage.setItem('superuser', '0');
+            window.location.href = '/login'
+        }
     });
 
 

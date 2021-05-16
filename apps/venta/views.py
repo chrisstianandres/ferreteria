@@ -421,7 +421,7 @@ def CrudView_online(request):
             return render(request, 'front-end/venta/online.html', data)
     else:
         data['key'] = 1
-        data['titulo'] = 'Inicio de Sesion'
+        data['title'] = 'Inicio de Sesion'
         data['nomb'] = nombre_empresa()
         return render(request, 'front-end/login.html', data)
 

@@ -122,6 +122,7 @@ def sitio(request):
             'imagen': p.get_image(),
             'modal_numero': '{}{}'.format('portfolioModal', c),
             'presentacion': p.presentacion.nombre,
+            'stock': p.stock,
             'id': p.id
         })
         c += 1
@@ -139,6 +140,7 @@ def sitio(request):
             item = producto.toJSON()
             item['cantidad'] = 1
             item['subtotal'] = 0
+            item['iva_emp'] = empresa.iva
             data.append(item)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -158,6 +160,7 @@ def catalogo(request):
             'imagen': p.get_image(),
             'modal_numero': '{}{}'.format('portfolioModal', c),
             'presentacion': p.presentacion.nombre,
+            'stock': p.stock,
             'id': p.id
         })
         c += 1
@@ -175,6 +178,7 @@ def catalogo(request):
             item = producto.toJSON()
             item['cantidad'] = 1
             item['subtotal'] = 0
+            item['iva_emp'] = empresa.iva
             data.append(item)
         return HttpResponse(json.dumps(data), content_type='application/json')
 

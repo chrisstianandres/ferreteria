@@ -1,6 +1,9 @@
 import json
+from PIL import Image
 
 from datetime import datetime, timedelta
+
+from django.db import transaction
 from django.db.models import Q, Sum, Max, Count
 from django.db.models.functions import Coalesce
 from django.http import HttpResponseRedirect, HttpResponse
@@ -253,23 +256,34 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
         action = request.POST['action']
         try:
             if action == 'add':
-                f = self.form_class(request.POST or None, request.FILES or None)
-                if f.is_valid():
-                    f.save(commit=False)
-                    if (Producto.objects.filter(producto_base_id=int(f.data['producto_base']),
-                                                presentacion_id=int(f.data['presentacion']))):
-                        f.add_error("presentacion", "Ya existe este producto con esta presentacion")
-                        data['error'] = f.errors
+                with transaction.atomic():
+                    f = self.form_class(request.POST or None, request.FILES or None)
+                    if f.is_valid():
+                        f.save(commit=False)
+                        if (Producto.objects.filter(producto_base_id=int(f.data['producto_base']),
+                                                    presentacion_id=int(f.data['presentacion']))):
+                            f.add_error("presentacion", "Ya existe este producto con esta presentacion")
+                            data['error'] = f.errors
+                        else:
+                            if f.files['imagen']:
+                                var = f.save()
+                                image = Image.open(var.imagen)
+                                size = (1000, 1000)
+                                image = image.resize(size, Image.ANTIALIAS)
+                                image.save(var.imagen.path)
+                                data['producto_base'] = var.toJSON()
+                                data['resp'] = True
+                            else:
+                                var = f.save()
+                                data['producto_base'] = var.toJSON()
+                                data['resp'] = True
                     else:
-                        var = f.save()
-                        data['producto_base'] = var.toJSON()
-                        data['resp'] = True
-                else:
-                    data['error'] = f.errors
+                        data['error'] = f.errors
             elif action == 'delete':
-                pk = request.POST['id']
-                f = Producto.objects.get(pk=pk)
-                f.delete()
+                with transaction.atomic():
+                    pk = request.POST['id']
+                    f = Producto.objects.get(pk=pk)
+                    f.delete()
             elif action == 'search':
                 data = []
                 term = request.POST['term']
@@ -297,9 +311,18 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                         f.add_error("presentacion", "Ya existe este producto con esta presentacion")
                         data['error'] = f.errors
                     else:
-                        var = f.save()
-                        data['producto_base'] = var.toJSON()
-                        data['resp'] = True
+                        if f.files['imagen']:
+                            var = f.save()
+                            image = Image.open(var.imagen)
+                            size = (1000, 1000)
+                            image = image.resize(size, Image.ANTIALIAS)
+                            image.save(var.imagen.path)
+                            data['producto_base'] = var.toJSON()
+                            data['resp'] = True
+                        else:
+                            var = f.save()
+                            data['producto_base'] = var.toJSON()
+                            data['resp'] = True
                 else:
                     data['error'] = f.errors
             else:
@@ -339,7 +362,7 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
     model = Producto
     form_class = ProductoForm
     success_url = 'producto:lista'
-    template_name = 'front-end/producto/producto_form.html'
+    template_name = 'front-end/producto/list.html'
     permission_required = 'producto.change_producto'
 
     @method_decorator(csrf_exempt)
@@ -355,11 +378,19 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
             if action == 'edit':
                 f = self.form_class(request.POST or None, request.FILES or None, instance=producto)
                 if f.is_valid():
-                    var = f.save()
-                    data['producto_base'] = var.toJSON()
-                    data['resp'] = True
+                    if f.files['imagen']:
+                        var = f.save()
+                        image = Image.open(var.imagen)
+                        size = (1000, 1000)
+                        image = image.resize(size, Image.ANTIALIAS)
+                        image.save(var.imagen.path)
+                        data['producto_base'] = var.toJSON()
+                        data['resp'] = True
+                    else:
+                        var = f.save()
+                        data['producto_base'] = var.toJSON()
+                        data['resp'] = True
                 else:
-                    print(25)
                     data['error'] = f.errors
                     data['form'] = f
             else:
@@ -368,26 +399,8 @@ class Updateview(ValidatePermissionRequiredMixin, UpdateView):
             data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        pk = self.kwargs.get('pk', 0)
-        producto = self.model.objects.get(id=pk)
-        if 'form' not in data:
-            data['form'] = self.form_class(instance=producto)
-        data['icono'] = opc_icono
-        data['entidad'] = opc_entidad
-        data['boton'] = 'Guardar Edicion'
-        data['titulo'] = 'Edicion del Registro de un Producto'
-        data['action'] = 'edit'
-        data['crud'] = '/producto/editar/' + str(self.kwargs['pk'])
-        data['form_cat'] = CategoriaForm
-        data['form_pres'] = PresentacionForm
-        data['empresa'] = empresa
-        return data
-
 
 @csrf_exempt
-
 def index(request):
     data = {}
     try:

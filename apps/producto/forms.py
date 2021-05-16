@@ -1,8 +1,7 @@
 from django import forms
-from datetime import *
-
 from django.contrib.auth.models import Group
-from django.forms import SelectDateWidget, TextInput, NumberInput, EmailInput
+
+from django.forms import TextInput
 
 from apps.producto.models import Producto
 from apps.producto_base.models import Producto_base
@@ -49,8 +48,8 @@ class ProductoForm(forms.ModelForm):
         for field in self.Meta.fields:
             self.fields['pvp'].widget.attrs = {'class': 'form-control form-control-sm input-sm'}
             self.fields['pcp'].widget.attrs = {'class': 'form-control form-control-sm input-sm'}
-            self.fields['pcp'].initial = 1.00
-            self.fields['producto_base'].widget.attrs = {'class': 'form-control select2', 'style': "width: 89.5%"}
+            self.fields['pcp'].initial = format(1.00, '.2f')
+            self.fields['producto_base'].widget.attrs = {'class': 'form-control select2', 'style': "width: 85%"}
             self.fields['presentacion'].widget.attrs = {
                 'class': 'form-control select2', 'style': "width: 89.5%", 'id': 'id_presentacion_producto'}
 

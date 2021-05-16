@@ -31,12 +31,12 @@ class Producto(models.Model):
     def get_image(self):
         if self.imagen:
             return '{}{}'.format(MEDIA_URL, self.imagen)
-        return '{}{}'.format(MEDIA_URL, 'producto/no_imagen.jpg')
+        return '{}{}'.format(MEDIA_URL, 'producto/no_disponible.png')
 
     def name_image(self):
         if self.imagen:
             return '{}'.format(self.imagen)
-        return '{}{}'.format(MEDIA_URL, 'producto/no_imagen.jpg')
+        return '{}{}'.format(MEDIA_URL, 'producto/no_disponible.png')
 
     def check_image(self):
         if self.imagen:

@@ -1,145 +1,110 @@
 {% extends 'front-end/sitio/index.html' %}
 {% load static %}
 {% block mainNav %}
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-shrink" id="mainNav">
-    <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="#page-top"><h6
-                style="font-family:'Copperplate Gothic Light',serif;">{{ empresa.nombre }}</h6></a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
-                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
-                aria-label="Toggle navigation">
-            Menu
-            <i class="fas fa-bars ml-1"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav text-uppercase ml-auto">
-                <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#portfolio">Productos</a></li>
-                <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">Sobre nosotros</a></li>
-                {% if request.user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{% url 'menu' %}">Dashboard</a>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-shrink" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand js-scroll-trigger"><h6
+                    style="font-family:'Copperplate Gothic Light',serif;">{{ empresa.nombre }}</h6></a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                    data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars ml-1"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav text-uppercase ml-auto">
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{% url 'sitio:' %}">Sitio web</a>
                     </li>
-                {% else %}
-                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="">Inicia Sesion</a></li>
-                {% endif %}
-            <li class="nav-item"><a class="nav-link js-scroll-trigger" id="ver_carro" data-toggle="tooltip" title="Carrito de compras"><i class="fa fa-shopping-cart"></i></a></li>
-                <a class="portfolio-link" data-toggle="modal" href="#{{ p.modal_numero }}"></a>
-            </ul>
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{% url 'menu' %}">Dashboard</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="">Inicia Sesion</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" id="ver_carro" data-toggle="tooltip"
+                                            title="Carrito de compras"><i class="fa fa-shopping-cart"></i>
+                        <span class="badge badge-danger" id="count"></span></a></li>
+                    <a class="portfolio-link" data-toggle="modal" href="#{{ p.modal_numero }}"></a>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
     <script>
-    varkey =1;
+        varkey = 1;
     </script>
 {% endblock %}
 {% block masthead %}
 
 {% endblock %}
 {% block portfolio %}
-{#<!-- Portfolio Grid-->#}
-<section class="page-section bg-light" id="portfolio">
-    <div class="container">
-        <div class="text-center">
-            <h2 class="section-heading text-uppercase">Productos</h2>
-            <h3 class="section-subheading text-muted">Listado de nuestros productos.</h3>
-        </div>
-        <div class="row">
-            {% for p in productos %}
-                <div class="col-lg-4 col-sm-6 mb-4">
-                    <div class="portfolio-item">
-                        <a class="portfolio-link" data-toggle="modal" href="#{{ p.modal_numero }}">
-                            <div class="portfolio-hover">
-                                <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
-                            </div>
-                            <img class="img-fluid" src="{{ p.imagen }}" alt=""/>
-                        </a>
-                        <div class="portfolio-caption">
-                            <div class="portfolio-caption-heading">{{ p.nombre }}</div>
-                            <div class="portfolio-caption-subheading text-muted">{{ p.descripcion }}</div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-{% endblock %}
-<!-- Portfolio Modals-->
-{% block carrito %}
-<!-- Modal carrito-->
-<div class="portfolio-modal modal fade" id="carrito" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="close-modal" data-dismiss="modal"><img
-                        src="{% static 'sitio_web/assets/img/close-icon.svg' %}" alt="Cerrar modal"/></div>
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-12">
-                            <div class="modal-body">
-                                <!-- Project Details Go Here-->
-                                 <table id="datatable" class="table table-bordered table-hover" style="width: 100%">
-                                <thead>
-                                <tr>
-                                    <th class="text-center" scope="col" style="width: 10%"><i
-                                            class="zmdi zmdi-delete"></i></th>
-                                    <th>Producto</th>
-                                    <th>Categoria</th>
-                                    <th>Presentacion</th>
-                                    <th>Stock</th>
-                                    <th>Cantidad</th>
-                                    <th>Pvp</th>
-                                    <th>Subtotal</th>
-
-                                </tr>
-                                </thead>
-                                <tbody>
-
-
-                                </tbody>
-                            </table>
+    {#<!-- Portfolio Grid-->#}
+    <section class="page-section bg-light" id="portfolio">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-heading text-uppercase">Productos</h2>
+                <h3 class="section-subheading text-muted">Listado de nuestros productos.</h3>
+            </div>
+            <div class="row">
+                {% for p in productos %}
+                    <div class="col-lg-4 col-sm-6 mb-4">
+                        <div class="portfolio-item">
+                            <a class="portfolio-link" data-toggle="modal" href="#{{ p.modal_numero }}">
+                                <div class="portfolio-hover">
+                                    <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
+                                </div>
+                                <img class="img-fluid" src="{{ p.imagen }}" alt=""/>
+                            </a>
+                            <div class="portfolio-caption">
+                                <div class="portfolio-caption-heading">{{ p.nombre }}</div>
+                                <div class="portfolio-caption-subheading text-muted">{{ p.descripcion }}</div>
                             </div>
                         </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
+<!-- Portfolio Modals-->
+
 {% block about %}
 
 {% endblock %}
 {% block modals %}
-<!-- Modal 1-->
-{% for p in productos %}
-    <div class="portfolio-modal modal fade" id="{{ p.modal_numero }}" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="close-modal" data-dismiss="modal"><img
-                        src="{% static 'sitio_web/assets/img/close-icon.svg' %}" alt="Close modal"/></div>
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <div class="modal-body">
-                                <!-- Project Details Go Here-->
-                                <h2 class="text-uppercase">{{ p.nombre }}</h2>
-                                <img class="img-fluid d-block mx-auto" src="{{ p.imagen }}" alt=""/>
-                                <p>{{ p.descripcion }}</p>
-                                <ul class="list-inline">
-                                    <li><strong>Precio:</strong> $ {{ p.pvp }}</li>
-                                    <li><strong>Categoria:</strong> {{ p.categoria }}</li>
-                                    <li><strong>Presentacion:</strong> {{ p.presentacion }}</li>
-                                </ul>
-                                <button class="btn btn-primary" type="button" data-dismiss="modal" name="vender"
-                                        value="{{ p.id }}">
-                                    <i class="fa fa-shopping-cart mr-1"></i>
-                                    Agregar al carrito
-                                </button>
+    <!-- Modal 1-->
+    {% for p in productos %}
+        <div class="portfolio-modal modal fade" id="{{ p.modal_numero }}" tabindex="-1" role="dialog"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="close-modal" data-dismiss="modal"><img
+                            src="{% static 'sitio_web/assets/img/close-icon.svg' %}" alt="Close modal"/></div>
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <div class="modal-body">
+                                    <!-- Project Details Go Here-->
+                                    <h2 class="text-uppercase">{{ p.nombre }}</h2>
+                                    <img class="img-fluid d-block mx-auto" src="{{ p.imagen }}" alt=""/>
+                                    <p>{{ p.descripcion }}</p>
+                                    <ul class="list-inline">
+                                        <li><strong>Stock:</strong> {{ p.stock }}</li>
+                                        <li><strong>Precio:</strong> $ {{ p.pvp }}</li>
+                                        <li><strong>Categoria:</strong> {{ p.categoria }}</li>
+                                        <li><strong>Presentacion:</strong> {{ p.presentacion }}</li>
+                                    </ul>
+                                    <button class="btn btn-primary" type="button" data-dismiss="modal" name="vender"
+                                            value="{{ p.id }}">
+                                        <i class="fa fa-shopping-cart mr-1"></i>
+                                        Agregar al carrito
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-{% endfor %}
+    {% endfor %}
 {% endblock %}
 {#navbar-shrink#}

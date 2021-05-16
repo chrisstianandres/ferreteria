@@ -18,10 +18,13 @@ $(document).ready(function () {
         boostat: 5,
         maxboostedstep: 10,
         prefix: '$'
-    })
-        .on('change keyup', this, function () {
+    }).on('change keyup', this, function () {
             cal_pvp();
-        });
+        }).keypress(function (e) {
+        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+            return false;
+        }
+    });//Para solo numeros
     $('input[name="pvp"]').prop('readonly', true);
     validador();
     $("#form_prod").validate({
