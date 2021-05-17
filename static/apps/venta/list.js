@@ -55,9 +55,9 @@ function datatable_fun() {
                     var span;
                     if (row.estado === 1) {
                         span = '<span class="badge bg-success" style="color: white">' + data + '</span>';
-                    } else if (data.estado === 0) {
+                    } else if (row.estado === 0) {
                         span = '<span class="badge bg-danger" style="color: white">' + data + '</span>';
-                    } else if (data.estado === 2) {
+                    } else if (row.estado === 2) {
                         span = '<span class="badge bg-warning" style="color: white">' + data + '</span>';
                     }
                     return span;
@@ -68,7 +68,6 @@ function datatable_fun() {
                 class: 'text-center',
                 width: "15%",
                 render: function (data, type, row) {
-                    console.log(row.estado === 2 );
                     var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" ' +
                         'style="color: white" data-toggle="tooltip" title="Detalle de Productos" >' +
                         '<i class="fa fa-search"></i></a>' + ' ';
@@ -238,7 +237,7 @@ $(function () {
 
     $('#nuevo').on('click', function () {
         if (user_tipo === '0') {
-            window.location.href = '/venta/online'
+            window.location.href = '/productos/catalogo'
         } else {
             window.location.href = '/venta/nuevo'
         }

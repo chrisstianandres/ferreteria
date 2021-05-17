@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'apps.sitioweb',
     'apps.cta_x_cbr',
     'apps.pago_cta_x_cbr',
-    'apps.ubicacion'
+    'apps.ubicacion',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

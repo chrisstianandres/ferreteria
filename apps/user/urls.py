@@ -12,6 +12,6 @@ urlpatterns = [
     path('newgroup', login_required(CrudViewGroup.as_view()), name='newgroup'),
     path('estado', login_required(views.estado), name='estado'),
     path('editar/<int:pk>', login_required(Updateview.as_view()), name='editar'),
-    path('profile', login_required(views.profile), name='profile'),
+    path('profile', login_required(Profile.as_view()), name='profile'),
 
 ]

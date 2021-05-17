@@ -4,7 +4,7 @@
     * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-agency/blob/master/LICENSE)
     */
 
-var carro_respaldo, superuser=$('#superuser').val(), pagar;
+var carro_respaldo, superuser = $('#superuser').val(), pagar;
 
 var carrito = {
     items: {
@@ -63,11 +63,13 @@ var carrito = {
         var numero = this.items.productos.length;
         if (numero >= 1) {
             $('#count').html(numero);
+            $('#paypal_btn').fadeIn();
         } else {
+            $('#paypal_btn').fadeOut();
             $('#count').html('');
         }
         tblventa = $("#datatable").DataTable({
-            autoWidth: false,
+            autoWidth: true,
             dataSrc: "",
             responsive: true,
             dom:
@@ -121,36 +123,40 @@ var carrito = {
                 }
             ],
             rowCallback: function (row, data) {
-                $(row).find('input[name="cantidad"]').TouchSpin({
-                    min: 1,
-                    max: data.stock,
-                    step: 1,
-                    buttondown_class: 'btn btn-primary btn-sm',
-                    buttonup_class: 'btn btn-primary btn-sm',
+                $(row).find('input[name="cantidad"]')
+                    .TouchSpin({
+                        min: 1,
+                        max: data.stock,
+                        step: 1,
+                        buttondown_class: 'btn btn-primary btn-sm',
+                        buttonup_class: 'btn btn-primary btn-sm',
 
-                }).keypress(function (e) {
-                    if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
-                        return false;
-                    }
-                }).keyup(function (e) {
-                    e.preventDefault();
-                    if ($(this).val() > data.stock) {
-                        menssaje_error('Error!', 'No puede elegir una cantidad mayor que el stock disponible', 'fas fa-exclamation-circle');
-                    }
+                    })
+                    .keypress(function (e) {
+                        if (e.which !== 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+                            return false;
+                        }
+                    })
+                    .keyup(function (e) {
+                        e.preventDefault();
+                        if ($(this).val() > data.stock) {
+                            menssaje_error('Error!', 'No puede elegir una cantidad mayor que el stock disponible', 'fas fa-exclamation-circle');
+                        }
+                    })
+                    .on('change', function (e) {
+                        e.preventDefault();
+                        if ($(this).val() === '') {
+                            $(this).val(1);
+                            localStorage.clear();
+                            var cantidad = parseInt($(this).val());
+                            var tr = tblventa.cell($(this).closest('td, li')).index();
+                            carrito.items.productos[tr.row].cantidad_venta = cantidad;
+                            carrito.calculate();
+                            localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
+                            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
+                        }
 
-                }).on('change', function (e) {
-                    if ($(this).val() === '') {
-                        $(this).val(1);
-                        localStorage.clear();
-                        var cantidad = parseInt($(this).val());
-                        var tr = tblventa.cell($(this).closest('td, li')).index();
-                        carrito.items.productos[tr.row].cantidad_venta = cantidad;
-                        carrito.calculate();
-                        localStorage.setItem('carrito', JSON.stringify(carrito.items.productos));
-                        $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
-                    }
-
-                })
+                    })
             }
         });
     },
@@ -237,14 +243,14 @@ var carrito = {
         carro_respaldo = JSON.parse(localStorage.getItem('carrito'));
         carrito.items.productos = carro_respaldo;
         carrito.list();
-         if(carrito.items.productos.length>0){
-        $('#count').html(carrito.items.productos.length);
-    }
+        if (carrito.items.productos.length > 0) {
+            $('#count').html(carrito.items.productos.length);
+        }
     } else {
         carrito.list();
-         if(carrito.items.productos.length>0){
-        $('#count').html(carrito.items.productos.length);
-    }
+        if (carrito.items.productos.length > 0) {
+            $('#count').html(carrito.items.productos.length);
+        }
     }
 
 
@@ -274,18 +280,42 @@ var carrito = {
         })
     });
 
-    $(document).on('click', 'a[rel="pay"]', function (e) {
+    $(document).on('click', '#save', function (e) {
         e.preventDefault();
         if (carrito.items.productos.length === 0) return false;
-        if (superuser === 1) {
-            localStorage.setItem('pagar', '1');
-            localStorage.setItem('superuser', '1');
-            window.location.href = '/venta/nuevo'
-        } else {
-            localStorage.setItem('pagar', '1');
-            localStorage.setItem('superuser', '0');
-            window.location.href = '/login'
-        }
+        var parametros;
+        carrito.items.cliente = $('#user_id').val();
+        parametros = {'ventas': JSON.stringify(carrito.items)};
+        parametros['action'] = 'reserva';
+        $.ajax({
+            dataType: 'JSON',
+            type: 'POST',
+            url: window.location.pathname,
+            data: parametros,
+        }).done(function (data) {
+            if (!data.hasOwnProperty('error')) {
+                $.isLoading({
+                    text: "<strong>" + 'Cargando..' + "</strong>",
+                    tpl: '<span class="isloading-wrapper %wrapper%"><i class="fa fa-refresh fa-2x fa-spin"></i><br>%text%</span>',
+                });
+                setTimeout(function () {
+                    $.isLoading('hide');
+                    printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+                        window.open('/venta/printpdf/' + data['id'], '_blank');
+                        localStorage.clear();
+                        location.href = '/venta/lista_cliente';
+                    }, function () {
+                        localStorage.clear();
+                        location.href = '/venta/lista_cliente';
+                    })
+                }, 1000);
+                return false;
+            }
+            menssaje_error('Error', data.error, 'fas fa-exclamation-circle');
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            menssaje_error(textStatus, errorThrown, 'fas fa-exclamation-circle');
+        });
+
     });
 
 
@@ -311,4 +341,59 @@ var carrito = {
             $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + carrito.items.productos[tr.row].subtotal.toFixed(2));
 
         });
+
+
+    paypal.Buttons({
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: $('input[name="total"]').val()
+                    }
+                }]
+            });
+
+            // This function sets up the details of the transaction, including the amount and line item details.
+
+        },
+        onApprove: function (data, actions) {
+            // This function captures the funds from the transaction.
+            return actions.order.capture().then(function (details) {
+                // This function shows a transaction success message to your buyer.
+                var parametros;
+                carrito.items.cliente = $('#user_id').val();
+                parametros = {'ventas': JSON.stringify(carrito.items)};
+                parametros['action'] = 'add';
+                $.ajax({
+                    dataType: 'JSON',
+                    type: 'POST',
+                    url: window.location.pathname,
+                    data: parametros,
+                }).done(function (data) {
+                    if (!data.hasOwnProperty('error')) {
+                        $.isLoading({
+                            text: "<strong>" + 'Cargando..' + "</strong>",
+                            tpl: '<span class="isloading-wrapper %wrapper%"><i class="fa fa-refresh fa-2x fa-spin"></i><br>%text%</span>',
+                        });
+                        setTimeout(function () {
+                            $.isLoading('hide');
+                            printpdf('Alerta!', '¿Desea generar el comprobante en PDF?', function () {
+                                window.open('/venta/printpdf/' + data['id'], '_blank');
+                                localStorage.clear();
+                                location.href = '/venta/lista_cliente';
+                            }, function () {
+                                localStorage.clear();
+                                location.href = '/venta/lista_cliente';
+                            })
+                        }, 1000);
+                        return false;
+                    }
+                    menssaje_error('Error', data.error, 'fas fa-exclamation-circle');
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    menssaje_error(textStatus, errorThrown, 'fas fa-exclamation-circle');
+                });
+            });
+        }
+    }).render('#paypal-button-container');
+
 })(jQuery); // End of use strict

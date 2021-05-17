@@ -1,6 +1,7 @@
 import json
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.http import HttpResponseRedirect
@@ -16,6 +17,7 @@ from apps.mixins import ValidatePermissionRequiredMixin
 from apps.producto.models import Producto
 from apps.sitioweb.forms import SitiowebForm
 from apps.sitioweb.models import SitioWeb
+from apps.venta.models import Venta, Detalle_venta
 
 opc_icono = 'fa fa-newspaper fa'
 opc_entidad = 'Sitio Web'
@@ -109,79 +111,214 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         return data
 
 
-@csrf_exempt
-def sitio(request):
-    productos = []
+class sitio(TemplateView):
+    form_class = SitiowebForm
+    template_name = 'front-end/sitio/index.html'
     model = SitioWeb
-    c = 1
-    for p in Producto.objects.all():
-        productos.append({
-            'nombre': p.producto_base.nombre,
-            'categoria': p.producto_base.categoria.nombre,
-            'pvp': format(p.pvp, '.2f'),
-            'imagen': p.get_image(),
-            'modal_numero': '{}{}'.format('portfolioModal', c),
-            'presentacion': p.presentacion.nombre,
-            'stock': p.stock,
-            'id': p.id
-        })
-        c += 1
-    data = {'empresa': empresa, 'productos': productos, 'sitio': model.objects.first()}
-    if request.user.is_authenticated:
-        data['group'] = request.user.get_tipo_display
-    else:
-        data['group'] = 'NONE'
-    if request.method == 'POST':
-        action = request.POST['action']
-        data = []
-        if action == 'get':
-            id = request.POST['id']
-            producto = Producto.objects.get(id=id)
-            item = producto.toJSON()
-            item['cantidad'] = 1
-            item['subtotal'] = 0
-            item['iva_emp'] = empresa.iva
-            data.append(item)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'get':
+                    data = []
+                    id = request.POST['id']
+                    producto = Producto.objects.get(id=id)
+                    item = producto.toJSON()
+                    item['cantidad'] = 1
+                    item['subtotal'] = 0
+                    item['iva_emp'] = empresa.iva
+                    data.append(item)
+            elif action == 'add':
+                datos = json.loads(request.POST['ventas'])
+                if datos:
+                    with transaction.atomic():
+                        c = Venta()
+                        c.cliente_id = datos['cliente']
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                dv = Detalle_venta()
+                                dv.venta_id = c.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                                stock = Producto.objects.get(id=i['id'])
+                                stock.stock -= int(i['cantidad'])
+                                stock.save()
+                            data['id'] = c.id
+                            data['resp'] = True
+                        else:
+                            data['resp'] = False
+                            data['error'] = "Datos Incompletos"
+            elif action == 'reserva':
+                    datos = json.loads(request.POST['ventas'])
+                    if datos:
+                        with transaction.atomic():
+                            c = Venta()
+                            c.cliente_id = datos['cliente']
+                            c.subtotal = float(datos['subtotal'])
+                            c.iva = float(datos['iva'])
+                            c.total = float(datos['total'])
+                            c.estado = 2
+                            c.save()
+                            if datos['productos']:
+                                for i in datos['productos']:
+                                    dv = Detalle_venta()
+                                    dv.venta_id = c.id
+                                    dv.producto_id = int(i['id'])
+                                    dv.cantidad = int(i['cantidad'])
+                                    dv.pvp_actual = float(i['pvp'])
+                                    dv.subtotal = float(i['subtotal'])
+                                    dv.save()
+                                    stock = Producto.objects.get(id=i['id'])
+                                    stock.stock -= int(i['cantidad'])
+                                    stock.save()
+                            data['id'] = c.id
+                            data['resp'] = True
+                    else:
+                        data['resp'] = False
+                        data['error'] = "Datos Incompletos"
+        except Exception as e:
+            data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-    return render(request,  'front-end/sitio/index.html', data)
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        productos = []
+        c = 1
+        for p in Producto.objects.all()[0:6]:
+            productos.append({
+                'nombre': p.producto_base.nombre,
+                'categoria': p.producto_base.categoria.nombre,
+                'pvp': format(p.pvp, '.2f'),
+                'imagen': p.get_image(),
+                'modal_numero': '{}{}'.format('portfolioModal', c),
+                'presentacion': p.presentacion.nombre,
+                'stock': p.stock,
+                'id': p.id
+                })
+            c += 1
+        data['icono'] = opc_icono
+        data['sitio'] = SitioWeb.objects.first()
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Sitio web'
+        data['empresa'] = empresa
+        data['productos'] = productos
+        return data
 
 
-@csrf_exempt
-def catalogo(request):
-    productos = []
+class catalogo(TemplateView):
+    form_class = SitiowebForm
+    template_name = 'front-end/sitio/catalogo.html'
     model = SitioWeb
-    c = 1
-    for p in Producto.objects.all()[0:6]:
-        productos.append({
-            'nombre': p.producto_base.nombre,
-            'categoria': p.producto_base.categoria.nombre,
-            'pvp': format(p.pvp, '.2f'),
-            'imagen': p.get_image(),
-            'modal_numero': '{}{}'.format('portfolioModal', c),
-            'presentacion': p.presentacion.nombre,
-            'stock': p.stock,
-            'id': p.id
-        })
-        c += 1
-    data = {'empresa': empresa, 'productos': productos, 'sitio': model.objects.first()}
-    if request.user.is_authenticated:
-        data['group'] = request.user.get_tipo_display
-    else:
-        data['group'] = 'NONE'
-    if request.method == 'POST':
-        action = request.POST['action']
-        data = []
-        if action == 'get':
-            id = request.POST['id']
-            producto = Producto.objects.get(id=id)
-            item = producto.toJSON()
-            item['cantidad'] = 1
-            item['subtotal'] = 0
-            item['iva_emp'] = empresa.iva
-            data.append(item)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'get':
+                    data = []
+                    id = request.POST['id']
+                    producto = Producto.objects.get(id=id)
+                    item = producto.toJSON()
+                    item['cantidad'] = 1
+                    item['subtotal'] = 0
+                    item['iva_emp'] = empresa.iva
+                    data.append(item)
+            elif action == 'add':
+                datos = json.loads(request.POST['ventas'])
+                if datos:
+                    print(datos)
+                    with transaction.atomic():
+                        c = Venta()
+                        c.cliente_id = datos['cliente']
+                        c.subtotal = float(datos['subtotal'])
+                        c.iva = float(datos['iva'])
+                        c.total = float(datos['total'])
+                        c.save()
+                        if datos['productos']:
+                            for i in datos['productos']:
+                                dv = Detalle_venta()
+                                dv.venta_id = c.id
+                                dv.producto_id = int(i['id'])
+                                dv.cantidad = int(i['cantidad'])
+                                dv.pvp_actual = float(i['pvp'])
+                                dv.subtotal = float(i['subtotal'])
+                                dv.save()
+                                stock = Producto.objects.get(id=i['id'])
+                                stock.stock -= int(i['cantidad'])
+                                stock.save()
+                            data['id'] = c.id
+                            data['resp'] = True
+                        else:
+                            data['resp'] = False
+                            data['error'] = "Datos Incompletos"
+            elif action == 'reserva':
+                    datos = json.loads(request.POST['ventas'])
+                    if datos:
+                        with transaction.atomic():
+                            c = Venta()
+                            c.cliente_id = datos['cliente']
+                            c.subtotal = float(datos['subtotal'])
+                            c.iva = float(datos['iva'])
+                            c.total = float(datos['total'])
+                            c.estado = 2
+                            c.save()
+                            if datos['productos']:
+                                for i in datos['productos']:
+                                    dv = Detalle_venta()
+                                    dv.venta_id = c.id
+                                    dv.producto_id = int(i['id'])
+                                    dv.cantidad = int(i['cantidad'])
+                                    dv.pvp_actual = float(i['pvp'])
+                                    dv.subtotal = float(i['subtotal'])
+                                    dv.save()
+                                    stock = Producto.objects.get(id=i['id'])
+                                    stock.stock -= int(i['cantidad'])
+                                    stock.save()
+                            data['id'] = c.id
+                            data['resp'] = True
+                    else:
+                        data['resp'] = False
+                        data['error'] = "Datos Incompletos"
+        except Exception as e:
+            data['error'] = str(e)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
-    return render(request,  'front-end/sitio/catalogo.html', data)
-
-
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        productos = []
+        c = 1
+        for p in Producto.objects.all():
+            productos.append({
+                'nombre': p.producto_base.nombre,
+                'categoria': p.producto_base.categoria.nombre,
+                'pvp': format(p.pvp, '.2f'),
+                'imagen': p.get_image(),
+                'modal_numero': '{}{}'.format('portfolioModal', c),
+                'presentacion': p.presentacion.nombre,
+                'stock': p.stock,
+                'id': p.id
+                })
+            c += 1
+        data['icono'] = opc_icono
+        data['sitio'] = SitioWeb.objects.first()
+        data['entidad'] = opc_entidad
+        data['titulo'] = 'Catalogo de productos'
+        data['empresa'] = empresa
+        data['productos'] = productos
+        return data

@@ -31,7 +31,10 @@ def menu(request):
         'titulo': 'Menu Principal', 'empresa': nombre_empresa(),
         'icono': 'fas fa-tachometer-alt', 'entidad': 'Menu Principal',
     }
-    return render(request, 'front-end/index.html', data)
+    if request.user.tipo == 1:
+        return render(request, 'front-end/index.html', data)
+    else:
+        return HttpResponseRedirect("/venta/lista_cliente")
 
 
 # -----------------------------------------------LOGEO----------------------------------------------------------------#

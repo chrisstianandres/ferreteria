@@ -65,8 +65,8 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 if request.user.tipo == 1:
                     query = Venta.objects.all()
                 else:
-                    query = Venta.objects.filter(user_id=request.user.id)
-
+                    query = Venta.objects.filter(cliente_id=request.user.id)
+                    print(query)
                 for c in query:
                     data.append(c.toJSON())
             elif action == 'detalle':
@@ -128,6 +128,56 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             data['boton'] = 'Nueva Venta'
             data['titulo'] = 'Listado de Ventas'
             data['titulo_lista'] = 'Listado de Ventas'
+        data['empresa'] = empresa
+        return data
+
+
+class lista_cliente(ListView):
+    model = Venta
+    template_name = 'front-end/venta/list.html'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'list':
+                data = []
+                query = Venta.objects.filter(cliente_id=request.user.id)
+                for c in query:
+                    data.append(c.toJSON())
+            elif action == 'detalle':
+                id = request.POST['id']
+                if id:
+                    data = []
+                    result = Detalle_venta.objects.filter(venta_id=id)
+                    for p in result:
+                        data.append({
+                            'producto': p.producto.producto_base.nombre,
+                            'categoria': p.producto.producto_base.categoria.nombre,
+                            'presentacion': p.producto.presentacion.nombre,
+                            'cantidad': p.cantidad,
+                            'pvp': p.pvp_actual,
+                            'subtotal': p.subtotal
+                        })
+                else:
+                    data['error'] = 'Ha ocurrido un error'
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['icono'] = opc_icono
+        data['entidad'] = opc_entidad
+        data['boton'] = 'Nueva Compra'
+        data['titulo'] = 'Listado de Compras'
+        data['titulo_lista'] = 'Listado de Compras'
         data['empresa'] = empresa
         return data
 
