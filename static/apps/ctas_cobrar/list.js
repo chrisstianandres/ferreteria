@@ -15,7 +15,7 @@ function datatable_fun() {
             dataSrc: ""
         },
         columns: [
-            {"data": "venta.cliente.full_name_list"},
+            {"data": "venta.cliente.full_name"},
             {"data": "nro_cuotas"},
             {"data": "valor"},
             {"data": "interes"},
@@ -42,9 +42,8 @@ function datatable_fun() {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    var edit = '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="detalle" ' +
-                        'data-toggle="tooltip" title="Detalle"><i class="fa fa-search"></i></a>' + ' ';
-                    return edit
+                    return '<a style="color: white" type="button" class="btn btn-success btn-xs" rel="detalle" ' +
+                        'data-toggle="tooltip" title="Detalle"><i class="fa fa-search"></i></a>' + ' '
 
                 }
             },
@@ -53,20 +52,19 @@ function datatable_fun() {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    return '<span>' + data + '</span>'
+                    var span;
+                    if (row.estado === 2) {
+                        span = '<span class="badge bg-success" style= "color: white">' + data + '</span>';
+                    } else if (row.estado === 1) {
+                        span = '<span class="badge bg-danger" style= "color: white">' + data + '</span>';
+                    } else if (row.estado === 0) {
+                        span = '<span class="badge bg-warning" style= "color: white">' + data + '</span>';
+                    }
+                    return span
 
                 }
             },
-        ],
-        createdRow: function (row, data, dataIndex) {
-            if (data.estado === 2) {
-                $('td', row).eq(6).find('span').addClass('badge bg-success').attr("style", "color: white");
-            } else if (data.estado === 1) {
-                $('td', row).eq(6).find('span').addClass('badge bg-danger').attr("style", "color: white");
-            } else if (data.estado === 0) {
-                $('td', row).eq(6).find('span').addClass('badge bg-warning').attr("style", "color: white");
-            }
-        },
+        ]
     });
 }
 
@@ -100,6 +98,7 @@ $(function () {
                     {data: 'fecha'},
                     {data: 'fecha_pago'},
                     {data: 'valor'},
+                    {data: 'saldo'},
                     {data: 'estado_text'},
                     {data: 'id'},
                 ],
@@ -112,7 +111,23 @@ $(function () {
                         targets: [-2],
                         orderable: false,
                         render: function (data, type, row) {
-                            return '<span>' + data + '</span>'
+                            var span;
+                            if (row.estado === 2) {
+                                span = '<span class="badge bg-success" style="color:white">' + data + '</span>';
+                            } else if (row.estado === 1) {
+                                span = '<span class="badge bg-danger" style="color:white">' + data + '</span>';
+                            } else if (row.estado === 0) {
+                                span = '<span class="badge bg-warning" style="color:white">' + data + '</span>';
+                            }
+                            return span;
+
+                        }
+                    },
+                    {
+                        targets: [0],
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return row.fecha_venta === null ? '<span class="badge bg-warning" style="color:white">' + row.estado_text + '</span>': data;
 
                         }
                     },
@@ -127,51 +142,14 @@ $(function () {
                         targets: [-1],
                         width: "15%",
                         render: function (data, type, row) {
-                            return '<a type="button" rel="pagar" class="btn btn-success btn-xs btn-round" ' +
+                            return row.estado===0|| row.estado===1 ?'<a type="button" rel="pagar" class="btn btn-success btn-xs btn-round" ' +
                                 'style="color: white" data-toggle="tooltip" title="Realizar pago" >' +
-                                '<i class="fas fa-hand-holding-usd"></i></a>' + ' ';
+                                '<i class="fas fa-hand-holding-usd"></i></a>' + ' ': '';
                         }
                     },
                 ],
-                footerCallback: function (row, data, start, end, display) {
-                    var api = this.api(), data;
-
-                    // Remove the formatting to get integer data for summation
-                    var intVal = function (i) {
-                        return typeof i === 'string' ?
-                            i.replace(/[\$,]/g, '') * 1 :
-                            typeof i === 'number' ?
-                                i : 0;
-                    };
-                    // Total over this page
-                    pageTotal = api
-                        .column(2, {page: 'current'})
-                        .data()
-                        .reduce(function (a, b) {
-                            return intVal(a) + intVal(b);
-                        }, 0);
-
-                    // Update footer
-                    $(api.column(2).footer()).html(
-                        '$' + parseFloat(pageTotal).toFixed(2)
-                        // parseFloat(data).toFixed(2)
-                    );
-                },
                 createdRow: function (row, data, dataIndex) {
-                    if (data.estado === 2) {
-                        $('td', row).eq(3).find('span').addClass('badge bg-success').attr("style", "color: white");
-                        $('td', row).eq(4).find('a[rel="pagar"]').hide();
-                    } else if (data.estado === 1) {
-                        $('td', row).eq(3).find('span').addClass('badge bg-danger').attr("style", "color: white");
-                        if (data.fecha_pago === null) {
-                            $('td', row).eq(1).html('<span class="badge bg-danger" style="color: white">' + data.estado_text + '</span>');
-                        }
-                    } else if (data.estado === 0) {
-                        $('td', row).eq(3).find('span').addClass('badge bg-warning').attr("style", "color: white");
-                        if (data.fecha_pago === null) {
-                            $('td', row).eq(1).html('<span class="badge bg-warning" style="color: white">' + data.estado_text + '</span>');
-                        }
-                    }
+
                 },
             });
             if (data.estado === 1) {

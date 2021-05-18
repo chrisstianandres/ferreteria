@@ -151,7 +151,7 @@ $(function () {
             save_with_ajax('Alerta',
                 window.location.pathname, 'Esta seguro que desea realizar un abono de $' + abono + '?', parametros,
                 function () {
-                   location.reload()
+                   window.location.href = '/ctas_cobrar/lista'
                 });
         }
     );
