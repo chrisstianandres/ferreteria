@@ -25,13 +25,14 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
 
-from apps.producto_base.models import Producto_base
 from apps.proveedor.forms import ProveedorForm
 
 opc_icono = 'fa fa-shopping-bag'
 opc_entidad = 'Compras'
 crud = '/compra/crear'
 empresa = nombre_empresa()
+year = [{'id': y, 'year': (datetime.now().year) - y} for y in range(0, 5)]
+producto = [{'id': p.id, 'nombre': p.producto_base.nombre} for p in Producto.objects.all()]
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
@@ -261,7 +262,7 @@ class printpdf(ValidatePermissionRequiredMixin, View):
 
 class report(ValidatePermissionRequiredMixin, ListView):
     model = Compra
-    template_name = 'front-end/compra/compra_report_product.html'
+    template_name = 'front-end/compra/report_product.html'
     permission_required = 'compra.view_compra'
 
     @csrf_exempt
@@ -281,16 +282,34 @@ class report(ValidatePermissionRequiredMixin, ListView):
                 end_date = request.POST.get('end_date', '')
                 if start_date == '' and end_date == '':
                     query = Detalle_compra.objects.values('compra__fecha_compra', 'producto__producto_base__nombre',
-                                                          'p_compra_actual'). \
-                        order_by().annotate(Sum('cantidad')).annotate(Sum('compra__total')).annotate(Sum('subtotal'))
+                                                          'p_compra_actual', 'compra__proveedor__nombre'). \
+                        order_by().annotate(Sum('cantidad')).annotate(Sum('compra__total')).annotate(Sum('subtotal')).\
+                        filter(compra__estado=1)
                 else:
                     query = (Detalle_compra.objects.values('compra__fecha_compra', 'producto__producto_base__nombre',
-                                                           'p_compra_actual').
+                                                           'p_compra_actual', 'compra__proveedor__nombre').
                         filter(compra__fecha_compra__range=[start_date, end_date]).order_by().annotate(
                         Sum('cantidad'))).annotate(Sum('compra__total'))
                 for p in query:
                     data.append([
                         p['compra__fecha_compra'].strftime("%d/%m/%Y"),
+                        p['compra__proveedor__nombre'],
+                        p['producto__producto_base__nombre'],
+                        int(p['cantidad__sum']),
+                        format(p['p_compra_actual'], '.2f'),
+                        format(p['compra__total__sum'], '.2f')])
+            elif action == 'producto':
+                id = request.POST.get('id', '')
+                data = []
+                query = Detalle_compra.objects.values('compra__fecha_compra', 'producto__producto_base__nombre',
+                                                          'p_compra_actual', 'compra__proveedor__nombre'). \
+                        order_by().annotate(Sum('cantidad')).annotate(Sum('compra__total')).annotate(Sum('subtotal')).\
+                        filter(compra__estado=1, producto_id=id)
+
+                for p in query:
+                    data.append([
+                        p['compra__fecha_compra'].strftime("%d/%m/%Y"),
+                        p['compra__proveedor__nombre'],
                         p['producto__producto_base__nombre'],
                         int(p['cantidad__sum']),
                         format(p['p_compra_actual'], '.2f'),
@@ -307,7 +326,10 @@ class report(ValidatePermissionRequiredMixin, ListView):
         data['entidad'] = opc_entidad
         data['boton'] = 'Nueva Compra'
         data['titulo'] = 'Reporte de Compras'
+        data['titulo_lista'] = 'Reporte de Compras'
         data['empresa'] = empresa
+        data['year'] = year
+        data['producto'] = producto
         return data
 
 

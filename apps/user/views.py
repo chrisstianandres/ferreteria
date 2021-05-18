@@ -359,7 +359,7 @@ class Profile(TemplateView):
         data['entidad'] = 'Perfil de Usuario'
         data['boton'] = 'Guardar Edicion'
         data['titulo'] = 'Perfil de Usuario'
-        data['titulo_lista'] = 'Datos del Usuario',
+        data['titulo_lista'] = 'Datos del Usuario'
         data['action'] = 'edit'
         dato = self.model.objects.get(pk=self.request.user.id)
         data['form'] = self.form_class(instance=dato)

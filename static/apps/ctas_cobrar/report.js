@@ -1,11 +1,12 @@
-var datatable;
 var datos = {
     fechas: {
         'start_date': '',
         'end_date': '',
+        'tipo': 0,
         'action': 'report',
+        'id': ''
     },
-   add: function (data) {
+    add: function (data) {
         if (data.key === 1) {
             this.fechas['start_date'] = data.startDate.format('YYYY-MM-DD');
             this.fechas['end_date'] = data.endDate.format('YYYY-MM-DD');
@@ -16,7 +17,7 @@ var datos = {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
             this.fechas['id'] = data.id;
-            this.fechas['action'] = 'producto';
+            this.fechas['action'] = 'cliente';
         } else {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
@@ -38,7 +39,7 @@ $(function () {
     daterange();
     datatable = $("#datatable").DataTable({
         destroy: true,
-        scrollX: true,
+        responsive: true,
         autoWidth: false,
         order: [[2, "asc"]],
         ajax: {
@@ -77,20 +78,28 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5],
+                        columns: [0, 1, 2, 3, 4, 5, 6],
                         search: 'applied',
                         order: 'applied'
                     },
                     customize: customize_report
                 },
                 {
-                    text: '<i class="far fa-file-excel"></i> Excel</i>',
-                    className: "btn btn-success my_class",
+                    text: '<i class="far fa-file-excel"></i> Excel</i>', className: "btn btn-success my_class",
                     extend: 'excel',
                     footer: true
-                },
+                }
             ]
         },
+        columns: [
+            {data: 'cta_cobrar.venta.cliente.full_name'},
+            {data: "fecha"},
+            {data: "fecha_pago"},
+            {data: "valor"},
+            {data: "valor_pagado"},
+            {data: "saldo"},
+            {data: "estado_text"}
+        ],
         columnDefs: [
             {
                 targets: '_all',
@@ -98,24 +107,42 @@ $(function () {
 
             },
             {
-                targets: [-2],
+                targets: [-2, -3, -4],
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    return '$ ' + data;
+                    console.log(row);
+                    return '$' + parseFloat(data).toFixed(2);
                 }
             },
             {
                 targets: [-1],
                 width: '20%',
                 render: function (data, type, row) {
-                    return '$ ' + data;
+                    var span;
+                    if (row.estado === 2) {
+                        span = '<span class="badge bg-success" style="color:white">' + data + '</span>';
+                    } else if (row.estado === 1) {
+                        span = '<span class="badge bg-danger" style="color:white">' + data + '</span>';
+                    } else if (row.estado === 0) {
+                        span = '<span class="badge bg-warning" style="color:white">' + data + '</span>';
+                    }
+                    return span;
+                }
+            },
+            {
+                targets: [2],
+                render: function (data, type, row) {
+                    var span = data;
+                    if (row.estado === 0) {
+                        span = '<span class="badge bg-warning" style="color:white">' + row.estado_text + '</span>';
+                    }
+                    return span;
                 }
             },
         ],
-        footerCallback: function (row, data, start, end, display) {
-            var api = this.api(), data;
-
+        footerCallback: function (row, start, end, display) {
+            var api = this.api();
             // Remove the formatting to get integer data for summation
             var intVal = function (i) {
                 return typeof i === 'string' ?
@@ -124,27 +151,38 @@ $(function () {
                         i : 0;
             };
             // Total over this page
-            pageTotal = api.column(5, {page: 'current'}).data().reduce(function (a, b) {
-                    return intVal(a) + intVal(b);
-                }, 0);
-            total = api.column(5).data().reduce(function (a, b) {
+            pageTotalsiniva = api.column(3, {page: 'current'}).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
-
-            cantTotal = api.column(3, {page: 'current'}).data().reduce(function (a, b) {
-                    return intVal(a) + intVal(b);
-                }, 0);
-
-            cantidad = api.column(3).data().reduce(function (a, b) {
+            totaliva = api.column(3).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+            pageTotaliva = api.column(4, {page: 'current'}).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+            totalconiva = api.column(4).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+            pageTotalconiva = api.column(5, {page: 'current'}).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+            totalconiva = api.column(5).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
 
             // Update footer
-            $(api.column(5).footer()).html(
-                '$' + parseFloat(pageTotal).toFixed(2) + '( $ ' + parseFloat(total).toFixed(2) + ')'
+            $(api.column(3).footer()).html(
+                '$' + parseFloat(pageTotalsiniva).toFixed(2) + '( $ ' + parseFloat(pageTotalsiniva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
-            $(api.column(3).footer()).html(cantTotal+ '(' + cantidad + ')');
+            $(api.column(4).footer()).html(
+                '$' + parseFloat(pageTotaliva).toFixed(2) + '( $ ' + parseFloat(pageTotaliva).toFixed(2) + ')'
+                // parseFloat(data).toFixed(2)
+            );
+            $(api.column(5).footer()).html(
+                '$' + parseFloat(pageTotalconiva).toFixed(2) + '( $ ' + parseFloat(pageTotalconiva).toFixed(2) + ')'
+                // parseFloat(data).toFixed(2)
+            );
         },
 
     });
@@ -168,7 +206,7 @@ $(function () {
     $('#year1').on('change', function () {
         daterange()
     });
-    $('#producto_id').on('change', function () {
+    $('#cliente_id').on('change', function () {
         daterange()
     })
 });
@@ -208,7 +246,7 @@ function daterange() {
         pic2['key'] = 3;
         pic2['start_date'] = '';
         pic2['end_date'] = '';
-        pic2['id'] = $('#producto_id').val();
+        pic2['id'] = $('#cliente_id').val();
         datos.add(pic2);
     }
 }

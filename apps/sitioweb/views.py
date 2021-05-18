@@ -140,6 +140,7 @@ class sitio(TemplateView):
                         c = Venta()
                         c.cliente_id = datos['cliente']
                         c.subtotal = float(datos['subtotal'])
+                        c.tipo_venta = 1
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
                         c.save()
@@ -168,8 +169,10 @@ class sitio(TemplateView):
                             c.cliente_id = datos['cliente']
                             c.subtotal = float(datos['subtotal'])
                             c.iva = float(datos['iva'])
+                            c.tipo_venta = 1
                             c.total = float(datos['total'])
                             c.estado = 2
+                            c.tipo_pago = 2
                             c.save()
                             if datos['productos']:
                                 for i in datos['productos']:

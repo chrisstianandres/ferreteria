@@ -20,6 +20,13 @@ $(document).ready(function () {
         contrase.show(1000);
     });
 
+    $('.cancel').on('click', function (e) {
+        e.preventDefault();
+        tabla.show(1000);
+        contrase.hide(1000);
+        formulario.hide(1000);
+    });
+
 
     form_edit.validate({
         rules: {

@@ -16,11 +16,14 @@ from apps.cta_x_cbr.models import Cta_x_cobrar
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.pago_cta_x_cbr.models import Pago_cta_x_cobrar
 from apps.ubicacion.models import *
+from apps.user.models import User
 
 opc_icono = 'fas fa-search-dollar'
 opc_entidad = 'Cuentas por Cobrar'
 crud = '/ctas_cobrar/nuevo'
 empresa = nombre_empresa()
+year = [{'id': y, 'year': (datetime.now().year) - y} for y in range(0, 5)]
+cliente = [{'id': p.id, 'nombre': p.get_full_name} for p in User.objects.filter(tipo=0)]
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
@@ -160,6 +163,8 @@ class pagar(ValidatePermissionRequiredMixin, ListView):
         data['boton'] = 'Guardar'
         data['titulo'] = 'Cuenta por cobrar'
         data['titulo_lista'] = 'Letras de credito'
+        saldo = Cta_x_cobrar.objects.get(id=self.kwargs['pk'])
+        data['saldo'] = format(saldo.saldo, '.2f')
         data['empresa'] = empresa
         return data
 
@@ -212,42 +217,56 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 
 
 class report(ValidatePermissionRequiredMixin, ListView):
-    model = Cliente
-    template_name = 'front-end/cliente/report.html'
-    permission_required = 'cliente.view_cliente'
+    model = Pago_cta_x_cobrar
+    template_name = 'front-end/pago/report.html'
+    permission_required = 'venta.view_venta'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Cliente.objects.none()
+        return Cta_x_cobrar.objects.none()
 
     def post(self, request, *args, **kwargs):
         data = {}
-        action = request.POST['action']
-        if action == 'report':
-            data = []
+        try:
             start_date = request.POST.get('start_date', '')
             end_date = request.POST.get('end_date', '')
-            try:
+            action = request.POST['action']
+            print(action)
+            if action == 'report':
+                data = []
                 if start_date == '' and end_date == '':
-                    query = Cliente.objects.all()
+                    query = Pago_cta_x_cobrar.objects.all()
                 else:
-                    query = Cliente.objects.filter(fecha__range=[start_date, end_date])
-
+                    query = Pago_cta_x_cobrar.objects.filter(fecha_pago__range=[start_date, end_date])
                 for p in query:
                     data.append(p.toJSON())
-            except:
-                pass
-            return JsonResponse(data, safe=False)
+
+            elif action == 'cliente':
+                id = request.POST.get('id', '')
+                print(User.objects.get(id=id))
+                data = []
+                query = Pago_cta_x_cobrar.objects.filter(cta_cobrar__venta__cliente_id=id)
+                for p in query:
+                   data.append(p.toJSON())
+            else:
+                data['error'] = 'No ha seleccionado una opcion'
+        except Exception as e:
+            print(e)
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
-        data['titulo'] = 'Reporte de Clientes'
+        data['titulo'] = 'Reporte de Cuentas por cobrar'
         data['empresa'] = empresa
+        data['titulo_lista'] = 'Cuentas por cobrar'
+        data['year'] = year
+        data['cliente'] = cliente
         return data
 
 

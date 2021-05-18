@@ -53,7 +53,7 @@ $(function () {
                 render: function (data, type, row) {
                     var descargar = '<a type="button" class="btn btn-success btn-xs" data-toggle="tooltip"\n' +
                         '                       title="Descargar"\n' +
-                        '                       href="'+row.archive_path+ '"><i class="fas fa-download"></i></a>'+ ' ';
+                        '                       href="'+row.archive_path+ '" download="'+row.archive+'.slq"><i class="fas fa-download"></i></a>'+ ' ';
                     var eliminar = '<a type="button" rel="del" class="btn btn-danger btn-xs btn-round" ' +
                         'style="color: white" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>';
                     return descargar+eliminar;
@@ -66,7 +66,7 @@ $(function () {
         var data = datatable.row(tr.row).data();
         var parametros = {'id': data.id};
         save_estado('Alerta',
-            '/database_backup/eliminar', 'Esta seguro que desea eliminar este respaldo?', parametros,
+            '/respaldos/eliminar', 'Esta seguro que desea eliminar este respaldo?', parametros,
             function () {
                 menssaje_ok('Exito!', 'Exito al eliminar el respaldo!', 'far fa-smile-wink', function () {
                      datatable.ajax.reload(null,false);
@@ -78,7 +78,7 @@ $(function () {
         if (! datatable.data().any()) return false;
         var parametros = {'action': 'delete_access_all'};
         save_estado('Alerta',
-            '/database_backup/lista', 'Esta seguro que desea eliminar todos los respaldos?', parametros,
+            window.location.pathname, 'Esta seguro que desea eliminar todos los respaldos?', parametros,
             function () {
                 menssaje_ok('Exito!', 'Exito al eliminar los respaldos!', 'far fa-smile-wink', function () {
                     datatable.ajax.reload(null,false);
@@ -91,7 +91,7 @@ $(function () {
         e.preventDefault();
         var parametros = {'action': 'add'};
         save_estado('Alerta',
-            '/database_backup/nuevo', 'Esta seguro que desea realizar un respaldo de base de datos?', parametros,
+            '/respaldos/nuevo', 'Esta seguro que desea realizar un respaldo de base de datos?', parametros,
             function () {
                 menssaje_ok('Exito!', 'Exito al al generar el respaldo de base de datos!', 'far fa-smile-wink', function () {
                     datatable.ajax.reload(null, false);

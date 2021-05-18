@@ -45,6 +45,8 @@ opc_icono = 'fa fa-shopping-basket '
 opc_entidad = 'Ventas'
 crud = '/venta/crear'
 empresa = nombre_empresa()
+year = [{'id': y, 'year': (datetime.now().year) - y} for y in range(0, 5)]
+producto = [{'id': p.id, 'nombre': p.producto_base.nombre} for p in Producto.objects.all()]
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):
@@ -229,11 +231,12 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                                 cta.saldo = float(datos['total_deuda'])
                                 cta.nro_cuotas = int(datos['nro_cuotas'])
                                 cta.save()
+                                c.tipo_pago = 1
+                                c.save()
                                 x = 1
                                 ahora = datetime.now()
                                 debito = (float(datos['letra']) * float(datos['nro_cuotas']))
                                 calculo = (float(debito) - float(datos['total_deuda']))
-                                print(calculo)
                                 for n in range(0, int(datos['nro_cuotas'])):
                                     fech = ahora + relativedelta(months=x)
                                     let = Pago_cta_x_cobrar()
@@ -273,6 +276,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                         c.iva = float(datos['iva'])
                         c.total = float(datos['total'])
                         c.estado = 2
+                        c.tipo_pago = 2
                         c.save()
                         if datos['productos']:
                             for i in datos['productos']:
@@ -662,20 +666,43 @@ class report(ValidatePermissionRequiredMixin, ListView):
             if action == 'report':
                 data = []
                 if start_date == '' and end_date == '':
-                    query = Detalle_venta.objects.values('venta__fecha', 'inventario__producto__producto_base_id',
-                                                         'pvp_actual').order_by().annotate(
+                    query = Detalle_venta.objects.values('venta__fecha', 'producto_id', 'pvp_actual',
+                                                         'venta__cliente_id').order_by().annotate(
                         Sum('cantidad')).filter(venta__estado=1)
                 else:
-                    query = Detalle_venta.objects.values('venta__fecha', 'inventario__producto__producto_base_id',
-                                                         'pvp_actual') \
+                    query = Detalle_venta.objects.values('venta__fecha', 'producto_id', 'pvp_actual',
+                                                         'venta__cliente_id') \
                         .filter(venta__fecha__range=[start_date, end_date], venta__estado=1).order_by().annotate(
                         Sum('cantidad'))
                 for p in query:
                     total = p['pvp_actual'] * p['cantidad__sum']
-                    pr = Producto_base.objects.get(id=int(p['inventario__producto__producto_base_id']))
+                    pr = Producto.objects.get(id=int(p['producto_id']))
+                    cli = User.objects.get(id=int(p['venta__cliente_id']))
                     data.append([
                         p['venta__fecha'].strftime("%d/%m/%Y"),
-                        pr.nombre,
+                        cli.get_full_name(),
+                        pr.producto_base.nombre,
+                        int(p['cantidad__sum']),
+                        format(p['pvp_actual'], '.2f'),
+                        format(total, '.2f'),
+                        format((float(total) * iva), '.2f'),
+                        format(((float(total) * iva) + float(total)), '.2f')
+                    ])
+            elif action == 'producto':
+                id = request.POST.get('id', '')
+                data = []
+                query = Detalle_venta.objects.values('venta__fecha', 'producto_id', 'pvp_actual',
+                                                     'venta__cliente_id').order_by().annotate(
+                    Sum('cantidad')).filter(venta__estado=1, producto_id=id)
+
+                for p in query:
+                    total = p['pvp_actual'] * p['cantidad__sum']
+                    pr = Producto.objects.get(id=int(p['producto_id']))
+                    cli = User.objects.get(id=int(p['venta__cliente_id']))
+                    data.append([
+                        p['venta__fecha'].strftime("%d/%m/%Y"),
+                        cli.get_full_name(),
+                        pr.producto_base.nombre,
                         int(p['cantidad__sum']),
                         format(p['pvp_actual'], '.2f'),
                         format(total, '.2f'),
@@ -685,7 +712,8 @@ class report(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'No ha seleccionado una opcion'
         except Exception as e:
-            data['error'] = 'No ha seleccionado una opcion'
+            print(e)
+            data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
@@ -695,6 +723,8 @@ class report(ValidatePermissionRequiredMixin, ListView):
         data['titulo'] = 'Reporte de Ventas por productos'
         data['empresa'] = empresa
         data['titulo_lista'] = 'Ventas por productos'
+        data['year'] = year
+        data['producto'] = producto
         return data
 
 

@@ -2,10 +2,37 @@
 {% load static %}
 {% block elements %}
     <br>
-    <div class="row">
+     <div class="row">
         <div class="col-lg-4">
+            <label for="search">Buscar por:</label>
+            <select name="search" id="search" class="form-control select2">
+                <option value="0">Año</option>
+                <option value="1">Rango de fecha</option>
+                <option value="2">Producto</option>
+            </select>
+
+        </div>
+
+        <div class="col-lg-4" id="year_seccion">
+            <label for="year1">Año:</label>
+            <select name="year" id="year1" class="form-control select2">
+                {% for y in year %}
+                    <option value="{{ y.year }}">{{ y.year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-4" id="range_date" style="display: none">
             <label for="fecha"><strong>Rango de Fechas:</strong></label>
-            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm"></div>
+            <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm">
+        </div>
+          <div class="col-lg-4" id="producto_seccion" style="display: none">
+            <label for="producto_id">Producto:</label>
+            <select name="year" id="producto_id" class="form-control select2">
+                {% for p in producto %}
+                    <option value="{{ p.id }}">{{ p.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
     <br>
 {% endblock %}
@@ -13,9 +40,10 @@
     <thead>
     <tr>
         <th>Fecha</th>
+        <th>Proveedor</th>
         <th>Material</th>
         <th>Cantidad</th>
-        <th>p. Compra</th>
+        <th>Precio Compra</th>
         <th>Total</th>
     </tr>
     </thead>
@@ -23,19 +51,19 @@
     </tbody>
     <tfoot>
     <tr>
-        {#        <th></th>#}
-        <th style="text-align:center"><strong>Totales:</strong></th>
-        <th style="text-align:center"><strong>Cantidad:</strong></th>
-        <th style="text-align:center"></th>
-        <th style="text-align:center"><strong>Total:</strong></th>
-        <th style="text-align:center"></th>
+                <th></th>
+        <th><strong>Totales:</strong></th>
+        <th><strong>Cantidad:</strong></th>
+        <th></th>
+        <th><strong>Total:</strong></th>
+        <th></th>
     </tr>
     </tfoot>
 {% endblock %}
 
 {% block extra %}
     <script src="{% static 'apps/compra/compra_report_product.js' %}"></script>
-    <script src="{% static 'apps/funtions.js' %}"></script>
+{#    <script src="{% static 'apps/funtions.js' %}"></script>#}
 {% endblock %}
 {% block javascript %}
 

@@ -4,7 +4,7 @@ var logotipo;
 
 function datatable_fun() {
     datatable = $("#datatable").DataTable({
-        // responsive: true,
+        responsive: true,
         destroy: true,
         scrollX: true,
         autoWidth: false,
@@ -52,14 +52,17 @@ function datatable_fun() {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    var span;
+                    console.log(row);
+                    var span = '';
                     if (row.estado === 1) {
-                        span = '<span class="badge bg-success" style="color: white">' + data + '</span>';
+                        span +='<span class="badge bg-success" style="color: white">' + data + '</span> '+' ';
                     } else if (row.estado === 0) {
-                        span = '<span class="badge bg-danger" style="color: white">' + data + '</span>';
+                        span +='<span class="badge bg-danger" style="color: white">' + data + '</span> '+' ';
                     } else if (row.estado === 2) {
-                        span = '<span class="badge bg-warning" style="color: white">' + data + '</span>';
+                         span +='<span class="badge bg-warning" style="color: white">' + data + '</span> '+' ';
                     }
+                    span +='<span class="badge bg-info" style="color: white">' + row.tipo_venta + '</span> '+' ';
+                    span +='<span class="badge bg-secondary" style="color: white">' + row.tipo_pago + '</span> '+' ';
                     return span;
                 }
             },

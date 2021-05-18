@@ -2,13 +2,13 @@
 {% load static %}
 {% block elements %}
     <br>
-         <div class="row">
+    <div class="row">
         <div class="col-lg-4">
             <label for="search">Buscar por:</label>
             <select name="search" id="search" class="form-control select2">
                 <option value="0">Año</option>
                 <option value="1">Rango de fecha</option>
-                <option value="2">Producto</option>
+                <option value="2">Cliente</option>
             </select>
 
         </div>
@@ -25,10 +25,10 @@
             <label for="fecha"><strong>Rango de Fechas:</strong></label>
             <input type="text" name="fecha" id="fecha" class="form-control form-control-sm input-sm">
         </div>
-          <div class="col-lg-4" id="producto_seccion" style="display: none">
-            <label for="producto_id">Producto:</label>
-            <select name="year" id="producto_id" class="form-control select2">
-                {% for p in producto %}
+        <div class="col-lg-4" id="producto_seccion" style="display: none">
+            <label for="cliente_id">Cliente:</label>
+            <select name="cliente" id="cliente_id" class="form-control select2">
+                {% for p in cliente %}
                     <option value="{{ p.id }}">{{ p.nombre }}</option>
                 {% endfor %}
             </select>
@@ -39,14 +39,13 @@
 {% block table %}
     <thead>
     <tr>
-        <th>Fecha</th>
         <th>Cliente</th>
-        <th>Nombre</th>
-        <th>Cantidad</th>
-        <th>Pvp</th>
-        <th>Total (sin Iva)</th>
-        <th>Iva Generado</th>
-        <th>Total (con Iva)</th>
+        <th>Fecha</th>
+        <th>Fecha pago</th>
+        <th>Letra</th>
+        <th>Valor Pagado</th>
+        <th>Saldo</th>
+        <th>Estado</th>
     </tr>
     </thead>
     <tbody>
@@ -55,9 +54,8 @@
     <tr>
         <th></th>
         <th></th>
-        <th style="text-align:center" ><strong>Cantidad:</strong></th>
-        <th style="text-align:center"></th>
         <th style="text-align:center"><strong>Totales:</strong></th>
+        <th style="text-align:center"><strong></strong></th>
         <th style="text-align:center"></th>
         <th style="text-align:center"></th>
         <th style="text-align:center"></th>
@@ -65,13 +63,13 @@
     </tfoot>
 {% endblock %}
 {% block table_footer %}
-<a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
+    <a type="button" class="btn btn-success btn-sm" style="color: white" id="reload" onclick=" location.reload();">
         <i class="fas fa-sync-alt"></i> Actualizar
     </a>
 {% endblock %}
 
 {% block extra %}
-    <script src="{% static 'apps/venta/report_product.js' %}"></script>
+    <script src="{% static 'apps/ctas_cobrar/report.js' %}"></script>
 {% endblock %}
 {% block javascript %}
 

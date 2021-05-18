@@ -16,7 +16,8 @@ estado = (
 )
 tipo_pago = (
     (0, 'CONTADO'),
-    (1, 'CREDITO')
+    (1, 'CREDITO'),
+    (2, 'NO ACREDITADO')
 )
 
 tipo_venta = (
@@ -41,6 +42,7 @@ class Venta(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['estado_display'] = self.get_estado_display()
+        item['tipo_venta'] = self.get_tipo_venta_display()
         item['tipo_pago'] = self.get_tipo_pago_display()
         item['cliente'] = self.cliente.toJSON()
         return item

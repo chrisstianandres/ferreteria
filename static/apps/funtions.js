@@ -1,14 +1,14 @@
 var tbl_productos;
-// const toDataURL = url => fetch(url).then(response => response.blob())
-//     .then(blob => new Promise((resolve, reject) => {
-//         const reader = new FileReader();
-//         reader.onloadend = () => resolve(reader.result);
-//         reader.onerror = reject;
-//         reader.readAsDataURL(blob)
-//     }));
-// toDataURL('/media/logo_pdf.png').then(dataUrl => {
-//     logotipo = dataUrl;
-// });
+const toDataURL = url => fetch(url).then(response => response.blob())
+    .then(blob => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob)
+    }));
+toDataURL('/media/logo_pdf.png').then(dataUrl => {
+    logotipo = dataUrl;
+});
 
 function mostrar() {
     $('#div_table').removeClass('col-xl-12').addClass('col-xl-8 col-lg-12');
