@@ -30,6 +30,16 @@
         <!-- Divider -->
         <hr class="sidebar-divider">
 
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item active">
+            <a class="nav-link" href="{% url 'sitio:' %}">
+                <i class="fa fa-eye"></i>
+                <span>Ver sitio Web</span></a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
         <!-- Heading -->
         <div class="sidebar-heading">
             Gestión
@@ -69,6 +79,11 @@
             <a class="nav-link" href="{% url 'gasto:lista' %}">
                 <i class="fas fa-dollar-sign"></i>
                 <span>Gastos</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'sitio:configurar' %}">
+                <i class="fas fa-paste"></i>
+                <span>Sitio Web</span></a>
         </li>
         <!-- Nav Item - Utilities Collapse Menu -->
 

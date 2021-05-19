@@ -6,7 +6,6 @@ class SitioWeb(models.Model):
     titulo = models.CharField(max_length=50)
     mision = models.CharField(max_length=500)
     vision = models.CharField(max_length=500)
-    mapa = models.CharField(max_length=10000)
 
     def __str__(self):
         return '%s' % self.titulo

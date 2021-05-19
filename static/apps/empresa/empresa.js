@@ -57,12 +57,11 @@ $(document).ready(function () {
                 type: 'POST',
                 url: '/ubicacion/lista',
                 data: function (params) {
-                    var queryParameters = {
+                    return {
                         term: params.term,
                         'action': 'provincia',
                         'id': ''
                     };
-                    return queryParameters;
                 },
                 processResults: function (data) {
                     return {

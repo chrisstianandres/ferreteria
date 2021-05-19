@@ -2,7 +2,6 @@ var key, pagar;
 $(function () {
 
     pagar = localStorage.getItem('pagar');
-    console.log(pagar);
     key = $('#key').val();
     jQuery.validator.addMethod("lettersonly", function (value, element) {
         return this.optional(element) || /^[a-z," "]+$/i.test(value);
@@ -86,7 +85,7 @@ $(function () {
             }, function () {
                 $('input[name="username"]').val("");
                 $('input[name="password"]').val("");
-                 reset_form('form');
+                 reset('#form');
 
             });
         }

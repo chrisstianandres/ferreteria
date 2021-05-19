@@ -567,10 +567,6 @@ def grap(request):
                     'data': dataChart2(),
                     'titulo': str('Total de ventas del mes de' + " " + str(fecha.strftime("%B"))),
                 },
-                # 'chart3': {
-                #     'compras': datachartcontr(),
-                #     'ventas': grap_data()
-                # },
                 'tarjets': {
                     'data': data_tarjets()
                 }
@@ -624,7 +620,7 @@ def dataChart2():
     for p in producto:
         total = Detalle_venta.objects.filter(venta__fecha__year=year,
                                              venta__fecha__month=month,
-                                             inventario__producto_id=p).aggregate(
+                                             producto_id=p).aggregate(
             r=Coalesce(Sum('venta__total'), 0)).get('r')
         data.append({
             'name': p.producto_base.nombre,

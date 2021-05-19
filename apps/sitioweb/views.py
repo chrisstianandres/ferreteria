@@ -82,7 +82,6 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 web = SitioWeb.objects.first()
                 f = SitiowebForm(request.POST, instance=web)
                 data = self.save_data(f)
-                return HttpResponseRedirect('/')
         except ObjectDoesNotExist:
             f = SitiowebForm(request.POST)
             data = self.save_data(f)

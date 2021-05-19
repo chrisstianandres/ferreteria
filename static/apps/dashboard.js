@@ -109,7 +109,7 @@ function graficos() {
                 borderWidth: 1,
                 xPadding: 15,
                 yPadding: 15,
-                displayColors: false,
+                displayColors: true,
                 caretPadding: 10,
             },
             legend: {
@@ -118,87 +118,6 @@ function graficos() {
             cutoutPercentage: 80,
         },
     });
-
-    // grapie = Highcharts.chart('grapie', {
-    //     chart: {
-    //         plotBackgroundColor: null,
-    //         plotBorderWidth: 0,
-    //         plotShadow: false
-    //     },
-    //     title: {
-    //         text: 'Porcentaje de venta por Producto',
-    //     },
-    //     tooltip: {
-    //         pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    //     },
-    //     accessibility: {
-    //         point: {
-    //             valueSuffix: '%'
-    //         }
-    //     },
-    //     plotOptions: {
-    //         pie: {
-    //             dataLabels: {
-    //                 enabled: true,
-    //                 distance: -50,
-    //                 style: {
-    //                     fontWeight: 'bold',
-    //                     color: 'white'
-    //                 }
-    //             },
-    //             startAngle: -90,
-    //             endAngle: 90,
-    //             center: ['50%', '75%'],
-    //             size: '110%'
-    //         }
-    //     },
-    // });
-    // chart = Highcharts.chart('container2', {
-    //     chart: {
-    //         inverted: true,
-    //         polar: false
-    //     },
-    //
-    //     title: {
-    //         text: 'Total de Ventas del año'
-    //     },
-    //     xAxis: {
-    //         categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-    //     },
-    //     yAxis: {
-    //         title: {
-    //             text: 'Valores'
-    //         }
-    //     },
-    //
-    // });
-    // graph = Highcharts.chart('container3', {
-    //     chart: {
-    //         type: 'line'
-    //     },
-    //     title: {
-    //         text: ''
-    //     },
-    //     subtitle: {
-    //         text: 'Contraste de compras y ventas'
-    //     },
-    //     xAxis: {
-    //         categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-    //     },
-    //     yAxis: {
-    //         title: {
-    //             text: 'Dolares $'
-    //         }
-    //     },
-    //     plotOptions: {
-    //         line: {
-    //             dataLabels: {
-    //                 enabled: true
-    //             },
-    //             enableMouseTracking: false
-    //         }
-    //     },
-    // });
     $.ajax({
         url: '/venta/chart',
         type: 'POST',
@@ -207,28 +126,6 @@ function graficos() {
     }).done(function (data) {
         addData(myLineChart, data['dat'].titulo, data['dat'].data);
         addDataPie(myPieChart, data['chart2'].titulo, data['chart2'].data);
-
-        // chart.addSeries(data['dat']);
-        // grapie.addSeries(
-        //     {
-        //         type: 'pie',
-        //         name: 'Total',
-        //         innerSize: '50%',
-        //         data: data['chart2'].data
-        //     }
-        // );
-        // graph.addSeries(
-        //     {
-        //         name: 'Compras',
-        //         data: data['chart3'].compras
-        //     },
-        // );
-        // graph.addSeries(
-        //     {
-        //         name: 'Ventas',
-        //         data: data['chart3'].ventas
-        //     }
-        // );
         var tarjets = data['tarjets'];
         $('#ganacias').html('$' + tarjets['data'].ventas);
         $('#ganacias_anual').html('$' + tarjets['data'].ventas_anuales);
@@ -375,25 +272,26 @@ $(function () {
     if (user_tipo === 1) {
         // datatbles();
         graficos();
-    } else {
-        $('#venta_client').on('click', function () {
-            window.location.href = '/venta/lista'
-
-        });
-        $('#alquiler_client').on('click', function () {
-            window.location.href = '/alquiler/lista'
-
-        });
-        $('#rep_cliente').on('click', function () {
-            window.location.href = '/reparacion/lista'
-
-        });
-        $('#conf_cliente').on('click', function () {
-            window.location.href = '/confeccion/lista'
-
-        });
-
     }
+    // else {
+    //     $('#venta_client').on('click', function () {
+    //         window.location.href = '/venta/lista'
+    //
+    //     });
+    //     $('#alquiler_client').on('click', function () {
+    //         window.location.href = '/alquiler/lista'
+    //
+    //     });
+    //     $('#rep_cliente').on('click', function () {
+    //         window.location.href = '/reparacion/lista'
+    //
+    //     });
+    //     $('#conf_cliente').on('click', function () {
+    //         window.location.href = '/confeccion/lista'
+    //
+    //     });
+    //
+    // }
 
 
 });
