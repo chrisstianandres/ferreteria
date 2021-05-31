@@ -6,7 +6,7 @@ from apps.categoria.models import Categoria
 
 class Producto_base(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT)
-    nombre = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=50)
 
     def __str__(self):

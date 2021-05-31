@@ -105,7 +105,7 @@ class report(ValidatePermissionRequiredMixin, ListView):
                 action = request.POST['action']
                 if action == 'report':
                     data = []
-                    for c in Producto.objects.all():
+                    for c in Producto.objects.all().select_related('producto_base').select_related('presentacion'):
                         data.append(c.toJSON())
                 else:
                     data['error'] = 'No ha seleccionado una opcion'
@@ -265,7 +265,7 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                             f.add_error("presentacion", "Ya existe este producto con esta presentacion")
                             data['error'] = f.errors
                         else:
-                            if f.files['imagen']:
+                            if f.files:
                                 var = f.save()
                                 image = Image.open(var.imagen)
                                 size = (1000, 1000)
@@ -294,6 +294,11 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
             elif action == 'add_base':
                 f = Producto_baseForm(request.POST)
                 data = self.save_data(f)
+            elif action == 'edit_base':
+                pk = request.POST['id']
+                prod_base = Producto_base.objects.filter(id=pk).first()
+                f = Producto_baseForm(request.POST, instance=prod_base)
+                data = self.save_data(f)
             elif action == 'get':
                 data = []
                 pk = request.POST['id']
@@ -311,7 +316,8 @@ class Createview(ValidatePermissionRequiredMixin, CreateView):
                         f.add_error("presentacion", "Ya existe este producto con esta presentacion")
                         data['error'] = f.errors
                     else:
-                        if f.files['imagen']:
+
+                        if f.files:
                             var = f.save()
                             image = Image.open(var.imagen)
                             size = (1000, 1000)

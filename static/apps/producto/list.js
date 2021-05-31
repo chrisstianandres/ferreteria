@@ -1,12 +1,13 @@
 var logotipo;
 var datatable;
-var action;
+var action, action_base, pk_base;
 var pk;
 
 function datatable_fun() {
     datatable = $("#datatable").DataTable({
         responsive: true,
         autoWidth: false,
+        destroy:true,
         language: {
             url: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
         },
@@ -191,10 +192,10 @@ $(function () {
                 $('#id_des').val(null);
                 $('#id_cat').val(null);
                 $('#id_edit_producto').hide();
-                 $('#id_new_producto').show();
+                $('#id_new_producto').show();
             } else {
-                 $('#id_edit_producto').show();
-                 $('#id_new_producto').hide();
+                $('#id_edit_producto').show();
+                $('#id_new_producto').hide();
             }
 
         });
@@ -289,8 +290,8 @@ $(function () {
 
     $('#id_new_producto').on('click', function () {
         $('#Modal_prod').modal('show');
-        action = 'add';
-        pk = '';
+        action_base = 'add_base';
+        pk_base = '';
     });
     $('#id_new_categoria').on('click', function () {
         $('#Modal').modal('show');
@@ -307,8 +308,8 @@ $(function () {
     $('#form_prod').on('submit', function (e) {
         e.preventDefault();
         var parametros = new FormData(this);
-        parametros.append('action', 'add_base');
-        parametros.append('id', '');
+        parametros.append('action', action_base);
+        parametros.append('id', pk_base);
         var isvalid = $(this).valid();
         if (isvalid) {
             save_with_ajax2('Alerta',
@@ -380,12 +381,39 @@ $(function () {
                         $('select[name="presentacion"]').val('').trigger('change');
                         $('#check_image').html(
                             '<input type="file" name="imagen" accept="image/*" id="id_imagen">');
+                        // datatable.ajax.reload();
                     });
                 });
         }
     });
 
 
+    $('#id_edit_producto').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: '/producto/nuevo',
+            data: {
+                "id": $('#id_producto_base').val(),
+                'action': 'get'
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#Modal_prod').modal('show');
+                console.log(data);
+                $('#id_nombre_producto').val(data[0].nombre);
+                $('#id_descripcion').val(data[0].nombre);
+                var newOption = new Option(data[0]['categoria'].nombre, data[0]['categoria'].id, false, true);
+                $('#id_categoria').append(newOption).trigger('change');
+                action_base = 'edit_base';
+                pk_base = data[0]['id'];
+            },
+            error: function (xhr, status, data) {
+                alert(data);
+            },
+
+        });
+    });
 
     function check_image(data) {
         if (data.check === 1) {
@@ -402,7 +430,8 @@ $(function () {
         $('#id_des').val(data.producto_base.descripcion);
         $('#id_cat').val(data.producto_base.categoria.nombre);
         $('#id_pcp').val(data.pcp);
-        $('select[name="producto_base"]').val(data.producto_base.id).trigger('change');
+        var newOption = new Option(data.producto_base.nombre, data.producto_base.id, false, true);
+        $('#id_producto_base').append(newOption).trigger('change');
         $('select[name="presentacion"]').val(data.presentacion.id).trigger('change');
 
     }
