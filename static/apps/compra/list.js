@@ -68,7 +68,7 @@ function datatable_fun() {
                 width: "15%",
                 render: function (data, type, row) {
                     var detalle = '<a type="button" rel="detalle" class="btn btn-success btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Detalle de Productos" ><i class="fa fa-search"></i></a>' + ' ';
-                    var devolver = row.estado = 1 ? '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ':'';
+                    var devolver = row.estado === 1 ? '<a type="button" rel="devolver" class="btn btn-danger btn-xs btn-round" style="color: white" data-toggle="tooltip" title="Devolver"><i class="fa fa-times"></i></a>' + ' ' : '';
                     return detalle + devolver;
                 }
             },
@@ -76,7 +76,7 @@ function datatable_fun() {
                 targets: [-2],
                 class: 'text-center',
                 render: function (data, type, row) {
-                    return row.estado === 1 ? '<span class = "badge badge-success" style="color: white "> Finalizada </span>':
+                    return row.estado === 1 ? '<span class = "badge badge-success" style="color: white "> Finalizada </span>' :
                         '<span class = "badge badge-danger" style="color: white "> Devuelta </span>';
                 }
             },
@@ -129,7 +129,7 @@ $(function () {
             $('.tooltip').remove();
             var tr = datatable.cell($(this).closest('td, li')).index();
             var data = datatable.row(tr.row).data();
-            var parametros = {'id': data['4']};
+            var parametros = {'id': data.id, 'action': 'estado'};
             save_estado('Alerta',
                 '/compra/estado', 'Esta seguro que desea devolver esta compra?', parametros,
                 function () {

@@ -1,30 +1,25 @@
 import json
+import os
 from datetime import datetime, timedelta
 
+from django.conf import settings
+from django.contrib.staticfiles import finders
 from django.db import transaction
 from django.db.models import Sum
-from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.template.loader import get_template
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
+from xhtml2pdf import pisa
 
 from apps.backEnd import nombre_empresa
 from apps.compra.forms import CompraForm, Detalle_CompraForm
 from apps.compra.models import Compra, Detalle_compra
 from apps.empresa.models import Empresa
-from apps.inventario.models import Inventario
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.producto.models import Producto
-from datetime import date
-import os
-from django.conf import settings
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from django.contrib.staticfiles import finders
-
 from apps.proveedor.forms import ProveedorForm
 
 opc_icono = 'fa fa-shopping-bag'
@@ -56,9 +51,9 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                 start = request.POST['start_date']
                 end = request.POST['end_date']
                 if start and end:
-                    compra = Compra.objects.filter(fecha_compra__range=[start, end])
+                    compra = Compra.objects.filter(fecha_compra__range=[start, end]).select_related('proveedor')
                 else:
-                    compra = Compra.objects.all()
+                    compra = Compra.objects.all().select_related('proveedor')
                 for c in compra:
                     data.append(c.toJSON())
             elif action == 'detalle':
@@ -178,6 +173,46 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         data['titulo_lista'] = 'Detalle de productos'
         data['titulo_detalle'] = 'Datos de la factura'
         return data
+
+
+class DeleteView(ValidatePermissionRequiredMixin, TemplateView):
+    model = Compra
+    template_name = 'front-end/compra/form.html'
+    permission_required = 'compra.delete_compra'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        action = request.POST['action']
+        try:
+            if action == 'estado':
+                id = request.POST['id']
+                if id:
+                    with transaction.atomic():
+                        es = self.model.objects.get(id=id)
+                        es.estado = 0
+                        key = 0
+                        for i in Detalle_compra.objects.filter(compra_id=id):
+                            producto = Producto.objects.get(id=i.producto.id)
+                            if producto.stock <= i.cantidad:
+                                key = 1
+                                data['error'] = 'Uno o varios productos ya fueron vendidos de esta compra'
+                                break
+                        if key == 0:
+                            for i in Detalle_compra.objects.filter(compra_id=id):
+                                producto = Producto.objects.get(id=i.producto_id)
+                                producto.stock -= i.cantidad
+                                producto.save()
+                        es.save()
+            else:
+                data['error'] = 'No ha seleccionado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
 
 
 @csrf_exempt
