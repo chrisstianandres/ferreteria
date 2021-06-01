@@ -1,45 +1,39 @@
+import datetime as dt
+import json
 import locale
+import os
+from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
+from django.contrib.staticfiles import finders
+from django.db import transaction
+from django.db.models import Sum, Count, Q
+from django.db.models.functions import Coalesce
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+from django.template.loader import get_template
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import *
+from xhtml2pdf import pisa
 
+from apps.backEnd import nombre_empresa
 from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.compra.models import Compra
 from apps.cta_x_cbr.forms import Cta_cobrarForm
 from apps.cta_x_cbr.models import Cta_x_cobrar
 from apps.delvoluciones_venta.models import Devolucion
-from apps.inventario.models import Inventario
+from apps.empresa.models import Empresa
 from apps.mixins import ValidatePermissionRequiredMixin
-import json
-from datetime import datetime
-import datetime as dt
-
-from django.db import transaction
-from django.db.models import Sum, Count, Q
-from django.db.models.functions import Coalesce
-from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import *
-
-from apps.backEnd import nombre_empresa
 from apps.pago_cta_x_cbr.models import Pago_cta_x_cobrar
-
-from apps.producto_base.models import Producto_base
+from apps.producto.models import Producto
 from apps.user.forms import UserForm
 from apps.user.models import User
 from apps.venta.forms import Detalle_VentaForm, VentaForm
 from apps.venta.models import Venta, Detalle_venta
-from apps.empresa.models import Empresa
-from apps.producto.models import Producto
-
-import os
-from django.conf import settings
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from django.contrib.staticfiles import finders
 
 opc_icono = 'fa fa-shopping-basket '
 opc_entidad = 'Ventas'
@@ -96,7 +90,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         dev.fecha = datetime.now()
                         dev.save()
                         for i in Detalle_venta.objects.filter(venta_id=id):
-                            producto = Producto.objects.get(i.producto_id)
+                            producto = Producto.objects.get(id=i.producto_id)
                             producto.stock += i.cantidad
                             producto.save()
                         es.save()
@@ -187,7 +181,7 @@ class lista_cliente(ListView):
 class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     form_class = Venta
     template_name = 'front-end/venta/form.html'
-    permission_required = ('venta.add_venta', 'venta.change_venta')
+    permission_required = 'venta.add_venta'
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -298,14 +292,14 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
             elif action == 'list_list':
                 data = []
                 ids = json.loads(request.POST['ids'])
-                for c in Producto.objects.all().exclude(id__in=ids):
+                for c in Producto.objects.all().select_related('producto_base').select_related('presentacion').exclude(id__in=ids):
                     data.append(c.toJSON())
             elif action == 'search_no_stock':
                 ids = json.loads(request.POST['ids'])
                 data = []
                 term = request.POST['term']
                 query = Producto.objects.values('id', 'producto_base__nombre', 'presentacion__nombre'). \
-                    filter(producto_base__nombre__icontains=term)
+                    filter(producto_base__nombre__icontains=term).select_related('producto_base').select_related('presentacion')
                 for a in query.exclude(id__in=ids):
                     result = {'id': int(a['id']),
                               'text': str(a['producto_base__nombre']) + ' / ' + str(a['presentacion__nombre'])}
@@ -314,7 +308,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 data = []
                 ids = json.loads(request.POST['ids'])
                 term = request.POST['term']
-                query = Producto.objects.filter(producto_base__nombre__icontains=term, stock__gte=1)
+                query = Producto.objects.filter(producto_base__nombre__icontains=term, stock__gte=1).select_related('producto_base').select_related('presentacion')
                 for a in query.exclude(id__in=ids)[0:10]:
                     result = {'id': int(a.id), 'text': str(a.producto_base.nombre + ' / ' + str(a.presentacion.nombre))}
                     data.append(result)
@@ -622,10 +616,11 @@ def dataChart2():
                                              venta__fecha__month=month,
                                              producto_id=p).aggregate(
             r=Coalesce(Sum('venta__total'), 0)).get('r')
-        data.append({
-            'name': p.producto_base.nombre,
-            'y': float(total)
-        })
+        if total>1:
+            data.append({
+                'name': p.producto_base.nombre,
+                'y': float(total)
+            })
     return data
 
 

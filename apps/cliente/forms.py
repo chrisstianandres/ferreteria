@@ -94,6 +94,7 @@ class ClienteForm(forms.ModelForm):
                 usersave = User.objects.get(id=cliente.id)
                 usersave.groups.add(grupo)
                 usersave.save()
+                data = cliente
             else:
                 u.save()
         except Exception as e:

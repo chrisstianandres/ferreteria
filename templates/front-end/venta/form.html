@@ -86,7 +86,11 @@
         <div class="form-group col-lg-12">
             <label class="col-form-label"><strong>{{ form.tipo_pago.label_tag }}</strong></label>
             <div class="input-group">
-                {{ form.tipo_pago }}
+                <select name="tipo_pago" class="form-control" style="width: 100%"
+                        data-toggle="tooltip" id="id_tipo_pago" aria-hidden="true">
+                    <option value="0" selected="">CONTADO</option>
+                    <option value="1">CREDITO</option>
+                </select>
             </div>
         </div>
         <div id="credito" style="display:none">

@@ -83,7 +83,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
                 data = self.save_data(f)
             elif action == 'delete':
                 pk = request.POST['id']
-                cli = Cliente.objects.get(pk=pk)
+                cli = User.objects.get(pk=pk)
                 cli.delete()
                 data['resp'] = True
             else:
@@ -95,7 +95,9 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
     def save_data(self, f):
         data = {}
         if f.is_valid():
-            f.save()
+            prod = f.save()
+            data['resp'] = True
+            data['cliente'] = prod.toJSON()
         else:
             data['error'] = f.errors
         return data

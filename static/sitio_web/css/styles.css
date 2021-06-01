@@ -24,7 +24,7 @@
     --white: #fff;
     --gray: #6c757d;
     --gray-dark: #343a40;
-    --primary: #fed136;
+    --primary: rgba(255, 4, 4, 0.61);
     --secondary: #6c757d;
     --success: #28a745;
     --info: #17a2b8;
@@ -2534,14 +2534,14 @@ fieldset:disabled a.btn {
 
 .btn-primary {
     color: #fff;
-    background-color: #fed136;
-    border-color: #fed136;
+    background-color: #d6000c;
+    border-color: #d6000c;
 }
 
 .btn-primary:hover {
     color: #fff;
-    background-color: #fec810;
-    border-color: #fec503;
+    background-color: #91000a;
+    border-color: #91000a;
 }
 
 .btn-primary:focus, .btn-primary.focus {
@@ -10671,12 +10671,12 @@ img::-moz-selection {
     font-size: 0.75rem;
     color: #fff;
     text-transform: uppercase;
-    background-color: #fed136;
+    background-color: #d6000c;
     border: 0;
 }
 
 #mainNav .navbar-brand {
-    color: #fed136;
+    color: #d6000c;
     font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     font-weight: 700;
     letter-spacing: 0.0625em;
@@ -10695,7 +10695,7 @@ img::-moz-selection {
 }
 
 #mainNav .navbar-nav .nav-item .nav-link.active, #mainNav .navbar-nav .nav-item .nav-link:hover {
-    color: #fed136;
+    color: #d6000c;
 }
 
 @media (min-width: 992px) {
@@ -10807,7 +10807,7 @@ header.masthead .masthead-heading {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(254, 209, 54, 0.9);
+    background: rgba(254, 0, 12, 0.64);
     align-items: center;
     justify-content: center;
     opacity: 0;
@@ -10954,7 +10954,7 @@ header.masthead .masthead-heading {
     color: white;
     border: 7px solid #e9ecef;
     border-radius: 100%;
-    background-color: #fed136;
+    background-color: #d6000c;
 }
 
 .timeline > li .timeline-image h4 {
