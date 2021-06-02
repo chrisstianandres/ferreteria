@@ -66,7 +66,7 @@
 </p>
 <p>
     <b>FECHA DE VENTA:</b> {{ sale.fecha }}<br>
-    <b>CLIENTE:</b> {{ sale.cliente.nombres|upper }}&nbsp;{{ sale.cliente.apellidos|upper }}<br>
+    <b>CLIENTE:</b> {{ sale.cliente.get_full_name|upper }}<br>
     <b>CEDULA:</b> {{ sale.cliente.cedula }}<br>
 
 </p>
@@ -84,9 +84,9 @@
     <tbody>
     {% for d in det_sale %}
         <tr {% if forloop.first %}style="padding-top: 3px;" {% endif %}>
-            <td>{{ d.producto.producto.producto_base.nombre }}</td>
-            <td>{{ d.producto.producto.producto_base.categoria.nombre }}</td>
-            <td>{{ d.producto.producto.presentacion.nombre }}</td>
+            <td>{{ d.producto.producto_base.nombre }}</td>
+            <td>{{ d.producto.producto_base.categoria.nombre }}</td>
+            <td>{{ d.producto.presentacion.nombre }}</td>
             <td style="text-align: center;">{{ d.cantidad }}</td>
             <td class="text-center">${{ d.pvp }}</td>
             <td style="text-align: center;">${{ d.subtotal }}</td>

@@ -300,3 +300,23 @@ class UserForm_profile(forms.ModelForm):
             'direccion': forms.Textarea(),
 
         }
+
+
+class GroupForm(forms.ModelForm):
+    # constructor
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+            self.fields['name'].widget.attrs = {
+                'class': 'form-control form-control-sm input-sm'}
+            self.fields['permissions'].widget.attrs = {
+                'class': 'form-control form-control-sm input-sm select2', 'multiple': 'multiple'}
+
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions']
+        labels = {'name': 'Nombre', 'permissions': 'Permisos'}
+        widgets = {'name': forms.TextInput()}

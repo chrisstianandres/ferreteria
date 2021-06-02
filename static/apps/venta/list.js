@@ -52,7 +52,6 @@ function datatable_fun() {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    console.log(row);
                     var span = '';
                     if (row.estado === 1) {
                         span +='<span class="badge bg-success" style="color: white">' + data + '</span> '+' ';
@@ -147,7 +146,7 @@ $(function () {
             var data = datatable.row(tr.row).data();
             var parametros = {'id': data.id, 'action': 'pagar'};
             save_estado('Alerta',
-                window.location.pathname, 'Esta seguro que desea realizar el pago de esta venta de $ <strong>' + data.transaccion.total + '</strong>?', parametros,
+                window.location.pathname, 'Esta seguro que desea realizar el pago de esta venta de $ <strong>' + data.total + '</strong>?', parametros,
                 function () {
                     menssaje_ok('Exito!', 'Exito al realizar el pago de esta venta', 'far fa-smile-wink', function () {
                         datatable.ajax.reload(null, false);

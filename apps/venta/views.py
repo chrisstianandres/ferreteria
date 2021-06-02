@@ -59,17 +59,16 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             if action == 'list':
                 data = []
                 if request.user.tipo == 1:
-                    query = Venta.objects.all()
+                    query = Venta.objects.all().select_related('cliente')
                 else:
-                    query = Venta.objects.filter(cliente_id=request.user.id)
-                    print(query)
+                    query = Venta.objects.filter(cliente_id=request.user.id).select_related('cliente')
                 for c in query:
                     data.append(c.toJSON())
             elif action == 'detalle':
                 id = request.POST['id']
                 if id:
                     data = []
-                    result = Detalle_venta.objects.filter(venta_id=id)
+                    result = Detalle_venta.objects.filter(venta_id=id).select_related('venta').select_related('producto')
                     for p in result:
                         data.append({
                             'producto': p.producto.producto_base.nombre,
@@ -89,7 +88,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
                         dev.venta_id = id
                         dev.fecha = datetime.now()
                         dev.save()
-                        for i in Detalle_venta.objects.filter(venta_id=id):
+                        for i in Detalle_venta.objects.filter(venta_id=id).select_related('producto'):
                             producto = Producto.objects.get(id=i.producto_id)
                             producto.stock += i.cantidad
                             producto.save()
@@ -509,16 +508,13 @@ class printpdf(View):
     def pvp_cal(self, *args, **kwargs):
         data = []
         try:
-            result = Detalle_venta.objects.filter(venta_id=self.kwargs['pk']).values(
-                'inventario__producto_id',
-                'cantidad', 'pvp_actual', 'subtotal'). \
-                annotate(Count('inventario__producto_id'))
+            result = Detalle_venta.objects.filter(venta_id=self.kwargs['pk'])
             for i in result:
-                pb = Producto.objects.get(id=int(i['inventario__producto_id']))
-                item = {'producto': {'producto': pb.toJSON()}}
-                item['pvp'] = format(i['pvp_actual'], '.2f')
-                item['cantidad'] = i['cantidad']
-                item['subtotal'] = i['subtotal']
+                print(i.producto.toJSON())
+                item = i.toJSON()
+                # item['pvp'] = format(i['pvp_actual'], '.2f')
+                # item['cantidad'] = i['cantidad']
+                # item['subtotal'] = i['subtotal']
                 data.append(item)
         except:
             pass

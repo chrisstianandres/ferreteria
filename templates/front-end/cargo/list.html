@@ -1,0 +1,70 @@
+{% extends 'front-end/list.html' %}
+{% load static %}
+{% block table %}
+    <thead>
+    <tr>
+        <th style="width: 15%">ID</th>
+        <th style="width: 15%">Nombres</th>
+        <th class="text-center" style="width: 10%"><em class="fa fa-cog"></em></th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+{% endblock %}
+{% block modal %}
+    <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle"><i class="fas fa-cart-arrow-down"></i> Permisos
+                        del grupo </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form_save">
+                    <div id="caja" style="display: none">
+                        <div class="form-group col-lg-12">
+                            <div class="col-lg-12">
+                                <p><label for="nombre">Nombre del Grupo:</label>
+                                    <input type="text" name="nombre" placeholder="Ingrese un nombre"
+                                           class="form-control" id="nombre"></p>
+                            </div>
+                            <br><br>
+                            <h3>Permisos del grupo</h3>
+                        </div>
+                    </div>
+                    </form>
+                    <table class="table" id="tbldetalle">
+                        <thead>
+                        <tr>
+                            <th>Modulo</th>
+                            <th>Ver</th>
+                            <th>Agregar</th>
+                            <th>Editar</th>
+                            <th>Eliminar</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer" style="display: none" id="footer_modal">
+                    <a type="button" class="btn btn-success btn-sm" id="save" style="color: white">
+                        <i class="fa fa-save" aria-hidden="true"></i> Guardar
+                    </a>
+                    <a type="button" class="btn btn-danger btn-sm" onclick="$('#Modal').modal('hide');">
+                        <i class="fa fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra %}
+    <script src="{% static 'apps/cargo/list.js' %}"></script>
+    <script src="{% static 'apps/cargo/form.js' %}"></script>
+{% endblock %}
