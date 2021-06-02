@@ -510,7 +510,6 @@ class printpdf(View):
         try:
             result = Detalle_venta.objects.filter(venta_id=self.kwargs['pk'])
             for i in result:
-                print(i.producto.toJSON())
                 item = i.toJSON()
                 # item['pvp'] = format(i['pvp_actual'], '.2f')
                 # item['cantidad'] = i['cantidad']
@@ -523,19 +522,26 @@ class printpdf(View):
     def get(self, request, *args, **kwargs):
         try:
             template = get_template('front-end/report/pdf.html')
+            sale = Venta.objects.get(pk=self.kwargs['pk'])
+            if sale.tipo_pago == 1:
+                cta = Cta_x_cobrar.objects.get(venta_id=sale.id)
+            else:
+                cta = Cta_x_cobrar.objects.first()
             context = {'title': 'Comprobante de Venta',
-                       'sale': Venta.objects.get(pk=self.kwargs['pk']),
+                       'sale': sale,
                        'empresa': Empresa.objects.first(),
                        'det_sale': self.pvp_cal(),
-                       'icon': 'media/imagen.PNG',
+                       'cta': cta,
                        }
+
             html = template.render(context)
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename="report.pdf"'
             pisa_status = pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
             return response
-        except:
+        except Exception as e:
             pass
+            print(e)
         return HttpResponseRedirect(reverse_lazy('venta:lista'))
 
 

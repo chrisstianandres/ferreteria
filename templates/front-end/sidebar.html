@@ -3,7 +3,8 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" {% if request.user.tipo == 1 %}href="{% url 'menu' %}" {% endif %} >
+    <a class="sidebar-brand d-flex align-items-center justify-content-center"
+       {% if request.user.tipo == 1 %}href="{% url 'menu' %}" {% endif %}>
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-tools"></i>
         </div>
@@ -46,39 +47,48 @@
         </div>
 
         <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'cliente:lista' %}">
-                <i class="fa fa-users"></i>
-                <span>Clientes</span></a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'proveedor:lista' %}">
-                <i class="fas fa-toolbox"></i>
-                <span>Proveedores</span></a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'producto:lista' %}">
-                <i class="fas fa-fw fa-wrench"></i>
-                <span>Productos</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'categoria:lista' %}">
-                <i class="fab fa-buffer"></i>
-                <span>Categoria</span></a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'presentacion:lista' %}">
-                <i class="fas fa-truck-loading"></i>
-                <span>Presentacion</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'sitio:configurar' %}">
-                <i class="fas fa-paste"></i>
-                <span>Sitio Web</span></a>
-        </li>
+        {% if perms.cliente.view_cliente %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'cliente:lista' %}">
+                    <i class="fa fa-users"></i>
+                    <span>Clientes</span></a>
+            </li>
+        {% endif %}
+        {% if perms.proveedor.view_proveedor %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'proveedor:lista' %}">
+                    <i class="fas fa-toolbox"></i>
+                    <span>Proveedores</span></a>
+            </li>
+        {% endif %}
+        {% if perms.producto.view_producto %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'producto:lista' %}">
+                    <i class="fas fa-fw fa-wrench"></i>
+                    <span>Productos</span></a>
+            </li>
+        {% endif %}
+        {% if perms.categoria.view_categoria %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'categoria:lista' %}">
+                    <i class="fab fa-buffer"></i>
+                    <span>Categoria</span></a>
+            </li>
+        {% endif %}
+        {% if perms.presentacion.view_presentacion %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'presentacion:lista' %}">
+                    <i class="fas fa-truck-loading"></i>
+                    <span>Presentacion</span></a>
+            </li>
+        {% endif %}
+        {% if perms.sitioweb.view_sitioweb %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'sitio:configurar' %}">
+                    <i class="fas fa-paste"></i>
+                    <span>Sitio Web</span></a>
+            </li>
+        {% endif %}
         <!-- Nav Item - Utilities Collapse Menu -->
 
 
@@ -89,63 +99,76 @@
         <div class="sidebar-heading">
             Comercial
         </div>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'venta:lista' %}">
-                <i class="fas fa-hand-holding-usd"></i>
-                <span>Ventas</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'compra:lista' %}">
-                <i class="fas fa-shopping-bag"></i>
-                <span>Compras</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'ctas_cobrar:lista' %}">
-                <i class="fas fa-search-dollar"></i>
-                <span>Cuentas por Cobrar</span></a>
-        </li>
+        {% if perms.venta.view_venta %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'venta:lista' %}">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Ventas</span></a>
+            </li>
+        {% endif %}
+        {% if perms.compra.view_compra %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'compra:lista' %}">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Compras</span></a>
+            </li>
+        {% endif %}
+        {% if perms.cta_x_cobrar.view_cta_x_cobrar %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'ctas_cobrar:lista' %}">
+                    <i class="fas fa-search-dollar"></i>
+                    <span>Cuentas por Cobrar</span></a>
+            </li>
+        {% endif %}
         <hr class="sidebar-divider">
 
         <!-- Heading -->
-        <div class="sidebar-heading">
-            Reportes
-        </div>
-       <li class="nav-item">
-            <a class="nav-link" href="{% url 'venta:report_by_product' %}">
-                <i class="fas fa-shopping-bag"></i>
-                <span>Ventas</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'compra:report_by_product' %}">
-                <i class="fas fa-shopping-bag"></i>
-                <span>Compras</span></a>
-        </li>
-         <li class="nav-item">
-            <a class="nav-link" href="{% url 'ctas_cobrar:report' %}">
-                <i class="fas fa-shopping-bag"></i>
-                <span>Cuentas por cobrar</span></a>
-        </li>
-        <hr class="sidebar-divider">
-
+        {% if perms.cta_x_cobrar.view_cta_x_cobrar %}
+            <div class="sidebar-heading">
+                Reportes
+            </div>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'venta:report_by_product' %}">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Ventas</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'compra:report_by_product' %}">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Compras</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'ctas_cobrar:report' %}">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Cuentas por cobrar</span></a>
+            </li>
+            <hr class="sidebar-divider">
+        {% endif %}
         <!-- Heading -->
         <div class="sidebar-heading">
             Seguridad
         </div>
+        {% if perms.user.view_user %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'user:lista' %}">
                 <i class="fas fa-user-shield"></i>
                 <span>Usuarios</span></a>
         </li>
+             {% endif %}
+        {% if perms.group.view_group %}
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'compra:lista' %}">
+            <a class="nav-link" href="{% url 'grupos:lista' %}">
                 <i class="fas fa-users-cog"></i>
                 <span>Grupos</span></a>
         </li>
+            {% endif %}
+        {% if perms.databasebackups.view_databasebackups %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'database_backup:lista' %}">
                 <i class="fas fa-server"></i>
                 <span>Respaldos</span></a>
         </li>
+            {% endif %}
     {% else %}
         <hr class="sidebar-divider">
         <!-- Heading -->

@@ -196,23 +196,34 @@ class UpdateViewGroup(UpdateView):
                 grupo.name = datos['nombre']
                 grupo.save()
                 for p in datos['modelos']:
-                    if p['nombre'] == 'cargo':
+                    nombre = p['nombre']
+                    if nombre == 'cuentas por cobrar':
+                        p['nombre'] = 'cta_x_cobrar'
+                    elif nombre == 'respaldos':
+                        p['nombre'] = 'databasebackups'
+                    elif nombre == 'grupos':
                         p['nombre'] = 'group'
+                    elif nombre == 'tipo de gasto':
+                        p['nombre'] = 'tipo_gasto'
                     if p['add'] == 1:
                         add = '{}_{}'.format('add', p['nombre'])
                         permiso_add = Permission.objects.get(codename=add)
+                        print(1)
                         grupo.permissions.add(permiso_add.id)
                     if p['view'] == 1:
                         view = '{}_{}'.format('view', p['nombre'])
                         permiso_view = Permission.objects.get(codename=view)
+                        print(2)
                         grupo.permissions.add(permiso_view.id)
                     if p['change'] == 1:
                         change = '{}_{}'.format('change', p['nombre'])
                         permiso_change = Permission.objects.get(codename=change)
+                        print(3)
                         grupo.permissions.add(permiso_change.id)
                     if p['delete'] == 1:
                         delete = '{}_{}'.format('delete', p['nombre'])
                         permiso_delete = Permission.objects.get(codename=delete)
+
                         grupo.permissions.add(permiso_delete.id)
                     grupo.save()
                 data['resp'] = True
