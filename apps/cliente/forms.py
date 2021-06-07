@@ -97,6 +97,7 @@ class ClienteForm(forms.ModelForm):
                 data = cliente
             else:
                 u.save()
+                data = User.objects.get(id=u.id)
         except Exception as e:
             data['error'] = str(e)
             print(e)

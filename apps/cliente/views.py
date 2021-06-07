@@ -36,7 +36,7 @@ class lista(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'list':
                 data = []
-                for c in User.objects.filter(tipo=0):
+                for c in User.objects.filter(tipo=0).iterator():
                     data.append(c.toJSON())
             else:
                 data['error'] = 'No ha seleccionado una opcion'
@@ -75,12 +75,18 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         try:
             if action == 'add':
                 f = ClienteForm(request.POST)
-                data = self.save_data(f)
+                if User.objects.filter(email=f.data['email']):
+                    data['error'] = 'Ya existe un cliente con este correo'
+                else:
+                    data = self.save_data(f)
             elif action == 'edit':
                 pk = request.POST['id']
                 cliente = User.objects.get(pk=int(pk))
                 f = ClienteForm(request.POST, instance=cliente)
-                data = self.save_data(f)
+                if User.objects.filter(email=f.data['email']):
+                    data['error'] = 'Ya existe un cliente con este correo'
+                else:
+                    data = self.save_data(f)
             elif action == 'delete':
                 pk = request.POST['id']
                 cli = User.objects.get(pk=pk)
@@ -97,6 +103,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
         if f.is_valid():
             prod = f.save()
             data['resp'] = True
+            # print(prod)
             data['cliente'] = prod.toJSON()
         else:
             data['error'] = f.errors
