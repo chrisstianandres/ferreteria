@@ -71,7 +71,8 @@ $(function () {
                         location.href = '/';
                     }
 
-                } else {
+                }
+                else {
                     if (pagar === '1') {
                         setTimeout(function () {
                             location.href = '/venta/nuevo';

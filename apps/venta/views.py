@@ -463,7 +463,7 @@ def CrudView_online(request):
             data['form'] = VentaForm()
             data['form2'] = Detalle_VentaForm()
             data['detalle'] = []
-            user = Cliente.objects.get(cedula=request.user.cedula)
+            user = User.objects.get(cedula=request.user.cedula)
             data['user'] = user
             return render(request, 'front-end/venta/online.html', data)
     else:

@@ -5,7 +5,7 @@
     */
 
 var carro_respaldo, superuser = $('#superuser').val(), pagar;
-
+pagar = localStorage.getItem('pagar');
 var carrito = {
     items: {
         fecha_venta: '',
@@ -179,6 +179,9 @@ var carrito = {
     }
 };
 (function ($) {
+    if (pagar==='1'){
+         $('#carrito').modal('show');
+    }
     "use strict"; // Start of use strict
     $('[data-toggle="tooltip"]').tooltip();
     // Smooth scrolling using jQuery easing
@@ -253,6 +256,11 @@ var carrito = {
         }
     }
 
+    $(document).on('click', 'a[rel="pay"]', function (e) {
+        e.preventDefault();
+        if (carrito.items.productos.length === 0) return false;
+        localStorage.setItem('pagar', 1);
+    });
 
     $(document).on('click', 'button[name="vender"]', function (e) {
         e.preventDefault();

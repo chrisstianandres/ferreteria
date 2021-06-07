@@ -56,6 +56,7 @@ var ventas = {
                 {data: "producto_base.nombre"},
                 {data: "producto_base.categoria.nombre"},
                 {data: "presentacion.nombre"},
+                {data: "imagen"},
                 {data: "stock"},
                 {data: "cantidad"},
                 {data: "pvp"},
@@ -79,6 +80,14 @@ var ventas = {
                     orderable: false,
                     render: function (data, type, row) {
                         return '$' + parseFloat(data).toFixed(2);
+                    }
+                },
+                {
+                    targets: [-5],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" width="30" height="30" class="img-circle elevation-2" alt="">';
                     }
                 },
                 {
@@ -126,7 +135,13 @@ $(function () {
             var tr = tblventa.cell($(this).closest('td, li')).index();
             ventas.items.productos[tr.row].cantidad = cantidad;
             ventas.calculate();
-            $('td:eq(7)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+            $('td:eq(8)', tblventa.row(tr.row).node()).html('$' + ventas.items.productos[tr.row].subtotal.toFixed(2));
+        })
+    .on('click', '.img-circle', function () {
+            var tr = tblventa.cell($(this).closest('td, li')).index();
+            var data = tblventa.row(tr.row).data();
+            $('#Modal_imagen').modal('show');
+            $('#img_prod').html('<img src="' + data.imagen + '" width="100%" height="100%" class="img-circle elevation-2" alt="" rel="imagen">');
         });
     //remover todos los productos del detalle
     $('.btnRemoveall').on('click', function () {
