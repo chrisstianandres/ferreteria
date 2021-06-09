@@ -3,19 +3,18 @@ import json
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import Group
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, request
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, UpdateView, TemplateView
+from django.views.generic import ListView, UpdateView, TemplateView, View
 
 from apps.backEnd import nombre_empresa
-from apps.cliente.models import Cliente
 from apps.mixins import ValidatePermissionRequiredMixin
 from apps.producto.forms import GroupForm
-from apps.user.forms import UserForm, UserForm_online, UserForm_profile
+from apps.user.forms import UserForm, UserForm_profile
 from apps.user.models import User
-from apps.proveedor.models import Proveedor
 
 opc_icono = 'fas fa-user-shield'
 opc_entidad = 'Usuarios'
@@ -301,24 +300,6 @@ def estado(request):
     return JsonResponse(data)
 
 
-# def profile(request):
-#     empleado = User.objects.get(id=request.user.id)
-#     crud = '/user/profile'
-#
-#     if request.method == 'GET':
-#         form = UserForm_profile(instance=empleado)
-#         data['form'] = form
-#     else:
-#         form = UserForm_profile(request.POST, request.FILES, instance=empleado)
-#         if form.is_valid():
-#             form.save()
-#             return HttpResponseRedirect('/user/profile')
-#         else:
-#             data['form'] = form
-#     return render(request, 'front-end/user/profile.html', data)
-#     # return render(request, 'front-end/profile.html', data)
-
-
 class Profile(TemplateView):
     model = User
     form_class = UserForm_profile
@@ -419,3 +400,12 @@ def __validar_ced_ruc(nro, tipo):
     mod = total % base
     val = base - mod if mod != 0 else 0
     return val == d_ver
+
+
+class UserChangeGroup(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            request.session['group'] = Group.objects.get(pk=self.kwargs['pk'])
+        except:
+            pass
+        return HttpResponseRedirect(reverse_lazy('menu'))

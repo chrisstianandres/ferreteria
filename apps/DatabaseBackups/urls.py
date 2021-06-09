@@ -9,5 +9,5 @@ app_name = 'DatabaseBackup'
 urlpatterns = [
     path('nuevo', login_required(DatabaseBackupsCreateView.as_view()), name='nuevo'),
     path('lista', login_required(DatabaseBackupsListView.as_view()), name='lista'),
-    path('eliminar', login_required(views.eliminar), name='eliminar'),
+    path('eliminar/<int:id>', login_required(DatabaseBackupsDeleteView.as_view()), name='eliminar'),
 ]

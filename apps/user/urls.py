@@ -13,5 +13,6 @@ urlpatterns = [
     path('estado', login_required(views.estado), name='estado'),
     path('editar/<int:pk>', login_required(Updateview.as_view()), name='editar'),
     path('profile', login_required(Profile.as_view()), name='profile'),
+    path('change/group/<int:pk>/', UserChangeGroup.as_view(), name='user_change_group'),
 
 ]

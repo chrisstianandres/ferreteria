@@ -70,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'crum.CurrentRequestUserMiddleware',
 ]
 
 ROOT_URLCONF = 'ferreteria.urls'
@@ -159,3 +160,5 @@ STATICFILES_DIRS = [
 ]
 AUTH_USER_MODEL = 'user.User'
 LOGIN_URL = '/login'
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'

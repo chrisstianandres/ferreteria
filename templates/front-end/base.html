@@ -30,7 +30,7 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/select/1.3.1/css/select.bootstrap4.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <style>
         .btn-space {
             margin-right: 5px;
@@ -104,7 +104,9 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body">Seleccione "Cerrar sesión" a continuación si está listo para finalizar su sesión actual.</div>
+            <div class="modal-body">Seleccione "Cerrar sesión" a continuación si está listo para finalizar su sesión
+                actual.
+            </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
                 <a class="btn btn-danger" href="{% url 'logout' %}">Cerrar sesión</a>
@@ -164,6 +166,35 @@ setInterval(reloj, 1000);
 {% block javascript %}
 
 {% endblock %}
+
+<script>
+    {% if messages %}
+        let html = '<p>';
+        {% for message in messages %}
+            html += '{{ message }}<br>';
+        {% endfor %}
+        html += '</p>';
+        var obj = $.confirm({
+            theme: 'supervan',
+            icon: 'far fa-sad-tear',
+            title: 'Error!',
+            type: 'red',
+            content: html,
+            draggable: true,
+            buttons: {
+                info: {
+                    text: '<i class="fas fa-check"></i> Ok',
+                    btnClass: 'btn-blue'
+                },
+            }
+        });
+        Swal.fire({
+            title: 'Error!',
+            html: html,
+            icon: 'error'
+        });
+    {% endif %}
+</script>
 </body>
 
 </html>

@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, DeleteView
 
 from apps.DatabaseBackups.models import DatabaseBackups
 from apps.backEnd import nombre_empresa, JsonResponse
@@ -61,7 +61,7 @@ class DatabaseBackupsListView(ValidatePermissionRequiredMixin, ListView):
         return context
 
 
-class DatabaseBackupsCreateView(TemplateView):
+class DatabaseBackupsCreateView(ValidatePermissionRequiredMixin, TemplateView):
     template_name = 'front-end/databasebackups/create.html'
     success_url = reverse_lazy('database_backup:lista')
     permission_required = 'add_databasebackups'
@@ -116,12 +116,18 @@ class DatabaseBackupsCreateView(TemplateView):
         file = ''
         data = {}
         try:
-            db_name = connection.settings_dict['NAME']
+            db = connection.settings_dict['NAME']
+            db_name = '{}{}{}'.format("'", db, "'")
+            db_pass = connection.settings_dict['PASSWORD']
+            db_user = connection.settings_dict['USER']
+            db_host = connection.settings_dict['HOST']
             data_now = '{0:%Y_%m_%d}'.format(datetime.now())
             name_backup = "{}_{}.sql".format('backup', data_now)
-            script = 'mysqldump -u user_bd -p123456 {} >{}'.format(db_name, name_backup)
+            # script = 'mysqldump -u {} -h {} -p{} --set-gtid-purged=OFF --no-tablespaces {} > {}'.format(db_user, db_host, db_pass, db_name, name_backup)
+            script = 'mysqldump -u {} -h {} --set-gtid-purged=OFF --no-tablespaces {} > {}'.format(db_user, db_host, db_name, name_backup)
+            print(BASE_DIR)
             subprocess.run(script, shell=True)
-            file = os.path.join(BASE_DIR, name_backup)
+            file = os.path.join('/home/megacentroferretero/', name_backup)
             check = DatabaseBackups.objects.filter(fecha=datetime.now())
             if check:
                 data['error'] = 'Ya existe un respaldo realizado el dia de hoy'
@@ -131,6 +137,11 @@ class DatabaseBackupsCreateView(TemplateView):
                 db.archive.save(name_backup, File(open(file, 'rb')), save=False)
                 db.save()
         except Exception as e:
+            print('')
+            print('')
+            print('')
+            print(12)
+            print(e)
             data['error'] = str(e)
         finally:
             if len(file):
@@ -168,42 +179,35 @@ class DatabaseBackupsCreateView(TemplateView):
         context['action'] = 'add'
         return context
 
-# class DatabaseBackupsDeleteView(AccessModuleMixin, PermissionModuleMixin, DeleteView):
-#     model = DatabaseBackups
-#     template_name = 'databasebackups/delete.html'
-#     success_url = reverse_lazy('databasebackups_list')
-#     permission_required = 'delete_databasebackups'
-#
-#     @method_decorator(csrf_exempt)
-#     def dispatch(self, request, *args, **kwargs):
-#         return super().dispatch(request, *args, **kwargs)
-#
-#     def post(self, request, *args, **kwargs):
-#         data = {}
-#         try:
-#             self.get_object().delete()
-#         except Exception as e:
-#             data['error'] = str(e)
-#         return HttpResponse(json.dumps(data), content_type='application/json')
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['title'] = 'Notificación de eliminación'
-#         context['list_url'] = self.success_url
-#         return context
+class DatabaseBackupsDeleteView(ValidatePermissionRequiredMixin, DeleteView):
+    model = DatabaseBackups
+    template_name = 'front-end/databasebackups/backup_list.html'
+    permission_required = 'delete_databasebackups'
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            self.get_object().delete()
+        except Exception as e:
+            data['error'] = str(e)
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-@csrf_exempt
-def eliminar(request):
-    data = {}
-    try:
-        id = request.POST['id']
-        if id:
-            ps = DatabaseBackups.objects.get(pk=id)
-            ps.delete()
-            data['resp'] = True
-        else:
-            data['error'] = 'Ha ocurrido un error'
-    except Exception as e:
-        data['error'] = str(e)
-    return JsonResponse(data)
+# @csrf_exempt
+# def eliminar(request):
+#     data = {}
+#     try:
+#         id = request.POST['id']
+#         if id:
+#             ps = DatabaseBackups.objects.get(pk=id)
+#             ps.delete()
+#             data['resp'] = True
+#         else:
+#             data['error'] = 'Ha ocurrido un error'
+#     except Exception as e:
+#         data['error'] = str(e)
+#     return JsonResponse(data)

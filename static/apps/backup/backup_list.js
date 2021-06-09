@@ -48,15 +48,15 @@ $(function () {
                 targets: '_all',
                 class: 'text-center',
             },
-             {
+            {
                 targets: [-1],
                 render: function (data, type, row) {
                     var descargar = '<a type="button" class="btn btn-success btn-xs" data-toggle="tooltip"\n' +
                         '                       title="Descargar"\n' +
-                        '                       href="'+row.archive_path+ '" download="'+row.archive+'.slq"><i class="fas fa-download"></i></a>'+ ' ';
+                        '                       href="' + row.archive_path + '" download="' + row.archive + '.slq"><i class="fas fa-download"></i></a>' + ' ';
                     var eliminar = '<a type="button" rel="del" class="btn btn-danger btn-xs btn-round" ' +
                         'style="color: white" data-toggle="tooltip" title="Eliminar"><i class="fa fa-trash"></i></a>';
-                    return descargar+eliminar;
+                    return descargar + eliminar;
                 }
             },
         ]
@@ -69,19 +69,19 @@ $(function () {
             '/respaldos/eliminar', 'Esta seguro que desea eliminar este respaldo?', parametros,
             function () {
                 menssaje_ok('Exito!', 'Exito al eliminar el respaldo!', 'far fa-smile-wink', function () {
-                     datatable.ajax.reload(null,false);
+                    datatable.ajax.reload(null, false);
                 })
             });
     });
 
     function delete_All() {
-        if (! datatable.data().any()) return false;
+        if (!datatable.data().any()) return false;
         var parametros = {'action': 'delete_access_all'};
         save_estado('Alerta',
             window.location.pathname, 'Esta seguro que desea eliminar todos los respaldos?', parametros,
             function () {
                 menssaje_ok('Exito!', 'Exito al eliminar los respaldos!', 'far fa-smile-wink', function () {
-                    datatable.ajax.reload(null,false);
+                    datatable.ajax.reload(null, false);
                 })
             });
 
@@ -90,13 +90,53 @@ $(function () {
     $('#nuevo').on('click', function (e) {
         e.preventDefault();
         var parametros = {'action': 'add'};
-        save_estado('Alerta',
-            '/respaldos/nuevo', 'Esta seguro que desea realizar un respaldo de base de datos?', parametros,
-            function () {
-                menssaje_ok('Exito!', 'Exito al al generar el respaldo de base de datos!', 'far fa-smile-wink', function () {
-                    datatable.ajax.reload(null, false);
-                })
-            });
+        $.confirm({
+            theme: 'supervan',
+            type: 'red',
+            icon: 'fas fa-exclamation-circle',
+            title: 'Alerta!',
+            content: 'Esta seguro que desea realizar un respaldo de base de datos?',
+            columnClass: 'small',
+            draggable: true,
+            buttons: {
+                si: {
+                    text: '<i class="fas fa-check"></i> Si',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        let obj = $.confirm({
+                            icon: 'fa fa-spinner fa-spin',
+                            title: 'Working!',
+                            content: 'Sit back, we are processing your request!'
+                        });
+                        $.ajax({
+                            dataType: 'JSON',
+                            type: 'POST',
+                            url: '/respaldos/nuevo',
+                            data: parametros,
+                        }).done(function (data) {
+                            if (!data.hasOwnProperty('error')) {
+                                menssaje_ok('Exito!', 'Exito al al generar el respaldo de base de datos!', 'far fa-smile-wink', function () {
+                                    obj.close();
+                                    datatable.ajax.reload(null, false);
+                                });
+                                return false;
+                            }
+                            menssaje_error(data.error, data.content, 'fa fa-times-circle');
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            alert(textStatus + ': ' + errorThrown);
+                        });
+                        //
+
+                    }
+                },
+                no: {
+                    text: '<i class="fas fa-times"></i> No',
+                    btnClass: 'btn-red',
+                    action: function () {
+                    }
+                }
+            }
+        });
 
     })
 

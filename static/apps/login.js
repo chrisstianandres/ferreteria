@@ -53,10 +53,11 @@ $(function () {
             var parametros;
             parametros = {
                 'username': $('input[name="username"]').val(),
-                'password': $('input[name="password"]').val()
+                'password': $('input[name="password"]').val(),
+                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
             };
 
-            login('/connect/', parametros, function () {
+            login('/login/', parametros, function () {
                 window.$.dialog({
                     icon: 'fa fa-spinner fa-spin',
                     title: 'Iniciando Sesion!',
