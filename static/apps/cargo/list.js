@@ -45,10 +45,7 @@ function listar() {
         data: datos.items.modelos,
         columns: [
             {data: 'nombre'},
-            {data: 'view'},
-            {data: 'add'},
-            {data: 'change'},
-            {data: 'delete'},
+            {data: 'check'}
         ],
         columnDefs: [
             {
@@ -57,53 +54,9 @@ function listar() {
                 width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
-                    if (row.nombre === 'empresa' || row.nombre === 'devolucion' || row.nombre === 'inventario' || row.nombre === 'sitioweb' || row.nombre === 'reportes') {
-                        return ''
-                    } else {
-                        return data === 0 ? '<input type="checkbox" name="eliminar">' : '<input type="checkbox" checked="checked" name="eliminar">';
-                    }
+                        return data === 0 ? '<input type="checkbox" name="check">' : '<input type="checkbox" checked="checked" name="check">';
                 }
-            },
-            {
-                targets: [-2],
-                class: 'text-center',
-                width: '10%',
-                orderable: false,
-                render: function (data, type, row) {
-                    if (row.nombre === 'compra' || row.nombre === 'venta' || row.nombre === 'devolucion' || row.nombre === 'inventario' || row.nombre === 'reportes') {
-                        return ''
-                    } else {
-                        return data === 0 ? '<input type="checkbox" name="editar">' : '<input type="checkbox" checked="checked" name="editar">';
-                    }
-
-
-                }
-            },
-            {
-                targets: [-3],
-                class: 'text-center',
-                width: '10%',
-                orderable: false,
-                render: function (data, type, row) {
-                    if (row.nombre === 'empresa' || row.nombre === 'inventario' || row.nombre === 'sitioweb' || row.nombre === 'reportes') {
-                        return '';
-                    } else {
-                        return data === 0 ? '<input type="checkbox" name="agregar">' : '<input type="checkbox" checked="checked" name="agregar">';
-                    }
-
-
-                }
-            },
-            {
-                targets: [-4],
-                class: 'text-center',
-                width: '10%',
-                orderable: false,
-                render: function (data, type, row) {
-                    return data === 0 ? '<input type="checkbox" name="ver">' : '<input type="checkbox" checked="checked" name="ver">';
-
-                }
-            },
+            }
         ]
     });
 }
@@ -119,10 +72,7 @@ function listar_edit() {
                 data: datos.items.modelos,
                 columns: [
                     {data: 'nombre'},
-                    {data: 'view'},
-                    {data: 'add'},
-                    {data: 'change'},
-                    {data: 'delete'},
+                    {data: 'check'}
                 ],
                 columnDefs: [
                     {
@@ -131,53 +81,9 @@ function listar_edit() {
                         width: '10%',
                         orderable: false,
                         render: function (data, type, row) {
-                            if (row.nombre === 'empresa' || row.nombre === 'devolucion' || row.nombre === 'inventario' || row.nombre === 'sitioweb' || row.nombre === 'reportes') {
-                                return ''
-                            } else {
-                                return data === 0 ? '<input type="checkbox" name="eliminar">' : '<input type="checkbox" checked="checked" name="eliminar">';
-                            }
+                                return data === 0 ? '<input type="checkbox" name="check">' : '<input type="checkbox" checked="checked" name="check">';
                         }
-                    },
-                    {
-                        targets: [-2],
-                        class: 'text-center',
-                        width: '10%',
-                        orderable: false,
-                        render: function (data, type, row) {
-                            if (row.nombre === 'compra' || row.nombre === 'venta' || row.nombre === 'devolucion' || row.nombre === 'inventario' || row.nombre === 'reportes') {
-                                return ''
-                            } else {
-                                return data === 0 ? '<input type="checkbox" name="editar">' : '<input type="checkbox" checked="checked" name="editar">';
-                            }
-
-
-                        }
-                    },
-                    {
-                        targets: [-3],
-                        class: 'text-center',
-                        width: '10%',
-                        orderable: false,
-                        render: function (data, type, row) {
-                            if (row.nombre === 'empresa' || row.nombre === 'inventario' || row.nombre === 'sitioweb' || row.nombre === 'reportes') {
-                                return '';
-                            } else {
-                                return data === 0 ? '<input type="checkbox" name="agregar">' : '<input type="checkbox" checked="checked" name="agregar">';
-                            }
-
-
-                        }
-                    },
-                    {
-                        targets: [-4],
-                        class: 'text-center',
-                        width: '10%',
-                        orderable: false,
-                        render: function (data, type, row) {
-                            return data === 0 ? '<input type="checkbox" name="ver">' : '<input type="checkbox" checked="checked" name="ver">';
-
-                        }
-                    },
+                    }
                 ]
             });
 
@@ -273,10 +179,7 @@ $(function () {
                 },
                 columns: [
                     {data: 'nombre'},
-                    {data: 'view'},
-                    {data: 'add'},
-                    {data: 'change'},
-                    {data: 'delete'},
+                    {data: 'check'}
                 ],
                 columnDefs: [
                     {
@@ -285,53 +188,9 @@ $(function () {
                         width: '10%',
                         orderable: false,
                         render: function (data, type, row) {
-                            if (row.nombre === 'empresa' || row.nombre === 'devolucion' || row.nombre === 'inventario' || row.nombre === 'sitioweb' || row.nombre === 'reportes') {
-                                return ''
-                            } else {
-                                return data === 0 ? '<input type="checkbox" name="eliminar" disabled="disabled">' : '<input type="checkbox" checked="checked" name="eliminar" disabled="disabled">';
-                            }
+                                return data === 0 ? '<input type="checkbox" name="check" disabled="disabled">' : '<input type="checkbox" checked="checked" name="check" disabled="disabled">';
                         }
-                    },
-                    {
-                        targets: [-2],
-                        class: 'text-center',
-                        width: '10%',
-                        orderable: false,
-                        render: function (data, type, row) {
-                            if (row.nombre === 'compra' || row.nombre === 'venta' || row.nombre === 'devolucion' || row.nombre === 'inventario' || row.nombre === 'reportes') {
-                                return ''
-                            } else {
-                                return data === 0 ? '<input type="checkbox" name="editar" disabled="disabled">' : '<input type="checkbox" checked="checked" name="editar" disabled="disabled">';
-                            }
-
-
-                        }
-                    },
-                    {
-                        targets: [-3],
-                        class: 'text-center',
-                        width: '10%',
-                        orderable: false,
-                        render: function (data, type, row) {
-                            if (row.nombre === 'empresa' || row.nombre === 'inventario' || row.nombre === 'sitioweb' || row.nombre === 'reportes') {
-                                return '';
-                            } else {
-                                return data === 0 ? '<input type="checkbox" name="agregar" disabled="disabled">' : '<input type="checkbox" checked="checked" name="agregar" disabled="disabled">';
-                            }
-
-
-                        }
-                    },
-                    {
-                        targets: [-4],
-                        class: 'text-center',
-                        width: '10%',
-                        orderable: false,
-                        render: function (data, type, row) {
-                            return data === 0 ? '<input type="checkbox" name="ver" disabled="disabled">' : '<input type="checkbox" checked="checked" name="ver" disabled="disabled">';
-
-                        }
-                    },
+                    }
                 ]
             });
         })
@@ -392,28 +251,10 @@ $(function () {
 
 
     $('#tbldetalle tbody')
-        .on('change', 'input[name="ver"]', function (e) {
+        .on('change', 'input[name="check"]', function (e) {
             e.preventDefault();
             var ver = $(this).is(':checked') ? 1 : 0;
             var tr = dt_nuevo.cell($(this).closest('td, li')).index();
-            datos.items.modelos[tr.row].view = ver;
-        })
-        .on('change', 'input[name="agregar"]', function (e) {
-            e.preventDefault();
-            var agregar = $(this).is(':checked') ? 1 : 0;
-            var tr = dt_nuevo.cell($(this).closest('td, li')).index();
-            datos.items.modelos[tr.row].add = agregar;
-        })
-        .on('change', 'input[name="editar"]', function (e) {
-            e.preventDefault();
-            var editar = $(this).is(':checked') ? 1 : 0;
-            var tr = dt_nuevo.cell($(this).closest('td, li')).index();
-            datos.items.modelos[tr.row].change = editar;
-        })
-        .on('change', 'input[name="eliminar"]', function (e) {
-            e.preventDefault();
-            var eliminar = $(this).is(':checked') ? 1 : 0;
-            var tr = dt_nuevo.cell($(this).closest('td, li')).index();
-            datos.items.modelos[tr.row].delete = eliminar;
+            datos.items.modelos[tr.row].check = ver;
         });
 });

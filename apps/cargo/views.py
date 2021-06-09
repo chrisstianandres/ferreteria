@@ -39,23 +39,11 @@ class Listgroupsview(ListView):
                                                            'provincia', 'producto_base', 'pago_cta_x_cobrar']):
                         nombre = c.model
                         set_add = 0
-                        set_view = 0
-                        set_delete = 0
-                        set_change = 0
                         if c.name == 'grupo':
                             nombre = 'group'
                         add = '{}_{}'.format('add', nombre)
-                        view = '{}_{}'.format('view', nombre)
-                        change = '{}_{}'.format('change', nombre)
-                        delete = '{}_{}'.format('delete', nombre)
                         if Group.objects.filter(permissions__codename=add, id=pk):
                             set_add = 1
-                        if Group.objects.filter(permissions__codename=view, id=pk):
-                            set_view = 1
-                        if Group.objects.filter(permissions__codename=change, id=pk):
-                            set_change = 1
-                        if Group.objects.filter(permissions__codename=delete, id=pk):
-                            set_delete = 1
                         if nombre == 'cta_x_cobrar':
                             nombre = 'cuentas por cobrar'
                         elif nombre == 'databasebackups':
@@ -65,9 +53,7 @@ class Listgroupsview(ListView):
                         elif nombre == 'tipo_gasto':
                             nombre = 'tipo de gasto'
 
-                        data.append({'id': c.id, 'nombre': nombre, 'num': x, 'view': set_view, 'add': set_add,
-                                     'change': set_change, 'delete': set_delete})
-
+                        data.append({'id': c.id, 'nombre': nombre, 'num': x, 'check': set_add})
                         x += 1
             elif action == 'modelos':
                 data = []
@@ -85,8 +71,7 @@ class Listgroupsview(ListView):
                         nombre = 'grupos'
                     elif nombre == 'tipo_gasto':
                         nombre = 'tipo de gasto'
-                    data.append({'id': c.id, 'nombre': nombre, 'num': x, 'view': 0, 'add': 0, 'change': 0,
-                                 'delete': 0})
+                    data.append({'id': c.id, 'nombre': nombre, 'num': x, 'check': 0})
                     x += 1
             else:
                 data['error'] = 'No ha seleccionado una opcion'
@@ -129,8 +114,7 @@ class CrudViewGroup(TemplateView):
                     nombre = c.model
                     if c.name == 'grupo':
                         nombre = 'rol'
-                    data.append({'id': c.id, 'nombre': nombre, 'num': x, 'view': 0, 'add': 0, 'change': 0,
-                                 'delete': 0})
+                    data.append({'id': c.id, 'nombre': nombre, 'num': x, 'check': 0 })
                     x += 1
             elif action == 'add':
                 datos = json.loads(request.POST['permisos'])
@@ -138,23 +122,34 @@ class CrudViewGroup(TemplateView):
                 grupo.name = datos['nombre']
                 grupo.save()
                 for p in datos['modelos']:
-                    if p['add'] == 1:
-                        add = '{}_{}'.format('add', p['nombre'])
-                        permiso_add = Permission.objects.get(codename=add)
-                        grupo.permissions.add(permiso_add.id)
-                    if p['view'] == 1:
-                        view = '{}_{}'.format('view', p['nombre'])
-                        permiso_view = Permission.objects.get(codename=view)
-                        grupo.permissions.add(permiso_view.id)
-                    if p['change'] == 1:
-                        change = '{}_{}'.format('change', p['nombre'])
-                        permiso_change = Permission.objects.get(codename=change)
-                        grupo.permissions.add(permiso_change.id)
-                    if p['delete'] == 1:
-                        delete = '{}_{}'.format('delete', p['nombre'])
-                        permiso_delete = Permission.objects.get(codename=delete)
-                        grupo.permissions.add(permiso_delete.id)
-                    grupo.save()
+                    nombre = p['nombre']
+                    if nombre == 'cuentas por cobrar':
+                        p['nombre'] = 'cta_x_cobrar'
+                    elif nombre == 'respaldos':
+                        p['nombre'] = 'databasebackups'
+                    elif nombre == 'grupos':
+                        p['nombre'] = 'group'
+                    elif nombre == 'tipo de gasto':
+                        p['nombre'] = 'tipo_gasto'
+                    if p['check'] == 1:
+                        if p['nombre'] == 'reportes':
+                            view = '{}_{}'.format('view', p['nombre'])
+                            permiso_view = Permission.objects.get(codename=view)
+                            grupo.permissions.add(permiso_view.id)
+                        else:
+                            add = '{}_{}'.format('add', p['nombre'])
+                            permiso_add = Permission.objects.get(codename=add)
+                            grupo.permissions.add(permiso_add.id)
+                            view = '{}_{}'.format('view', p['nombre'])
+                            permiso_view = Permission.objects.get(codename=view)
+                            grupo.permissions.add(permiso_view.id)
+                            change = '{}_{}'.format('change', p['nombre'])
+                            permiso_change = Permission.objects.get(codename=change)
+                            grupo.permissions.add(permiso_change.id)
+                            delete = '{}_{}'.format('delete', p['nombre'])
+                            permiso_delete = Permission.objects.get(codename=delete)
+                            grupo.permissions.add(permiso_delete.id)
+                        grupo.save()
                 data['resp'] = True
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
@@ -205,27 +200,25 @@ class UpdateViewGroup(UpdateView):
                         p['nombre'] = 'group'
                     elif nombre == 'tipo de gasto':
                         p['nombre'] = 'tipo_gasto'
-                    if p['add'] == 1:
-                        add = '{}_{}'.format('add', p['nombre'])
-                        permiso_add = Permission.objects.get(codename=add)
-                        print(1)
-                        grupo.permissions.add(permiso_add.id)
-                    if p['view'] == 1:
-                        view = '{}_{}'.format('view', p['nombre'])
-                        permiso_view = Permission.objects.get(codename=view)
-                        print(2)
-                        grupo.permissions.add(permiso_view.id)
-                    if p['change'] == 1:
-                        change = '{}_{}'.format('change', p['nombre'])
-                        permiso_change = Permission.objects.get(codename=change)
-                        print(3)
-                        grupo.permissions.add(permiso_change.id)
-                    if p['delete'] == 1:
-                        delete = '{}_{}'.format('delete', p['nombre'])
-                        permiso_delete = Permission.objects.get(codename=delete)
-
-                        grupo.permissions.add(permiso_delete.id)
-                    grupo.save()
+                    if p['check'] == 1:
+                        if p['nombre'] == 'reportes':
+                            view = '{}_{}'.format('view', p['nombre'])
+                            permiso_view = Permission.objects.get(codename=view)
+                            grupo.permissions.add(permiso_view.id)
+                        else:
+                            add = '{}_{}'.format('add', p['nombre'])
+                            permiso_add = Permission.objects.get(codename=add)
+                            grupo.permissions.add(permiso_add.id)
+                            view = '{}_{}'.format('view', p['nombre'])
+                            permiso_view = Permission.objects.get(codename=view)
+                            grupo.permissions.add(permiso_view.id)
+                            change = '{}_{}'.format('change', p['nombre'])
+                            permiso_change = Permission.objects.get(codename=change)
+                            grupo.permissions.add(permiso_change.id)
+                            delete = '{}_{}'.format('delete', p['nombre'])
+                            permiso_delete = Permission.objects.get(codename=delete)
+                            grupo.permissions.add(permiso_delete.id)
+                        grupo.save()
                 data['resp'] = True
             else:
                 data['error'] = 'No ha seleccionado ninguna opción'
