@@ -360,7 +360,7 @@ function menssaje_error_form(title, obj, icon, callback) {
         html = '<p>' + obj + '</p>';
     }
     $.confirm({
-        theme: 'modern',
+        theme: 'supervan',
         icon: icon,
         title: title,
         type: 'red',

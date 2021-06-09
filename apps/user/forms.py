@@ -125,21 +125,23 @@ class UserForm_online(forms.ModelForm):
             # })
 
             self.fields['first_name'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese sus dos nombres', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese un nombre', 'class': 'form-control form-control-user'})
             self.fields['last_name'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese sus dos Apellidos', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese un apellido', 'class': 'form-control form-control-user'})
             self.fields['cedula'].widget = TextInput(
-                attrs={'placeholder': 'Ingrese numero de cedula', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingrese numero de cedula', 'class': 'form-control form-control-user'})
             self.fields['telefono'].widget = TextInput(
-                attrs={'placeholder': 'Ingresa un numero de telefono', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingresa un numero de telefono', 'class': 'form-control form-control-user'})
             self.fields['celular'].widget = TextInput(
-                attrs={'placeholder': 'Ingresa un numero de celular', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingresa un numero de celular', 'class': 'form-control form-control-user'})
             self.fields['email'].widget = TextInput(
-                attrs={'placeholder': 'Ingresa un correo', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingresa un correo', 'class': 'form-control form-control-user'})
             self.fields['username'].widget = TextInput(
-                attrs={'placeholder': 'Ingresa un nombre de usuario', 'class': 'form-control form-rounded'})
+                attrs={'placeholder': 'Ingresa un nombre de usuario', 'class': 'form-control form-control-user'})
+            self.fields['password'].widget = TextInput(
+                attrs={'placeholder': 'Ingresa una contraseña','type':"password" , 'class': 'form-control form-control-user'})
             self.fields['sexo'].widget.attrs = {
-                'class': 'form-control select2'
+                'class': 'form-control'
             }
             # self.fields["fecha_nacimiento"].widget = SelectDateWidget(years=years,
             #                                                         attrs={'class': 'selectpicker'})
@@ -170,7 +172,6 @@ class UserForm_online(forms.ModelForm):
             'direccion': 'Direccion',
             'password': 'Contraseña',
 
-
         }
         widgets = {
             'username': forms.TextInput(),
@@ -182,7 +183,7 @@ class UserForm_online(forms.ModelForm):
             'telefono': forms.TextInput(),
             'celular': forms.TextInput(),
             'direccion': forms.Textarea(),
-            'password': forms.PasswordInput(attrs={'class': 'form-control'}, render_value=True)
+            'password': forms.PasswordInput(attrs={'class': 'form-control form-control-user'}, render_value=True),
         }
 
     @transaction.atomic()
@@ -199,26 +200,8 @@ class UserForm_online(forms.ModelForm):
                     user = User.objects.get(pk=u.pk)
                     if user.password != pwd:
                         u.set_password(pwd)
-                nombres = self.cleaned_data['first_name']
-                apellidos = self.cleaned_data['last_name']
-                cedula = self.cleaned_data['cedula']
-                sexo = self.cleaned_data['sexo']
-                telefono = self.cleaned_data['telefono']
-                correo = self.cleaned_data['email']
-                cliente = Cliente(
-                    nombres=nombres,
-                    apellidos=apellidos,
-                    cedula=cedula,
-                    correo=correo,
-                    sexo=sexo,
-                    telefono=telefono,
-                    direccion='Sin direccion'
-                )
-                cliente.save()
                 u.save()
-                grupo = Group.objects.get(name__icontains='cliente')
                 usersave = User.objects.get(id=u.id)
-                usersave.groups.add(grupo)
                 usersave.tipo = 0
                 usersave.save()
             else:
@@ -333,7 +316,7 @@ class ResetPasswordForm(forms.Form):
         cleaned = super().clean()
         if not User.objects.filter(username=cleaned['username']).exists():
             self._errors['error'] = self._errors.get('error', self.error_class())
-            self._errors['error'].append('Usuario inexistente')
+            self._errors['error'].append('Usuario no existe')
         return cleaned
 
     def get_user(self):

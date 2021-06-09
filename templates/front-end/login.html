@@ -37,34 +37,42 @@
                 <div class="card-body p-0">
                     <!-- Nested Row within Card Body -->
                     <div class="row">
-                        <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
-                        <div class="col-lg-6">
+                        {% block clase %}
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                        {% endblock %}
+                        {% block hay %}
+                            <div class="col-lg-6">
                             <div class="p-5">
-                                <div class="text-center">
-                                    <h1 class="h4 text-gray-900 mb-4">Bienvenido!</h1>
-                                </div>
-                                <form class="user" id="form">
-                                    {% csrf_token %}
-                                    <div class="form-group">
-                                        <input type="text" name="username" class="form-control form-control-user"
-                                               id="username" aria-describedby="emailHelp"
-                                               placeholder="Ingresa un nombre de usuario">
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="password" name="password" class="form-control form-control-user"
-                                               id="password" placeholder="Ingresa una contraseña">
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-user btn-block">
-                                        Iniciar Sesion
-                                    </button>
-                                </form>
-                                <hr>
-                                <div class="text-center">
-                                    <a class="small" href="register.html">Olvide mi contraseña</a>
-                                    <p class="text-center"> O </p>
-                                    <a class="small" href="register.html">Crea una cuenta!</a>
-                                </div>
+                        {% endblock %}
+                        {% block form_login %}
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Bienvenido!</h1>
                             </div>
+                            <form class="user" id="form">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input type="text" name="username" class="form-control form-control-user"
+                                           id="username" aria-describedby="emailHelp"
+                                           placeholder="Ingresa un nombre de usuario">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" name="password"
+                                           class="form-control form-control-user"
+                                           id="password" placeholder="Ingresa una contraseña">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                    Iniciar Sesion
+                                </button>
+                            </form>
+                            <hr>
+                            <div class="text-center">
+                                <a class="small" href="{% url 'reset' %}">Olvide mi contraseña</a>
+                                <p class="small"> O </p>
+                                <a class="small" href="{% url 'singnup' %}">Crea una cuenta!</a>
+                            </div>
+                        {% endblock %}
+
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -95,7 +103,10 @@
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.js"></script>
 <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.min.js"></script>
-<script src="{% static 'apps/login.js' %}"></script>
+{% block add %}
+    <script src="{% static 'apps/login.js' %}"></script>
+{% endblock %}
+
 
 </body>
 

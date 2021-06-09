@@ -61,7 +61,8 @@ $(function () {
                 window.$.dialog({
                     icon: 'fa fa-spinner fa-spin',
                     title: 'Iniciando Sesion!',
-                    content: 'Estamos iniciando sesion, por favor espera un momento'
+                    content: 'Estamos iniciando sesion, por favor espera un momento',
+                    buttons: { ok: { isHidden: true}, cancel: { isHidden: true} }
                 });
                 if (key === '0') {
                     if (pagar === '1') {
@@ -93,4 +94,5 @@ $(function () {
         }
     });
 });
+
 

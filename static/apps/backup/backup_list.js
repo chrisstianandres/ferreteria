@@ -104,9 +104,10 @@ $(function () {
                     btnClass: 'btn-blue',
                     action: function () {
                         let obj = $.confirm({
-                            icon: 'fa fa-spinner fa-spin',
-                            title: 'Working!',
-                            content: 'Sit back, we are processing your request!'
+                           icon: 'fa fa-spinner fa-spin',
+                            title: 'Estamos Trabajando!',
+                            content: 'Se esta creando el archivo de respaldo!',
+                            buttons: { ok: { isHidden: true}, cancel: { isHidden: true}, }
                         });
                         $.ajax({
                             dataType: 'JSON',
