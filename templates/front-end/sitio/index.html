@@ -54,7 +54,8 @@
                         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{% url 'menu' %}">Dashboard</a>
                         </li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{% url 'login' %}">Inicia Sesion</a></li>
+                        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{% url 'login' %}">Inicia
+                            Sesion</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link js-scroll-trigger" id="ver_carro" data-toggle="tooltip"
                                             title="Carrito de compras"><i class="fa fa-shopping-cart"></i>
@@ -152,6 +153,17 @@
                         <div class="timeline-body"><p class="text-muted">{{ sitio.vision }}</p></div>
                     </div>
                 </li>
+                <li>
+                    <div class="timeline-image"><img class="rounded-circle img-fluid"
+                                                     src="{% static 'sitio_web/assets/img/about/4.jpg' %}" alt=""/>
+                    </div>
+                    <div class="timeline-panel">
+                        <div class="timeline-heading">
+                            <h4 class="subheading">Acerda de nosotros</h4>
+                        </div>
+                        <div class="timeline-body"><p class="text-muted">{{ sitio.acerca }}</p></div>
+                    </div>
+                </li>
                 <li class="timeline-inverted">
                     <div class="timeline-image">
                         <h4>
@@ -166,19 +178,54 @@
             </ul>
         </div>
     </section>
+    <style>
+        .map-responsive {
+            overflow: hidden;
+            padding-bottom: 56.25%;
+            position: relative;
+            height: 0;
+        }
+
+        .map-responsive iframe {
+            left: 0;
+            top: 0;
+            height: 95%;
+            width: 95%;
+            position: absolute;
+
+        }
+    </style>
+    <div class="row">
+        <div class="container text-center">
+            <h2><i class="fa fa-map-marked"></i> Nuestra Ubicacion</h2>
+            <hr>
+            <br>
+        </div>
+
+    </div>
+<div class="row">
+<div class="col-lg-8 col-sm-8">
+   <div class="map-responsive">
+        {{sitio.coordenadas|safe}}
+    </div>
+</div>
+    <div class="col-lg-4 col-sm-4">
+        <h4>{{ empresa.direccion |upper}}</h4>
+        <h6>{{  empresa.ubicacion.canton.nombre }} - {{ empresa.ubicacion.canton.provincia.nombre |upper}} </h6>
+    </div>
+</div>
 {% endblock %}
 
 {% block Footer %}
     <!-- Footer-->
-     <input type="hidden" value="{{ request.user.id }}" id="user_id">
+    <input type="hidden" value="{{ request.user.id }}" id="user_id">
     <footer class="footer py-4">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-4 text-lg-left">Copyright © Sistemas Expertos 2020-2021</div>
                 <div class="col-lg-4 my-3 my-lg-0">
-                    <a class="btn btn-dark btn-social mx-2" href="#"><i class="fab fa-twitter"></i></a>
-                    <a class="btn btn-dark btn-social mx-2" href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a class="btn btn-dark btn-social mx-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a class="btn btn-dark btn-social mx-2" href="{{ empresa.twitter }}"><i class="fab fa-twitter"></i></a>
+                    <a class="btn btn-dark btn-social mx-2" href="{{ empresa.facebook }}"><i class="fab fa-facebook-f"></i></a>
                 </div>
             </div>
         </div>
@@ -249,7 +296,8 @@
                     {% if request.user.is_authenticated %}
 
                         <div id="paypal_btn" class="centrar">
-                            <button type="button" class="btn btn-blue btn-lg btn-flat col-lg-6 col-sm-10 col-xs-12" style="height: 10%" id="save">
+                            <button type="button" class="btn btn-blue btn-lg btn-flat col-lg-6 col-sm-10 col-xs-12"
+                                    style="height: 10%" id="save">
                                 <i class="far fa-save"></i> Reservar
                                 <span class="ripple ripple-animate"
                                       style="height: 115px; width: 115px; animation-duration: 0.7s;

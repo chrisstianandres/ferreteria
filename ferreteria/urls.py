@@ -32,7 +32,6 @@ urlpatterns = [
     path('singup/', backEnd.SingUpView.as_view(), name='singnup'),
     path('accounts/login/', backEnd.LoginFormView.as_view(), name='login'),
     path('logout/', backEnd.disconnect, name='logout'),
-    # path('connect/', backEnd.connect, name='connect'),
     path('respaldos/', include('apps.DatabaseBackups.urls', namespace='database_backup')),
     path('empresa/', include('apps.empresa.urls', namespace='empresa')),
     path('ubicacion/', include('apps.ubicacion.urls', namespace='ubicacion')),
