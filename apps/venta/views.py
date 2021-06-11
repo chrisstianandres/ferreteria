@@ -537,8 +537,8 @@ class printpdf(View):
                        'empresa': Empresa.objects.first(),
                        'det_sale': self.pvp_cal(),
                        'cta': cta,
+                       'icon': '{}{}'.format(settings.MEDIA_URL, empresa.foto),
                        }
-
             html = template.render(context)
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename="report.pdf"'

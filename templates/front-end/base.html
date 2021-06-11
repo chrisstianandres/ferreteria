@@ -64,6 +64,11 @@
         <!-- Main Content -->
         <div id="content">
             <input type="hidden" name="user_tipo" value="{{ request.user.tipo }}">
+            <input type="hidden" id="id_logo" value="{{ empresa.get_image }}">
+            <input type="hidden" id="id_ruc" value="{{ empresa.ruc }}">
+            <input type="hidden" id="id_direccion" value="{{ empresa.direccion }}">
+            <input type="hidden" id="id_ciudad" value="{{ empresa.ubicacion }}">
+            <input type="hidden" id="id_user" value="{{ request.user.get_full_name }}">
             {% include 'front-end/header.html' %}
 
             {% block content %}

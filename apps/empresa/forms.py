@@ -47,6 +47,7 @@ class EmpresaForm(forms.ModelForm):
         model = Empresa
         fields = ['nombre',
                   'ubicacion',
+                  'foto',
                   'ruc',
                   'correo',
                   'direccion',

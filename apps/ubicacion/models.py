@@ -44,7 +44,7 @@ class Parroquia(models.Model):
     nombre = models.CharField(max_length=150)
 
     def __str__(self):
-        return '{} / {} / {}'.format(self.canton.provincia.nombre, self.canton.nombre, self.nombre)
+        return '{} - {} - {}'.format(self.canton.provincia.nombre, self.canton.nombre, self.nombre)
 
     def toJSON(self):
         item = model_to_dict(self)

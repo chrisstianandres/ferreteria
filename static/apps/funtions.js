@@ -6,9 +6,29 @@ const toDataURL = url => fetch(url).then(response => response.blob())
         reader.onerror = reject;
         reader.readAsDataURL(blob)
     }));
-toDataURL('/media/logo_pdf.png').then(dataUrl => {
+
+toDataURL($('#id_logo').val()).then(dataUrl => {
     logotipo = dataUrl;
 });
+const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
+    "Noviembre", "Diciembre"
+];
+var date = new Date();
+
+function formatDateToString(date) {
+    // 01, 02, 03, ... 29, 30, 31
+    var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
+    // 01, 02, 03, ... 10, 11, 12
+    // month < 10 ? '0' + month : '' + month; // ('' + month) for string result
+    var MM = monthNames[date.getMonth()]; //monthNames[d.getMonth()])
+    // 1970, 1971, ... 2015, 2016, ...
+    var yyyy = date.getFullYear();
+    // create the format you want
+    return (dd + " de " + MM + " de " + yyyy);
+}
+
+var jsDate = formatDateToString(date);
+
 
 function mostrar() {
     $('#div_table').removeClass('col-xl-12').addClass('col-xl-8 col-lg-12');
@@ -397,171 +417,228 @@ function borrar_producto_carito(title, content, callback) {
 }
 
 
-function customize(doc) {
-    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
-        "Noviembre", "Diciembre"
-    ];
-    var date = new Date();
+// function customize(doc) {
+//     //[izquierda, arriba, derecha, abajo]
+//     doc.pageMargins = [25, 150, 25, 50];
+//     doc.defaultStyle.fontSize = 12;
+//     doc.styles.tableHeader.fontSize = 12;
+//     doc.content[1].table.body[0].forEach(function (h) {
+//         h.fillColor = '#4e73df'
+//     });
+//     doc.styles.title = {color: '#2D1D10', fontSize: '16', alignment: 'center'};
+//     doc['header'] = (function () {
+//         return {
+//             columns: [
+//                 {
+//                     alignment: 'left', image: logotipo, width: 180, height: 100
+//                 },
+//                 {
+//                     text: $('#nombre_empresa').text(), fontSize: 45, alignment: 'center', margin: [-90, 30, 0]
+//                 },
+//             ],
+//             margin: [20, 10, 0, 0],  //[izquierda, arriba, derecha, abajo]
+//
+//
+//         }
+//     });
+//     doc['footer'] = (function (page, pages) {
+//         return {
+//             columns: [
+//                 {
+//                     alignment: 'left',
+//                     text: ['Reporte creado el: ', {text: jsDate.toString()}]
+//                 },
+//                 {
+//                     alignment: 'right',
+//                     text: ['Pagina ', {text: page.toString()}, ' de ', {text: pages.toString()}]
+//                 }
+//             ],
+//             margin: 20
+//         }
+//     });
+//     var objLayout = {};
+//     objLayout['hLineWidth'] = function (i) {
+//         return .5;
+//     };
+//     objLayout['vLineWidth'] = function (i) {
+//         return .5;
+//     };
+//     objLayout['hLineColor'] = function (i) {
+//         return '#000000';
+//     };
+//     objLayout['vLineColor'] = function (i) {
+//         return '#000000';
+//     };
+//     objLayout['paddingLeft'] = function (i) {
+//         return 4;
+//     };
+//     objLayout['paddingRight'] = function (i) {
+//         return 4;
+//     };
+//     doc.content[0].layout = objLayout;
+//     doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+//     doc.styles.tableBodyEven.alignment = 'center';
+//     doc.styles.tableBodyOdd.alignment = 'center';
+// }
 
-    function formatDateToString(date) {
-        // 01, 02, 03, ... 29, 30, 31
-        var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
-        // 01, 02, 03, ... 10, 11, 12
-        // month < 10 ? '0' + month : '' + month; // ('' + month) for string result
-        var MM = monthNames[date.getMonth() + 1]; //monthNames[d.getMonth()])
-        // 1970, 1971, ... 2015, 2016, ...
-        var yyyy = date.getFullYear();
-        // create the format you want
-        return (dd + " de " + MM + " de " + yyyy);
-    }
-
-    var jsDate = formatDateToString(date);
-    //[izquierda, arriba, derecha, abajo]
-    doc.pageMargins = [25, 150, 25, 50];
-    doc.defaultStyle.fontSize = 12;
-    doc.styles.tableHeader.fontSize = 12;
-    doc.content[1].table.body[0].forEach(function (h) {
-        h.fillColor = '#4e73df'
-    });
-    doc.styles.title = {color: '#2D1D10', fontSize: '16', alignment: 'center'};
-    doc['header'] = (function () {
-        return {
-            columns: [
-                {
-                    alignment: 'left', image: logotipo, width: 100, height: 100
-                },
-                {
-                    text: $('#nombre_empresa').text(), fontSize: 45, alignment: 'center', margin: [-90, 30, 0]
-                },
-            ],
-            margin: [20, 10, 0, 0],  //[izquierda, arriba, derecha, abajo]
-
-
-        }
-    });
-    doc['footer'] = (function (page, pages) {
-        return {
-            columns: [
-                {
-                    alignment: 'left',
-                    text: ['Reporte creado el: ', {text: jsDate.toString()}]
-                },
-                {
-                    alignment: 'right',
-                    text: ['Pagina ', {text: page.toString()}, ' de ', {text: pages.toString()}]
-                }
-            ],
-            margin: 20
-        }
-    });
-    var objLayout = {};
-    objLayout['hLineWidth'] = function (i) {
-        return .5;
-    };
-    objLayout['vLineWidth'] = function (i) {
-        return .5;
-    };
-    objLayout['hLineColor'] = function (i) {
-        return '#000000';
-    };
-    objLayout['vLineColor'] = function (i) {
-        return '#000000';
-    };
-    objLayout['paddingLeft'] = function (i) {
-        return 4;
-    };
-    objLayout['paddingRight'] = function (i) {
-        return 4;
-    };
-    doc.content[0].layout = objLayout;
-    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split('');
-    doc.styles.tableBodyEven.alignment = 'center';
-    doc.styles.tableBodyOdd.alignment = 'center';
-}
+// function customize_report(doc) {
+//     //[izquierda, arriba, derecha, abajo]
+//     doc.pageMargins = [25, 180, 25, 50];
+//     doc.defaultStyle.fontSize = 12;
+//     doc.styles.tableHeader.fontSize = 12;
+//     doc.content[1].table.body[0].forEach(function (h) {
+//         h.fillColor = '#4e73df'
+//     });
+//     doc.content[1].table.body[doc.content[1].table.body.length - 1].forEach(function (h) {
+//         h.fillColor = '#4e73df'
+//     });
+//     doc.styles.title = {color: '#2D1D10', fontSize: '16', alignment: 'center'};
+//     var dir = $('#id_direccion').css("font-size", 12);
+//     var ruc = $('#id_ruc').css("font-size", 12);
+//     doc['header'] = (function () {
+//         return {
+//             columns: [
+//                 {
+//                     alignment: 'left', image: logotipo, width: 180, height: 100
+//                 },
+//                 {
+//                     text: $('#nombre_empresa').text() + '\n' + dir.val() + '\n' + ruc.val(),
+//                     fontSize: 25,
+//                     alignment: 'center'
+//                 },
+//             ],
+//             margin: [20, 10, 0, 0],  //[izquierda, arriba, derecha, abajo]
+//
+//
+//         }
+//     });
+//     doc['footer'] = (function (page, pages) {
+//         return {
+//             columns: [
+//                 {
+//                     alignment: 'left',
+//                     text: ['Reporte creado el: ', {text: jsDate.toString()}]
+//                 },
+//                 {
+//                     alignment: 'right',
+//                     text: ['Pagina ', {text: page.toString()}, ' de ', {text: pages.toString()}]
+//                 }
+//             ],
+//             margin: 20
+//         }
+//     });
+//     var objLayout = {};
+//     objLayout['hLineWidth'] = function (i) {
+//         return .5;
+//     };
+//     objLayout['vLineWidth'] = function (i) {
+//         return .5;
+//     };
+//     objLayout['hLineColor'] = function (i) {
+//         return '#000000';
+//     };
+//     objLayout['vLineColor'] = function (i) {
+//         return '#000000';
+//     };
+//     objLayout['paddingLeft'] = function (i) {
+//         return 4;
+//     };
+//     objLayout['paddingRight'] = function (i) {
+//         return 4;
+//     };
+//     doc.content[0].layout = objLayout;
+//     doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split('');
+//     doc.styles.tableBodyEven.alignment = 'center';
+//     doc.styles.tableBodyOdd.alignment = 'center';
+// }
 
 function customize_report(doc) {
-    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre",
-        "Noviembre", "Diciembre"
-    ];
-    var date = new Date();
-
-    function formatDateToString(date) {
-        // 01, 02, 03, ... 29, 30, 31
-        var dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
-        // 01, 02, 03, ... 10, 11, 12
-        // month < 10 ? '0' + month : '' + month; // ('' + month) for string result
-        var MM = monthNames[date.getMonth() + 1]; //monthNames[d.getMonth()])
-        // 1970, 1971, ... 2015, 2016, ...
-        var yyyy = date.getFullYear();
-        // create the format you want
-        return (dd + " de " + MM + " de " + yyyy);
-    }
-
-    var jsDate = formatDateToString(date);
-    //[izquierda, arriba, derecha, abajo]
-    doc.pageMargins = [25, 150, 25, 50];
-    doc.defaultStyle.fontSize = 12;
-    doc.styles.tableHeader.fontSize = 12;
-    doc.content[1].table.body[0].forEach(function (h) {
-        h.fillColor = '#4e73df'
-    });
-    doc.content[1].table.body[doc.content[1].table.body.length - 1].forEach(function (h) {
-        h.fillColor = '#4e73df'
-    });
-    doc.styles.title = {color: '#2D1D10', fontSize: '16', alignment: 'center'};
-    doc['header'] = (function () {
-        return {
-            columns: [
-                {
-                    alignment: 'left', image: logotipo, width: 100, height: 100
-                },
-                {
-                    text: $('#nombre_empresa').text(), fontSize: 45, alignment: 'center', margin: [-90, 30, 0]
-                },
-            ],
-            margin: [20, 10, 0, 0],  //[izquierda, arriba, derecha, abajo]
-
-
+    doc.styles = {
+        header: {
+            fontSize: 30,
+            bold: true,
+            alignment: 'center'
+        },
+        subheader: {
+            fontSize: 13,
+            bold: true
+        },
+        quote: {
+            italics: true
+        },
+        small: {
+            fontSize: 8
+        },
+        tableHeader: {
+            bold: true,
+            fontSize: 11,
+            color: 'white',
+            fillColor: '#4e73df',
+            alignment: 'center'
         }
+    };
+    doc.content.splice(0, 0, {
+        margin: [0, -5, 0, 12],
+        width: 250, height: 100,
+        alignment: 'center',
+        image: logotipo
     });
+    doc.content.splice(1, 0, {
+        text: $('#nombre_empresa').text(),
+        style: 'header',
+    });
+    doc.content.splice(2, 0, {
+        alignment: 'center',
+        text: 'Direccion: ' + $('#id_direccion').val(),
+        style: 'subheader'
+    });
+    doc.content.splice(3, 0, {
+        alignment: 'center',
+        text: 'Ruc: ' + $('#id_ruc').val(),
+        style: 'subheader'
+    });
+    doc.content.splice(4, 0, {
+        alignment: 'center',
+        text: $('#id_ciudad').val(),
+        style: 'small'
+    });
+    doc.content.splice(5, 0, {
+        text: 'Reporte generado por: '+$('#id_user').val(),
+        style: 'subheader',
+        margin: [0, 0, 0, 20],
+    });
+    doc.content.splice(8, 0, {
+        margin: [0, 50, 0, 12],
+        text: '___________________________________',
+        style: 'subheader',
+         alignment: 'center',
+    });
+    doc.content.splice(9, 0, {
+        margin: [0, 0, 0, 0],
+        text: 'Firma del reponsable del reporte',
+        style: 'subheader',
+         alignment: 'center',
+    });
+    doc.styles.title = {fontSize: '25', alignment: 'center'};
+    console.log(doc.styles.title);
+    doc.content[7].table.widths = Array(doc.content[7].table.body[0].length + 1).join('*').split('');
+    doc.content[7].margin = [0, 35, 0, 0];
+    doc.content[7].layout = {};
     doc['footer'] = (function (page, pages) {
         return {
             columns: [
                 {
                     alignment: 'left',
-                    text: ['Reporte creado el: ', {text: jsDate.toString()}]
+                    text: ['Reporte generado el: ', {text: jsDate.toString()}]
                 },
                 {
                     alignment: 'right',
-                    text: ['Pagina ', {text: page.toString()}, ' de ', {text: pages.toString()}]
+                    text: ['página ', {text: page.toString()}, ' de ', {text: pages.toString()}]
                 }
             ],
             margin: 20
         }
     });
-    var objLayout = {};
-    objLayout['hLineWidth'] = function (i) {
-        return .5;
-    };
-    objLayout['vLineWidth'] = function (i) {
-        return .5;
-    };
-    objLayout['hLineColor'] = function (i) {
-        return '#000000';
-    };
-    objLayout['vLineColor'] = function (i) {
-        return '#000000';
-    };
-    objLayout['paddingLeft'] = function (i) {
-        return 4;
-    };
-    objLayout['paddingRight'] = function (i) {
-        return 4;
-    };
-    doc.content[0].layout = objLayout;
-    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split('');
-    doc.styles.tableBodyEven.alignment = 'center';
-    doc.styles.tableBodyOdd.alignment = 'center';
 }
 
 
@@ -658,8 +735,8 @@ function year_footer() {
 
 function reloj() {
     var fecha_js = new Date;
-    var segundos = fecha_js.getSeconds()<= 9 ? '0' + fecha_js.getSeconds() : fecha_js.getSeconds();
-    var hora = fecha_js.getHours()<= 9 ? '0' + fecha_js.getHours() : fecha_js.getHours();
+    var segundos = fecha_js.getSeconds() <= 9 ? '0' + fecha_js.getSeconds() : fecha_js.getSeconds();
+    var hora = fecha_js.getHours() <= 9 ? '0' + fecha_js.getHours() : fecha_js.getHours();
     var minutos = fecha_js.getMinutes() <= 9 ? '0' + fecha_js.getMinutes() : fecha_js.getMinutes();
 
     // segundos++;

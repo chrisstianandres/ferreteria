@@ -30,6 +30,7 @@ def editar(request):
         try:
             data = {}
             dato = request.POST
+            foto = request.FILES
             if dato:
                 config.nombre = dato['nombre']
                 config.ubicacion_id = dato['ubicacion']
@@ -43,6 +44,8 @@ def editar(request):
                 config.iva = dato['iva']
                 config.indice = dato['indice']
                 config.tasa = dato['tasa']
+                if foto:
+                    config.foto = foto['foto']
                 config.save()
                 data['resp'] = True
                 return JsonResponse(data, safe=False)

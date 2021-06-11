@@ -82,7 +82,7 @@ $(function () {
                         search: 'applied',
                         order: 'applied'
                     },
-                    customize: customize_report
+                    customize: customize_report,
                 },
                 {
                     text: '<i class="far fa-file-excel"></i> Excel</i>', className: "btn btn-success my_class",
