@@ -1,10 +1,11 @@
-from django.conf.urls import url
-from django.urls import path
-from . import views
 from django.contrib.auth.decorators import login_required
+from django.urls import path
+
+from apps.empresa.views import editar
+
 app_name = 'Empresa'
 
 urlpatterns = [
-    path('configuracion/', login_required(views.editar), name='editar'),
+    path('configuracion/', login_required(editar.as_view()), name='editar'),
 
 ]
