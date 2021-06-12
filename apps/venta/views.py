@@ -1,3 +1,4 @@
+import base64
 import datetime as dt
 import json
 import locale
@@ -34,6 +35,8 @@ from apps.user.forms import UserForm
 from apps.user.models import User
 from apps.venta.forms import Detalle_VentaForm, VentaForm
 from apps.venta.models import Venta, Detalle_venta
+from django.core.files.base import ContentFile
+
 
 opc_icono = 'fa fa-shopping-basket '
 opc_entidad = 'Ventas'
@@ -528,6 +531,8 @@ class printpdf(View):
         try:
             template = get_template('front-end/report/pdf.html')
             sale = Venta.objects.get(pk=self.kwargs['pk'])
+            txt = '{}{}'.format('media/', empresa.foto)
+            logo = self.base64_file(str(txt))
             if sale.tipo_pago == 1:
                 cta = Cta_x_cobrar.objects.get(venta_id=sale.id)
             else:
@@ -537,7 +542,7 @@ class printpdf(View):
                        'empresa': Empresa.objects.first(),
                        'det_sale': self.pvp_cal(),
                        'cta': cta,
-                       'icon': '{}{}'.format(settings.MEDIA_URL, empresa.foto),
+                       'icon': logo,
                        }
             html = template.render(context)
             response = HttpResponse(content_type='application/pdf')
@@ -548,6 +553,11 @@ class printpdf(View):
             pass
             print(e)
         return HttpResponseRedirect(reverse_lazy('venta:lista'))
+
+    def base64_file(self, data):
+        with open(data, "rb") as img_file:
+            b64_string = base64.b64encode(img_file.read())
+        return 'data:image/png;base64,{}'.format(b64_string)
 
 
 @csrf_exempt

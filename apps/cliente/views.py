@@ -113,7 +113,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 class report(ValidatePermissionRequiredMixin, ListView):
     model = Cliente
     template_name = 'front-end/cliente/report.html'
-    permission_required = 'cliente.view_cliente'
+    permission_required = 'view_reportes'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -131,10 +131,9 @@ class report(ValidatePermissionRequiredMixin, ListView):
             end_date = request.POST.get('end_date', '')
             try:
                 if start_date == '' and end_date == '':
-                    query = Cliente.objects.all()
+                    query = User.objects.filter(tipo=0)
                 else:
-                    query = Cliente.objects.filter(fecha__range=[start_date, end_date])
-
+                    query = User.objects.filter(date_joined__range=[start_date, end_date], tipo=0)
                 for p in query:
                     data.append(p.toJSON())
             except:

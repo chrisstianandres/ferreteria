@@ -118,8 +118,8 @@ class report(ValidatePermissionRequiredMixin, ListView):
             data['icono'] = opc_icono
             data['entidad'] = opc_entidad
             data['boton'] = 'Nuevo Producto'
-            data['titulo'] = 'Listado de Productos'
-            data['nuevo'] = '/producto/nuevo'
+            data['titulo'] = 'Reporte de Stock de Productos'
+            data['titulo_lista'] = 'Listado de Productos'
             data['empresa'] = empresa
             return data
 
