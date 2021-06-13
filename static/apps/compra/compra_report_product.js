@@ -9,10 +9,10 @@ var datos = {
         if (data.key === 1) {
             this.fechas['start_date'] = data.startDate.format('YYYY-MM-DD');
             this.fechas['end_date'] = data.endDate.format('YYYY-MM-DD');
-        } else if (data.key === 2) {
+        } else if (data.key === 0) {
             this.fechas['start_date'] = data.start_date;
             this.fechas['end_date'] = data.end_date;
-        } else if (data.key === 3) {
+        } else if (data.key === 2) {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
             this.fechas['id'] = data.id;
@@ -21,6 +21,12 @@ var datos = {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
         }
+        let obj = $.confirm({
+            icon: 'fa fa-spinner fa-spin',
+            title: 'Un momento por favor!',
+            content: 'Se esta cargando la informacion!',
+            buttons: {ok: {isHidden: true}, cancel: {isHidden: true},}
+        });
 
         $.ajax({
             url: window.location.pathname,
@@ -29,13 +35,13 @@ var datos = {
             success: function (data) {
                 datatable.clear();
                 datatable.rows.add(data).draw();
+                obj.close();
             }
         });
 
     },
 };
 $(function () {
-    daterange();
     datatable = $("#datatable").DataTable({
         destroy: true,
         scrollX: true,
@@ -159,7 +165,11 @@ $(function () {
             $('#year_seccion').hide();
             $('#producto_seccion').show();
             $('#range_date').hide();
-        } else {
+        } else if ($(this).val() === '3') {
+            $('#year_seccion').hide();
+            $('#producto_seccion').hide();
+            $('#range_date').hide();
+        }  else {
             $('#year_seccion').hide();
             $('#producto_seccion').hide();
             $('#range_date').show();
@@ -192,23 +202,27 @@ function daterange() {
 
         })
         .on('cancel.daterangepicker', function (ev, picker) {
-            picker['key'] = 0;
+            picker['key'] = 1;
             datos.add(picker);
         });
-
+    var picker = {};
     if ($('#search').val() === '0') {
-        var picker = {};
         var year = $('#year1').val();
-        picker['key'] = 2;
+        picker['key'] = 0;
         picker['start_date'] = year + '-01-01';
         picker['end_date'] = year + '-12-31';
         datos.add(picker);
     } else if ($('#search').val() === '2') {
         var pic2 = {};
-        pic2['key'] = 3;
+        pic2['key'] = 2;
         pic2['start_date'] = '';
         pic2['end_date'] = '';
         pic2['id'] = $('#producto_id').val();
         datos.add(pic2);
+    } else {
+        picker['key'] = 3;
+        picker['start_date'] = '';
+        picker['end_date'] = '';
+        datos.add(picker);
     }
 }

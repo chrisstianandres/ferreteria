@@ -1,28 +1,38 @@
+var year = $('#year1').val();
 var datos = {
     fechas: {
-        'start_date': '',
-        'end_date': '',
+        'start_date': year + '-01-01',
+        'end_date': year + '-12-31',
         'tipo': 0,
         'action': 'report',
         'id': ''
     },
     add: function (data) {
         if (data.key === 1) {
+            this.fechas['action'] = 'report';
             this.fechas['start_date'] = data.startDate.format('YYYY-MM-DD');
             this.fechas['end_date'] = data.endDate.format('YYYY-MM-DD');
-        } else if (data.key === 2) {
+        } else if (data.key === 0) {
+            this.fechas['action'] = 'report';
             this.fechas['start_date'] = data.start_date;
             this.fechas['end_date'] = data.end_date;
-        } else if (data.key === 3) {
+        } else if (data.key === 2) {
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
             this.fechas['id'] = data.id;
             this.fechas['action'] = 'cliente';
         } else {
+            this.fechas['action'] = 'report';
             this.fechas['start_date'] = '';
             this.fechas['end_date'] = '';
-        }
 
+        }
+        let obj = $.confirm({
+            icon: 'fa fa-spinner fa-spin',
+            title: 'Un momento por favor!',
+            content: 'Se esta cargando la informacion!',
+            buttons: {ok: {isHidden: true}, cancel: {isHidden: true},}
+        });
         $.ajax({
             url: window.location.pathname,
             type: 'POST',
@@ -30,13 +40,13 @@ var datos = {
             success: function (data) {
                 datatable.clear();
                 datatable.rows.add(data).draw();
+                obj.close();
             }
         });
 
     },
 };
 $(function () {
-    daterange();
     datatable = $("#datatable").DataTable({
         destroy: true,
         responsive: true,
@@ -78,7 +88,7 @@ $(function () {
                     pageSize: 'A4', //A3 , A5 , A6 , legal , letter
                     download: 'open',
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6],
+                        columns: [0, 1, 2, 3, 4, 5, 6, 7],
                         search: 'applied',
                         order: 'applied'
                     },
@@ -93,6 +103,7 @@ $(function () {
         },
         columns: [
             {data: 'cta_cobrar.venta.cliente.full_name'},
+            {data: "cta_cobrar.venta.fecha"},
             {data: "fecha"},
             {data: "fecha_pago"},
             {data: "valor"},
@@ -111,7 +122,6 @@ $(function () {
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    console.log(row);
                     return '$' + parseFloat(data).toFixed(2);
                 }
             },
@@ -129,57 +139,47 @@ $(function () {
                     }
                     return span;
                 }
-            },
-            {
-                targets: [2],
-                render: function (data, type, row) {
-                    var span = data;
-                    if (row.estado === 0) {
-                        span = '<span class="badge bg-warning" style="color:white">' + row.estado_text + '</span>';
-                    }
-                    return span;
-                }
-            },
+            }
         ],
         footerCallback: function (row, start, end, display) {
             var api = this.api();
             // Remove the formatting to get integer data for summation
             var intVal = function (i) {
                 return typeof i === 'string' ?
-                    i.replace(/[\$,]/g, '') * 1 :
+                    i.replace(/[$,]/g, '') * 1 :
                     typeof i === 'number' ?
                         i : 0;
             };
             // Total over this page
-            pageTotalsiniva = api.column(3, {page: 'current'}).data().reduce(function (a, b) {
+            pageTotalsiniva = api.column(4, {page: 'current'}).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
-            totaliva = api.column(3).data().reduce(function (a, b) {
+            totaliva = api.column(4).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
-            pageTotaliva = api.column(4, {page: 'current'}).data().reduce(function (a, b) {
-                return intVal(a) + intVal(b);
-            }, 0);
-            totalconiva = api.column(4).data().reduce(function (a, b) {
-                return intVal(a) + intVal(b);
-            }, 0);
-            pageTotalconiva = api.column(5, {page: 'current'}).data().reduce(function (a, b) {
+            pageTotaliva = api.column(5, {page: 'current'}).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
             totalconiva = api.column(5).data().reduce(function (a, b) {
                 return intVal(a) + intVal(b);
             }, 0);
+            pageTotalconiva = api.column(6, {page: 'current'}).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
+            totalconiva = api.column(6).data().reduce(function (a, b) {
+                return intVal(a) + intVal(b);
+            }, 0);
 
             // Update footer
-            $(api.column(3).footer()).html(
+            $(api.column(4).footer()).html(
                 '$' + parseFloat(pageTotalsiniva).toFixed(2) + '( $ ' + parseFloat(pageTotalsiniva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
-            $(api.column(4).footer()).html(
+            $(api.column(5).footer()).html(
                 '$' + parseFloat(pageTotaliva).toFixed(2) + '( $ ' + parseFloat(pageTotaliva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
-            $(api.column(5).footer()).html(
+            $(api.column(6).footer()).html(
                 '$' + parseFloat(pageTotalconiva).toFixed(2) + '( $ ' + parseFloat(pageTotalconiva).toFixed(2) + ')'
                 // parseFloat(data).toFixed(2)
             );
@@ -193,6 +193,10 @@ $(function () {
             $('#range_date').hide();
             $('#producto_seccion').hide();
 
+        } else if ($(this).val() === '1') {
+            $('#year_seccion').hide();
+            $('#producto_seccion').hide();
+            $('#range_date').show();
         } else if ($(this).val() === '2') {
             $('#year_seccion').hide();
             $('#producto_seccion').show();
@@ -200,7 +204,7 @@ $(function () {
         } else {
             $('#year_seccion').hide();
             $('#producto_seccion').hide();
-            $('#range_date').show();
+            $('#range_date').hide();
         }
     });
     $('#year1').on('change', function () {
@@ -208,12 +212,14 @@ $(function () {
     });
     $('#cliente_id').on('change', function () {
         daterange()
-    })
+    });
+    $('#fecha').on('apply.daterangepicker', function (ev, picker) {
+        picker['key'] = 1;
+        datos.add(picker);
+    });
 });
 
 function daterange() {
-
-    // $("div.toolbar").html('<br><div class="col-lg-3"><input type="text" name="fecha" class="form-control form-control-sm input-sm"></div> <br>');
     $('input[name="fecha"]').daterangepicker({
         locale: {
             format: 'YYYY-MM-DD',
@@ -224,29 +230,34 @@ function daterange() {
     })
         .on('apply.daterangepicker', function (ev, picker) {
             picker['key'] = 1;
-            console.log(picker);
             datos.add(picker);
             // filter_by_date();
 
         })
         .on('cancel.daterangepicker', function (ev, picker) {
-            picker['key'] = 0;
+            picker['key'] = 1;
             datos.add(picker);
         });
-
-    if ($('#search').val() === '0') {
-        var picker = {};
+    var picker = {};
+    var search = $('#search').val();
+    if (search === '0') {
         var year = $('#year1').val();
-        picker['key'] = 2;
+        picker['key'] = 0;
         picker['start_date'] = year + '-01-01';
         picker['end_date'] = year + '-12-31';
         datos.add(picker);
-    } else if ($('#search').val() === '2') {
-        var pic2 = {};
-        pic2['key'] = 3;
-        pic2['start_date'] = '';
-        pic2['end_date'] = '';
-        pic2['id'] = $('#cliente_id').val();
-        datos.add(pic2);
+    }
+    else if (search === '2') {
+        picker['key'] = 2;
+        picker['start_date'] = '';
+        picker['end_date'] = '';
+        picker['id'] = $('#cliente_id').val();
+        datos.add(picker);
+    }
+    else {
+       picker['key'] = 3;
+       picker['start_date'] = '';
+       picker['end_date'] = '';
+       datos.add(picker);
     }
 }

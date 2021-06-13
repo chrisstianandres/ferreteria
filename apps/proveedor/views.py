@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from django.db.models import Q
 from django.http import HttpResponse
@@ -121,38 +122,49 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 class report(ValidatePermissionRequiredMixin, ListView):
     model = Proveedor
     template_name = 'front-end/proveedor/report.html'
-    permission_required = 'proveedor.view_proveedor'
+    permission_required = 'view_reportes'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Proveedor.objects.none()
+        return self.model.objects.none()
 
     def post(self, request, *args, **kwargs):
         action = request.POST['action']
         if action == 'report':
-            data = []
-            start_date = request.POST.get('start_date', '')
-            end_date = request.POST.get('end_date', '')
+            start_date = request.POST['start_date']
+            end_date = request.POST['end_date']
+            key = request.POST['key']
+            data = {}
             try:
-                if start_date == '' and end_date == '':
-                    query = Proveedor.objects.all()
+                data = []
+                if key == '0' or key == '2':
+                    query = self.model.objects.filter(fecha__range=[start_date, end_date])
+                elif key == '1':
+                    query = self.model.objects.filter(fecha__year=start_date, fecha__month=end_date)
+                elif key == '4':
+                    if start_date != '':
+                        query = self.model.objects.filter(nombre__icontains=str(start_date))
+                    else:
+                        query = self.model.objects.none()
                 else:
-                    query = Proveedor.objects.filter(fecha__range=[start_date, end_date])
+                    query = self.model.objects.all()
                 for p in query:
                     data.append(p.toJSON())
-            except:
-                pass
+            except Exception as e:
+                data['error'] = str(e)
             return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
-        data['entidad'] = opc_entidad
+        data['entidad'] = 'Reporte de Proveedores'
         data['titulo'] = 'Reporte de Proveedores'
         data['empresa'] = empresa
+        data['titulo_lista'] = 'Listado de Proveedores'
+        data['years'] = [{'id': y, 'year': datetime.now().year - y} for y in range(0, 5)]
         return data
 
 

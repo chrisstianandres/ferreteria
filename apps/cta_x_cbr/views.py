@@ -219,7 +219,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 class report(ValidatePermissionRequiredMixin, ListView):
     model = Pago_cta_x_cobrar
     template_name = 'front-end/pago/report.html'
-    permission_required = 'venta.view_venta'
+    permission_required = 'view_reportes'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -235,24 +235,20 @@ class report(ValidatePermissionRequiredMixin, ListView):
             end_date = request.POST.get('end_date', '')
             action = request.POST['action']
             print(action)
+            print(start_date)
+            print(end_date)
             if action == 'report':
                 data = []
                 if start_date == '' and end_date == '':
-                    query = Pago_cta_x_cobrar.objects.all()
+                    query = Pago_cta_x_cobrar.objects.all().select_related('cta_cobrar')
                 else:
-                    query = Pago_cta_x_cobrar.objects.filter(fecha_pago__range=[start_date, end_date])
-                for p in query:
-                    data.append(p.toJSON())
-
-            elif action == 'cliente':
-                id = request.POST.get('id', '')
-                print(User.objects.get(id=id))
-                data = []
-                query = Pago_cta_x_cobrar.objects.filter(cta_cobrar__venta__cliente_id=id)
-                for p in query:
-                   data.append(p.toJSON())
+                    query = Pago_cta_x_cobrar.objects.filter(cta_cobrar__venta__fecha__range=[start_date, end_date]).select_related('cta_cobrar')
             else:
-                data['error'] = 'No ha seleccionado una opcion'
+                id = request.POST.get('id', '')
+                data = []
+                query = Pago_cta_x_cobrar.objects.filter(cta_cobrar__venta__cliente_id=id).select_related('cta_cobrar')
+            for p in query:
+                data.append(p.toJSON())
         except Exception as e:
             print(e)
             data['error'] = str(e)

@@ -654,7 +654,7 @@ def datachartcontr():
 class report(ValidatePermissionRequiredMixin, ListView):
     model = Venta
     template_name = 'front-end/venta/report_product.html'
-    permission_required = 'venta.view_venta'
+    permission_required = 'view_reportes'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):

@@ -620,7 +620,6 @@ function customize_report(doc) {
          alignment: 'center',
     });
     doc.styles.title = {fontSize: '25', alignment: 'center'};
-    console.log(doc.styles.title);
     doc.content[7].table.widths = Array(doc.content[7].table.body[0].length + 1).join('*').split('');
     doc.content[7].margin = [0, 35, 0, 0];
     doc.content[7].layout = {};

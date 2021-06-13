@@ -298,7 +298,7 @@ class printpdf(ValidatePermissionRequiredMixin, View):
 class report(ValidatePermissionRequiredMixin, ListView):
     model = Compra
     template_name = 'front-end/compra/report_product.html'
-    permission_required = 'compra.view_compra'
+    permission_required = 'view_reportes'
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -323,7 +323,7 @@ class report(ValidatePermissionRequiredMixin, ListView):
                 else:
                     query = (Detalle_compra.objects.values('compra__fecha_compra', 'producto__producto_base__nombre',
                                                            'p_compra_actual', 'compra__proveedor__nombre').
-                        filter(compra__fecha_compra__range=[start_date, end_date]).order_by().annotate(
+                        filter(compra__fecha_compra__range=[start_date, end_date], compra__estado=1).order_by().annotate(
                         Sum('cantidad'))).annotate(Sum('compra__total'))
                 for p in query:
                     data.append([
@@ -368,50 +368,3 @@ class report(ValidatePermissionRequiredMixin, ListView):
         return data
 
 
-class report_total(ValidatePermissionRequiredMixin, ListView):
-    model = Compra
-    template_name = 'front-end/compra/compra_report_total.html'
-    permission_required = 'compra.view_compra'
-
-    @csrf_exempt
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return Compra.objects.none()
-
-    def post(self, request, *args, **kwargs):
-        data = {}
-        try:
-            start_date = request.POST.get('start_date', '')
-            end_date = request.POST.get('end_date', '')
-            action = request.POST['action']
-            if action == 'report':
-                data = []
-                if start_date == '' and end_date == '':
-                    query = Compra.objects.values('fecha_compra', 'proveedor__nombre', 'user__username', ).order_by(). \
-                        annotate(Sum('total'))
-                else:
-                    query = Compra.objects.values('fecha_compra', 'proveedor__nombre', 'user__username').filter(
-                        fecha_compra__range=[start_date, end_date]).order_by(). \
-                        annotate(Sum('total'))
-                for p in query:
-                    data.append([
-                        p['fecha_compra'].strftime("%d/%m/%Y"),
-                        p['proveedor__nombre'],
-                        p['user__username'],
-                        format(p['total__sum'], '.2f')
-                    ])
-            else:
-                data['error'] = 'No ha seccionado una opcion'
-        except Exception as e:
-            data['error'] = str(e)
-        return JsonResponse(data, safe=False)
-
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        data['icono'] = opc_icono
-        data['entidad'] = opc_entidad
-        data['titulo'] = 'Reporte de Compras Totales'
-        data['empresa'] = empresa
-        return data

@@ -1,5 +1,5 @@
 import json
-import os
+from datetime import datetime
 
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import *
 
-from apps.backEnd import nombre_empresa, verificar
+from apps.backEnd import nombre_empresa
 from apps.cliente.forms import ClienteForm
 from apps.cliente.models import Cliente
 from apps.mixins import ValidatePermissionRequiredMixin
@@ -111,7 +111,7 @@ class CrudView(ValidatePermissionRequiredMixin, TemplateView):
 
 
 class report(ValidatePermissionRequiredMixin, ListView):
-    model = Cliente
+    model = User
     template_name = 'front-end/cliente/report.html'
     permission_required = 'view_reportes'
 
@@ -120,32 +120,43 @@ class report(ValidatePermissionRequiredMixin, ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Cliente.objects.none()
+        return self.model.objects.none()
 
     def post(self, request, *args, **kwargs):
-        data = {}
         action = request.POST['action']
         if action == 'report':
-            data = []
-            start_date = request.POST.get('start_date', '')
-            end_date = request.POST.get('end_date', '')
+            start_date = request.POST['start_date']
+            end_date = request.POST['end_date']
+            key = request.POST['key']
+            data = {}
             try:
-                if start_date == '' and end_date == '':
-                    query = User.objects.filter(tipo=0)
+                data = []
+                if key == '0' or key == '2':
+                    query = self.model.objects.filter(date_joined__range=[start_date, end_date], tipo=0)
+                elif key == '1':
+                    query = self.model.objects.filter(date_joined__year=start_date, date_joined__month=end_date, tipo=0)
+                elif key == '4':
+                    if start_date != '':
+                        query = self.model.objects.filter(Q(first_name__icontains=str(start_date)) | Q(last_name__icontains=str(start_date)), tipo=0)
+                    else:
+                        query = self.model.objects.none()
                 else:
-                    query = User.objects.filter(date_joined__range=[start_date, end_date], tipo=0)
+                    query = self.model.objects.filter(tipo=0)
                 for p in query:
                     data.append(p.toJSON())
-            except:
-                pass
+            except Exception as e:
+                data['error'] = str(e)
             return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
-        data['entidad'] = opc_entidad
+        data['entidad'] = 'Reporte de Clientes'
         data['titulo'] = 'Reporte de Clientes'
         data['empresa'] = empresa
+        data['titulo_lista'] = 'Listado de Clientes'
+        data['years'] = [{'id': y, 'year': datetime.now().year - y} for y in range(0, 5)]
+        data['names'] = [{'id': n.id, 'full_name': n.get_full_name} for n in self.model.objects.filter(tipo=0)]
         return data
 
 
