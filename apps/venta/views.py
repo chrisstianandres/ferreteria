@@ -43,7 +43,7 @@ opc_entidad = 'Ventas'
 crud = '/venta/crear'
 empresa = nombre_empresa()
 year = [{'id': y, 'year': (datetime.now().year) - y} for y in range(0, 5)]
-producto = [{'id': p.id, 'nombre': p.producto_base.nombre} for p in Producto.objects.all()]
+# producto = [{'id': p.id, 'nombre': p.producto_base.nombre} for p in Producto.objects.all()]
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):

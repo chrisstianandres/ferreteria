@@ -23,7 +23,7 @@ opc_entidad = 'Cuentas por Cobrar'
 crud = '/ctas_cobrar/nuevo'
 empresa = nombre_empresa()
 year = [{'id': y, 'year': (datetime.now().year) - y} for y in range(0, 5)]
-cliente = [{'id': p.id, 'nombre': p.get_full_name} for p in User.objects.filter(tipo=0)]
+# cliente = [{'id': p.id, 'nombre': p.get_full_name} for p in User.objects.filter(tipo=0)]
 
 
 class lista(ValidatePermissionRequiredMixin, ListView):

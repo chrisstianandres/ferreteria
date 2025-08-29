@@ -10,9 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='empresa',
-            name='tasa',
-            field=models.IntegerField(blank=True, default=16, null=True),
-        ),
     ]
