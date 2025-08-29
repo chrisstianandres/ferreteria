@@ -102,9 +102,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'bd_ferreteria',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
+        'USER': 'cgomezm3',
+        'PASSWORD': '1Soloperofeliz',
+        'HOST': 'cgomezm3.mysql.pythonanywhere-services.com',
         'PORT': '3306',
         'STORAGE_ENGINE': 'MyISAM / INNODB / ETC'
     }
