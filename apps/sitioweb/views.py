@@ -58,7 +58,6 @@ class lista(ValidatePermissionRequiredMixin, ListView):
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
-        empresa = nombre_empresa()
         data = super().get_context_data(**kwargs)
         data['icono'] = opc_icono
         data['entidad'] = opc_entidad
@@ -115,6 +114,7 @@ class sitio(TemplateView):
     form_class = SitiowebForm
     template_name = 'front-end/sitio/index.html'
     model = SitioWeb
+    empresa = nombre_empresa()
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
