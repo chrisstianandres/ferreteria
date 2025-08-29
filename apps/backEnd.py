@@ -26,9 +26,8 @@ from apps.empresa.models import Empresa
 
 
 def nombre_empresa():
-    if Empresa.objects.filter(id=1).exists():
-        empresa = Empresa.objects.first()
-    else:
+    empresa = Empresa.objects.first()
+    if not empresa:
         empresa = {'nombre': 'Sin nombre'}
     return empresa
 
